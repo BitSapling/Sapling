@@ -2,40 +2,66 @@ package com.ghostchu.sapling.domain.entity;
 
 import com.ghostchu.sapling.domain.type.PeerConnectableType;
 import com.ghostchu.sapling.domain.type.PeerNetworkType;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.Objects;
 
+@Entity
+@Table(name = "peers")
 public class Peer {
-    private final long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private long id;
+    @Column(name = "user_id")
+    private long userId;
+    @Column(name = "client_slug")
     @Nullable
     private String clientSlug;
+    @Column(name = "peer_id")
     @Nullable
     private String peerId;
+    @Column(name = "network_type")
     @Nullable
     private PeerNetworkType networkType;
+    @Column(name = "ipv4")
     @Nullable
     private String ipv4;
+    @Column(name = "ipv6")
     @Nullable
     private String ipv6;
+    @Column(name = "port")
     private int port;
+    @Column(name = "uploaded")
     private long uploaded;
+    @Column(name = "actual_uploaded")
     private long actualUploaded;
+    @Column(name = "downloaded")
     private long downloaded;
+    @Column(name = "actual_downloaded")
     private long actualDownloaded;
+    @Column(name = "seeder")
     private boolean seeder;
+    @Column(name = "start_time")
     @NotNull
     private Date startTime;
+    @Column(name = "last_activity")
     @NotNull
     private Date lastActivity;
+    @Column(name = "prev_activity")
     @NotNull
     private Date prevActivity;
+    @Column(name = "connectable")
     @NotNull
     private PeerConnectableType connectable;
+    @Column(name = "downloaded_offset")
     private long downloadedOffset;
+    @Column(name = "uploaded_offset")
     private long uploadedOffset;
+    @Column(name = "left")
     private long left;
 
     public Peer(long userId, @Nullable String peerId, @Nullable String clientSlug, @Nullable String ipv4, @Nullable String ipv6, int port, boolean seeder, @NotNull Date startTime, long left) {
@@ -58,6 +84,10 @@ public class Peer {
         this.left = left;
         this.port = port;
         updateNetworkType();
+    }
+
+    public Peer() {
+
     }
 
     private void updateNetworkType() {

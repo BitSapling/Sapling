@@ -1,11 +1,19 @@
 package com.ghostchu.sapling.domain.entity;
 
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+@Entity
+@Table(name = "tags")
 public class Tag {
-    private final long tagId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private long tagId;
+    @Column(name = "name")
     @NotNull
     private String name;
+    @Column(name = "color")
     @NotNull
     private String hexColor;
 
@@ -13,6 +21,10 @@ public class Tag {
         this.tagId = tagId;
         this.name = name;
         this.hexColor = hexColor;
+    }
+
+    public Tag() {
+
     }
 
     public long getTagId() {

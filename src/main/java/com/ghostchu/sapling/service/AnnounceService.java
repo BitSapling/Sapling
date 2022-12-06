@@ -5,14 +5,19 @@ import com.ghostchu.sapling.domain.entity.Torrent;
 import com.ghostchu.sapling.domain.entity.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Service
 public class AnnounceService {
+    private final Logger LOG = LoggerFactory.getLogger(AnnounceService.class);
+    private final RedisTemplate<Object, Object> redis;
     private final List<String> badClientKeywords = List.of(
             "Mozilla",
             "WebKit",
@@ -26,6 +31,10 @@ public class AnnounceService {
             "Lynx",
             "Opera"
     );
+
+    public AnnounceService(@Autowired RedisTemplate<Object, Object> redis) {
+        this.redis = redis;
+    }
 
     public boolean isBitTorrentClient(String userAgent) {
         for (String badClientKeyword : badClientKeywords) {
@@ -54,17 +63,17 @@ public class AnnounceService {
     }
 
     @NotNull
-    public Collection<Peer> fetchPeers(@NotNull Peer fetcher, @NotNull Torrent torrent, boolean onlyLeech, int max) {
-        return Collections.emptyList();
+    public List<Peer> fetchPeers(@NotNull Peer fetcher, @NotNull Torrent torrent, boolean onlyLeech, int max) {
+
     }
 
     @NotNull
     public Collection<Peer> fetchUserTorrentSeedingPeers(@NotNull Torrent torrent, @NotNull User user) {
-        return Collections.emptyList();
+
     }
 
     public boolean isCooldownHit(@NotNull Torrent torrent, @NotNull Peer peer) {
-        return false;
+
     }
 
     public void markCooldown(@NotNull Torrent torrent, @NotNull Peer peer) {
@@ -102,11 +111,11 @@ public class AnnounceService {
      * @param torrent The torrent
      */
     public void stopped(@NotNull Peer peer, @NotNull Torrent torrent) {
-
+        t
     }
 
     @Nullable
     public Peer getPeer(User user, Torrent torrent, String peerId) {
-        return null;
+
     }
 }

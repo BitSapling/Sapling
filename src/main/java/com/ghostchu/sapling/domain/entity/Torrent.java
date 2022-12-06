@@ -1,35 +1,56 @@
 package com.ghostchu.sapling.domain.entity;
 
 import com.ghostchu.sapling.domain.type.TorrentStatus;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
 
+@Entity
+@Table(name = "torrents")
 public class Torrent {
-    private final long torrentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private long torrentId;
+    @Column(name = "info_hash")
     @NotNull
-    private final String infoHash;
+    private String infoHash;
+    @Column(name = "user_id")
     private long userId;
+    @Column(name = "title")
     @NotNull
     private String title;
+    @Column(name = "sub_title")
     @NotNull
     private String subTitle;
+    @Column(name = "nfo_file")
     @Nullable
     private String nfoFile;
+    @Column(name = "description")
     @NotNull
     private String description;
+    @Column(name = "category")
     private int category;
+    @Column(name = "creator_group")
     private int creatorGroup;
+    @Column(name = "media")
     private int media;
+    @Column(name = "encoding")
     private int encoding;
+    @Column(name = "resolution")
     private int resolution;
+    @Column(name = "anonymous")
     private boolean anonymous;
+    @Column(name = "status")
     @NotNull
     private TorrentStatus torrentStatus;
+    @Column(name = "fields")
     @NotNull
     private Map<Integer, Object> fields;
+    @Column(name = "tags")
     @NotNull
     private List<Integer> tags;
 
@@ -50,6 +71,10 @@ public class Torrent {
         this.anonymous = anonymous;
         this.tags = tags;
         this.fields = fields;
+    }
+
+    public Torrent() {
+
     }
 
     public @NotNull String getInfoHash() {

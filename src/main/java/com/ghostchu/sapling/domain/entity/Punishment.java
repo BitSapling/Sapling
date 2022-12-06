@@ -1,22 +1,34 @@
 package com.ghostchu.sapling.domain.entity;
 
 import com.ghostchu.sapling.domain.type.PunishmentType;
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 
+@Entity
+@Table(name = "punishments")
 public class Punishment {
-    private final long punishmentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private long punishmentId;
+    @Column(name = "type")
     @NotNull
     private PunishmentType type;
+    @Column(name = "user_id")
     private long userId;
+    @Column(name = "reason")
     @NotNull
     private String reason;
+    @Column(name = "start_date")
     @NotNull
     private Date startDate;
+    @Column(name = "end_date")
     @NotNull
     private Date endDate;
+    @Column(name = "operator_id")
     private long operator;
 
     public Punishment(long punishmentId, @NotNull PunishmentType type, long userId, @NotNull String reason, @NotNull Date startDate, @NotNull Date endDate, long operator) {
@@ -27,6 +39,10 @@ public class Punishment {
         this.startDate = startDate;
         this.endDate = endDate;
         this.operator = operator;
+    }
+
+    public Punishment() {
+
     }
 
     public long getUserId() {
