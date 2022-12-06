@@ -72,7 +72,7 @@ public class AnnounceService {
     }
 
     public boolean isOverSpeed(long time, long bytes) {
-
+        return false;
     }
 
     /**

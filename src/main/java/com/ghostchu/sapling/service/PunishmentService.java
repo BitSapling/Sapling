@@ -13,29 +13,29 @@ import java.util.Collection;
 public class PunishmentService {
     @Nullable
     public Punishment getPunishment(long punishmentId) {
-
+        return null;
     }
 
     @NotNull
     public Collection<Punishment> getPunishments(@NotNull User user) {
-
+        return null;
     }
 
     @NotNull
     public Collection<Punishment> getPunishments() {
-
+        return null;
     }
 
     public long appendPunishment(@NotNull User user, @NotNull Punishment punishment) {
-
+        return -1;
     }
 
     public boolean removePunishment(@NotNull User user, @NotNull Punishment punishment) {
-
+        return false;
     }
 
     public boolean removePunishment(@NotNull User user, long punishmentId) {
-
+        return false;
     }
 
     public boolean isMuted(@NotNull User user) {
