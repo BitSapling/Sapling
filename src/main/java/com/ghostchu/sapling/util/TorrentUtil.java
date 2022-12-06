@@ -147,7 +147,7 @@ public class TorrentUtil {
 
     @NotNull
     public String getInfoHash() {
-        return HashUtil.sha1(bencode.encode((Map<String, Object>) this.dict.get("info")));
+        return HashUtil.sha1(bencode.encode((Map<?, ?>) this.dict.get("info")));
     }
 
     public byte[] save() {
