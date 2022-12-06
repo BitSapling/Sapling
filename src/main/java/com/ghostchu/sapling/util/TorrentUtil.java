@@ -4,10 +4,12 @@ import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
 import com.ghostchu.sapling.exception.*;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.StringJoiner;
 
 public class TorrentUtil {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
-    private final Bencode bencode = new Bencode();
+    private final Bencode bencode = new Bencode(StandardCharsets.ISO_8859_1);
     private final byte[] data;
     private final Map<String, Long> fileList = new LinkedHashMap<>();
     private Map<String, Object> dict;
@@ -49,24 +51,10 @@ public class TorrentUtil {
         validate();
     }
 
-    private void validate() throws InvalidTorrentVerifyException, InvalidTorrentVersionException, InvalidTorrentFileException, InvalidTorrentPiecesException, EmptyTorrentFileException {
-        if (this.dict == null)
-            throw new InvalidTorrentFileException("Bencode decode failed");
-        if (!this.dict.containsKey("info"))
-            throw new InvalidTorrentFileException("Missing info key");
-        if (isV2Torrent())
-            throw new InvalidTorrentVersionException("version 2");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> info = (Map<String, Object>) this.dict.get("info");
-        if (!info.containsKey("piece length") || !(info.get("piece length") instanceof Number))
-            throw new InvalidTorrentVerifyException("piece length", Number.class, info.get("piece length"));
-        if (!info.containsKey("name") || !(info.get("name") instanceof String))
-            throw new InvalidTorrentVerifyException("name", String.class, info.get("piece length"));
-        if (!info.containsKey("pieces") || !(info.get("pieces") instanceof String))
-            throw new InvalidTorrentVerifyException("pieces", String.class, info.get("pieces"));
-//        if (((String) info.get("pieces")).length() % 20 != 0)
-//            throw new InvalidTorrentPiecesException(((String) info.get("pieces")).length());
-        verifyAndCalcFiles();
+    @SneakyThrows
+    public static void main(String[] args) {
+        File file = new File("E:\\Download\\[M-TEAM]VMware+vSphere+7.torrent");
+        System.out.println(new TorrentUtil(file).getInfoHash());
     }
 
     private void verifyAndCalcFiles() throws InvalidTorrentVerifyException, EmptyTorrentFileException {
@@ -107,6 +95,26 @@ public class TorrentUtil {
         return totalSize;
     }
 
+    private void validate() throws InvalidTorrentVerifyException, InvalidTorrentVersionException, InvalidTorrentFileException, EmptyTorrentFileException {
+        if (this.dict == null)
+            throw new InvalidTorrentFileException("Bencode decode failed");
+        if (!this.dict.containsKey("info"))
+            throw new InvalidTorrentFileException("Missing info key");
+        if (isV2Torrent())
+            throw new InvalidTorrentVersionException("version 2");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> info = (Map<String, Object>) this.dict.get("info");
+        if (!info.containsKey("piece length") || !(info.get("piece length") instanceof Number))
+            throw new InvalidTorrentVerifyException("piece length", Number.class, info.get("piece length"));
+        if (!info.containsKey("name") || !(info.get("name") instanceof String))
+            throw new InvalidTorrentVerifyException("name", String.class, info.get("piece length"));
+        if (!info.containsKey("pieces") || !(info.get("pieces") instanceof String))
+            throw new InvalidTorrentVerifyException("pieces", String.class, info.get("pieces"));
+//        if (((String) info.get("pieces")).length() % 20 != 0)
+//            throw new InvalidTorrentPiecesException(((String) info.get("pieces")).length());
+        verifyAndCalcFiles();
+    }
+
 
     private boolean isV2Torrent() {
         @SuppressWarnings("unchecked")
@@ -135,6 +143,11 @@ public class TorrentUtil {
         this.dict.put("announce", announce);
         this.dict.put("announce-list", backupAnnounce);
         this.dict.remove("nodes");
+    }
+
+    @NotNull
+    public String getInfoHash() {
+        return HashUtil.sha1(bencode.encode((Map<String, Object>) this.dict.get("info")));
     }
 
     public byte[] save() {
