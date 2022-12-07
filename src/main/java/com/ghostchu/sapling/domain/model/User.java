@@ -22,7 +22,7 @@ public class User {
     @Column(name = "id")
     private long userId;
     @Column(name = "group_id")
-    private int groupId;
+    private long groupId;
     @Column(name = "email")
     @NotNull
     private String email;
