@@ -1,4 +1,4 @@
-package com.ghostchu.sapling.domain.entity;
+package com.ghostchu.sapling.domain.model;
 
 import com.ghostchu.sapling.domain.type.TorrentStatus;
 import jakarta.persistence.*;
@@ -44,7 +44,7 @@ public class Torrent {
     private int resolution;
     @Column(name = "anonymous")
     private boolean anonymous;
-    @Column(name = "status")
+    @Column(name = "torrent_status")
     @NotNull
     private TorrentStatus torrentStatus;
     @Column(name = "fields")
@@ -53,6 +53,8 @@ public class Torrent {
     @Column(name = "tags")
     @NotNull
     private List<Integer> tags;
+    @Column(name = "promotion_id")
+    private long promotionId;
 
     public Torrent(long torrentId, long userId, @NotNull String infoHash, @NotNull String title, @NotNull String subTitle, @Nullable String nfoFile, @NotNull String description, int category, int creatorGroup, int media, int encoding, int resolution, boolean anonymous, @NotNull TorrentStatus torrentStatus, @NotNull List<Integer> tags, @NotNull Map<Integer, Object> fields) {
         this.torrentId = torrentId;
@@ -195,5 +197,13 @@ public class Torrent {
 
     public void setTorrentStatus(@NotNull TorrentStatus torrentStatus) {
         this.torrentStatus = torrentStatus;
+    }
+
+    public long getPromotionId() {
+        return promotionId;
+    }
+
+    public void setPromotionId(long promotionId) {
+        this.promotionId = promotionId;
     }
 }

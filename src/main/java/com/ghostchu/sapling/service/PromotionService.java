@@ -1,7 +1,7 @@
 package com.ghostchu.sapling.service;
 
-import com.ghostchu.sapling.domain.entity.Torrent;
-import com.ghostchu.sapling.domain.type.Promotion;
+import com.ghostchu.sapling.domain.model.Promotion;
+import com.ghostchu.sapling.domain.model.Torrent;
 import org.springframework.stereotype.Service;
 
 @Service

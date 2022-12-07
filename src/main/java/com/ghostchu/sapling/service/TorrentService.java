@@ -1,6 +1,6 @@
 package com.ghostchu.sapling.service;
 
-import com.ghostchu.sapling.domain.entity.Torrent;
+import com.ghostchu.sapling.domain.model.Torrent;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

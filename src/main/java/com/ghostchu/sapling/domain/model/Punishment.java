@@ -1,4 +1,4 @@
-package com.ghostchu.sapling.domain.entity;
+package com.ghostchu.sapling.domain.model;
 
 import com.ghostchu.sapling.domain.type.PunishmentType;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.ghostchu.sapling.domain.entity;
+package com.ghostchu.sapling.domain.model;
 
 import com.ghostchu.sapling.domain.type.PeerConnectableType;
 import com.ghostchu.sapling.domain.type.PeerNetworkType;
@@ -18,6 +18,8 @@ public class Peer {
     private long id;
     @Column(name = "user_id")
     private long userId;
+    @Column(name = "torrent_id")
+    private long torrentId;
     @Column(name = "client_slug")
     @Nullable
     private String clientSlug;
@@ -253,10 +255,33 @@ public class Peer {
         this.left = left;
     }
 
+    public long getTorrentId() {
+        return torrentId;
+    }
+
+    public void setTorrentId(long torrentId) {
+        this.torrentId = torrentId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Peer peer = (Peer) o;
+        return id == peer.id && userId == peer.userId && torrentId == peer.torrentId && port == peer.port && uploaded == peer.uploaded && actualUploaded == peer.actualUploaded && downloaded == peer.downloaded && actualDownloaded == peer.actualDownloaded && seeder == peer.seeder && downloadedOffset == peer.downloadedOffset && uploadedOffset == peer.uploadedOffset && left == peer.left && Objects.equals(clientSlug, peer.clientSlug) && Objects.equals(peerId, peer.peerId) && networkType == peer.networkType && Objects.equals(ipv4, peer.ipv4) && Objects.equals(ipv6, peer.ipv6) && startTime.equals(peer.startTime) && lastActivity.equals(peer.lastActivity) && prevActivity.equals(peer.prevActivity) && connectable == peer.connectable;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, torrentId, clientSlug, peerId, networkType, ipv4, ipv6, port, uploaded, actualUploaded, downloaded, actualDownloaded, seeder, startTime, lastActivity, prevActivity, connectable, downloadedOffset, uploadedOffset, left);
+    }
+
     @Override
     public String toString() {
         return "Peer{" +
-                "userId=" + userId +
+                "id=" + id +
+                ", userId=" + userId +
+                ", torrentId=" + torrentId +
                 ", clientSlug='" + clientSlug + '\'' +
                 ", peerId='" + peerId + '\'' +
                 ", networkType=" + networkType +
@@ -274,19 +299,7 @@ public class Peer {
                 ", connectable=" + connectable +
                 ", downloadedOffset=" + downloadedOffset +
                 ", uploadedOffset=" + uploadedOffset +
+                ", left=" + left +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Peer peer = (Peer) o;
-        return userId == peer.userId && port == peer.port && Objects.equals(clientSlug, peer.clientSlug) && Objects.equals(peerId, peer.peerId) && Objects.equals(ipv4, peer.ipv4) && Objects.equals(ipv6, peer.ipv6);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, clientSlug, peerId, ipv4, ipv6, port);
     }
 }

@@ -1,6 +1,6 @@
 package com.ghostchu.sapling.service;
 
-import com.ghostchu.sapling.domain.entity.User;
+import com.ghostchu.sapling.domain.model.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;

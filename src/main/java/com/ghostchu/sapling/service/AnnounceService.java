@@ -1,8 +1,9 @@
 package com.ghostchu.sapling.service;
 
-import com.ghostchu.sapling.domain.entity.Peer;
-import com.ghostchu.sapling.domain.entity.Torrent;
-import com.ghostchu.sapling.domain.entity.User;
+import com.ghostchu.sapling.domain.model.Peer;
+import com.ghostchu.sapling.domain.model.Torrent;
+import com.ghostchu.sapling.domain.model.User;
+import com.ghostchu.sapling.repository.PeerRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import java.util.List;
 public class AnnounceService {
     private final Logger LOG = LoggerFactory.getLogger(AnnounceService.class);
     private final RedisTemplate<Object, Object> redis;
+    private final PeerRepository peerRepository;
     private final List<String> badClientKeywords = List.of(
             "Mozilla",
             "WebKit",
@@ -32,8 +34,9 @@ public class AnnounceService {
             "Opera"
     );
 
-    public AnnounceService(@Autowired RedisTemplate<Object, Object> redis) {
+    public AnnounceService(@Autowired RedisTemplate<Object, Object> redis, @Autowired PeerRepository peerRepository) {
         this.redis = redis;
+        this.peerRepository = peerRepository;
     }
 
     public boolean isBitTorrentClient(String userAgent) {
@@ -64,12 +67,12 @@ public class AnnounceService {
 
     @NotNull
     public List<Peer> fetchPeers(@NotNull Peer fetcher, @NotNull Torrent torrent, boolean onlyLeech, int max) {
-
+        return peerRepository.randomFetchTorrents(torrent.getTorrentId(), onlyLeech, max);
     }
 
     @NotNull
     public Collection<Peer> fetchUserTorrentSeedingPeers(@NotNull Torrent torrent, @NotNull User user) {
-
+        return peerRepository.findAllByTorrentIdAndUserId(torrent.getTorrentId(), user.getUserId());
     }
 
     public boolean isCooldownHit(@NotNull Torrent torrent, @NotNull Peer peer) {
@@ -87,35 +90,33 @@ public class AnnounceService {
     /**
      * A peer start downloading on torrent
      *
-     * @param peer    The peer
-     * @param torrent The torrent
+     * @param peer The peer
      */
-    public void start(@NotNull Peer peer, @NotNull Torrent torrent) {
-
+    @NotNull
+    public Peer start(@NotNull Peer peer) {
+        return peerRepository.save(peer);
     }
 
     /**
      * A peer completed the download on torrent
      *
      * @param peer    The peer
-     * @param torrent The torrent
      */
-    public void completed(@NotNull Peer peer, @NotNull Torrent torrent) {
-
+    public @NotNull Peer completed(@NotNull Peer peer) {
+        return peerRepository.save(peer);
     }
 
     /**
      * A peer stopped download or seeding on torrent
      *
      * @param peer    The peer
-     * @param torrent The torrent
      */
-    public void stopped(@NotNull Peer peer, @NotNull Torrent torrent) {
-        t
+    public void stopped(@NotNull Peer peer) {
+        peerRepository.delete(peer);
     }
 
     @Nullable
-    public Peer getPeer(User user, Torrent torrent, String peerId) {
-
+    public List<Peer> getPeers(@NotNull Torrent torrent) {
+        return peerRepository.findAllByTorrentId(torrent.getTorrentId());
     }
 }

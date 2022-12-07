@@ -1,4 +1,4 @@
-package com.ghostchu.sapling.domain.entity;
+package com.ghostchu.sapling.domain.model;
 
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;

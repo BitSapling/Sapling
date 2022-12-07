@@ -1,10 +1,10 @@
 package com.ghostchu.sapling.controller;
 
 import com.dampcake.bencode.Bencode;
-import com.ghostchu.sapling.domain.entity.Peer;
-import com.ghostchu.sapling.domain.entity.Torrent;
-import com.ghostchu.sapling.domain.entity.User;
-import com.ghostchu.sapling.domain.type.Promotion;
+import com.ghostchu.sapling.domain.model.Peer;
+import com.ghostchu.sapling.domain.model.Promotion;
+import com.ghostchu.sapling.domain.model.Torrent;
+import com.ghostchu.sapling.domain.model.User;
 import com.ghostchu.sapling.exception.*;
 import com.ghostchu.sapling.language.ITranslation;
 import com.ghostchu.sapling.service.*;
@@ -227,10 +227,10 @@ public class Announce {
 
         if (event != null) {
             switch (event) {
-                case "started", "start" -> service.start(userPeer, torrent);
-                case "completed", "complete" -> service.completed(userPeer, torrent);
+                case "started", "start" -> service.start(userPeer);
+                case "completed", "complete" -> service.completed(userPeer);
                 case "stopped", "stop" ->// Stopped
-                        service.stopped(userPeer, torrent);
+                        service.stopped(userPeer);
                 default -> LOG.debug("Undefined event {}", event);
             }
         }

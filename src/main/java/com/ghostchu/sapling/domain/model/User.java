@@ -1,4 +1,4 @@
-package com.ghostchu.sapling.domain.entity;
+package com.ghostchu.sapling.domain.model;
 
 import com.ghostchu.sapling.util.NumberUtil;
 import com.ghostchu.sapling.util.PasswordHash;

@@ -1,6 +1,6 @@
 package com.ghostchu.sapling.service;
 
-import com.ghostchu.sapling.domain.entity.Tag;
+import com.ghostchu.sapling.domain.model.Tag;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

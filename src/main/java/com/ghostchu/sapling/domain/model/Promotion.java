@@ -1,22 +1,38 @@
-package com.ghostchu.sapling.domain.type;
+package com.ghostchu.sapling.domain.model;
 
+import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+@Entity
+@Table(name = "promotions")
 public class Promotion {
-    private final long promotionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private long promotionId;
+    @Column(name = "name")
     @NotNull
-    private final String name;
+    private String name;
+    @Column(name = "display_name")
     @NotNull
     private String displayName;
+    @Column(name = "upload_off")
     private double uploadOff;
+    @Column(name = "download_off")
     private double downloadOff;
+    @Column(name = "priority")
+    private int priority;
 
-    public Promotion(long promotionId, @NotNull String name, String displayName, double uploadOff, double downloadOff) {
+    public Promotion(long promotionId, @NotNull String name, @NotNull String displayName, double uploadOff, double downloadOff) {
         this.promotionId = promotionId;
         this.name = name;
         this.displayName = displayName;
         this.uploadOff = uploadOff;
         this.downloadOff = downloadOff;
+    }
+
+    public Promotion() {
+
     }
 
     public @NotNull String getName() {
