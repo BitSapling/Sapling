@@ -1,11 +1,13 @@
 package com.ghostchu.sapling.domain.model;
 
+import com.ghostchu.sapling.util.JsonUtil;
 import com.ghostchu.sapling.util.NumberUtil;
 import com.ghostchu.sapling.util.PasswordHash;
+import io.leangen.geantyref.TypeToken;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
@@ -35,12 +37,12 @@ public class User {
     @Column(name = "passkey")
     @NotNull
     private UUID passkey;
-    @Column(name = "inviter")
+    @Column(name = "inviter_uid")
     private long inviterUid;
-    @Column(name = "join_at")
+    @Column(name = "join_date")
     @NotNull
     private Date joinDate;
-    @Column(name = "recent_activity")
+    @Column(name = "recent_activity_date")
     @NotNull
     private Date recentActivityDate;
     @Column(name = "uploaded")
@@ -72,7 +74,7 @@ public class User {
     private BigDecimal seedingScore;
     @Column(name = "recent_ips")
     @NotNull
-    private List<String> recentIps;
+    private String recentIps;
     @Column(name = "parked")
     private boolean parked;
     @Column(name = "introduction")
@@ -81,7 +83,7 @@ public class User {
     @Column(name = "region")
     @NotNull
     private String regionCode;
-    @Column(name = "language")
+    @Column(name = "lang")
     @NotNull
     private String languageCode;
     @Column(name = "show_ads")
@@ -91,16 +93,7 @@ public class User {
     private String signature;
     @Column(name = "invite_slots")
     private int inviteSlots;
-    @Column(name = "download_privilege")
-    private boolean downloadPrivilege;
-    @Column(name = "download_privilege_reason")
-    @Nullable
-    private String downloadPrivilegeReason;
 
-    private void updateDownloadPrivilege(boolean access, @Nullable String reason) {
-        downloadPrivilege = access;
-        downloadPrivilegeReason = reason;
-    }
 
     public boolean verifyPassword(@NotNull String password) {
         return PasswordHash.verify(password, this.passwordHash);
@@ -206,7 +199,9 @@ public class User {
 
     @NotNull
     public List<String> getRecentIps() {
-        return recentIps;
+        Type type = new TypeToken<List<String>>() {
+        }.getType();
+        return JsonUtil.getGson().fromJson(recentIps, type);
     }
 
     public boolean isParked() {

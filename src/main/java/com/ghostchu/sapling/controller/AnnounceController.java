@@ -31,7 +31,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/announce")
-public class Announce {
+public class AnnounceController {
     private static final int MAX_PEERS = 50;
     private static final int MAX_TORRENT_SEEDING_PEERS = 3 * 2; // 3 locations for double stack
     private static final int ANNOUNCE_INTERVAL_SECONDS = 120;
@@ -46,10 +46,10 @@ public class Announce {
     private final ITranslation lang;
     private final Bencode bencode = new Bencode();
     private final InetAddressValidator ipValidator = InetAddressValidator.getInstance();
-    private final Logger LOG = LoggerFactory.getLogger(Announce.class);
+    private final Logger LOG = LoggerFactory.getLogger(AnnounceController.class);
 
 
-    public Announce(@Autowired HttpServletRequest request, @Autowired AnnounceService service, @Autowired TorrentService torrentService, @Autowired UserService userService, @Autowired PunishmentService punishmentService, @Autowired PromotionService promotionService, @Autowired SeedBoxService seedBoxService, @Autowired ITranslation lang) {
+    public AnnounceController(@Autowired HttpServletRequest request, @Autowired AnnounceService service, @Autowired TorrentService torrentService, @Autowired UserService userService, @Autowired PunishmentService punishmentService, @Autowired PromotionService promotionService, @Autowired SeedBoxService seedBoxService, @Autowired ITranslation lang) {
         this.request = request;
         this.service = service;
         this.torrentService = torrentService;
