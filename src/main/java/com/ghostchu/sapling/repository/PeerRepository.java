@@ -29,4 +29,7 @@ public interface PeerRepository extends JpaRepository<Peer, Long> {
 
     @NotNull
     List<Peer> findAllByTorrentIdAndUserId(@NotNull Long torrentId, @NotNull Long userId);
+
+    @NotNull
+    Optional<Peer> findByUserIdAndTorrentIdAndPeerId(@NotNull Long userId, @NotNull Long torrentId, @NotNull String peerId);
 }

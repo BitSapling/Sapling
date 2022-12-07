@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AnnounceService {
@@ -76,7 +77,7 @@ public class AnnounceService {
     }
 
     public boolean isCooldownHit(@NotNull Torrent torrent, @NotNull Peer peer) {
-
+        return false;
     }
 
     public void markCooldown(@NotNull Torrent torrent, @NotNull Peer peer) {
@@ -100,7 +101,7 @@ public class AnnounceService {
     /**
      * A peer completed the download on torrent
      *
-     * @param peer    The peer
+     * @param peer The peer
      */
     public @NotNull Peer completed(@NotNull Peer peer) {
         return peerRepository.save(peer);
@@ -109,7 +110,7 @@ public class AnnounceService {
     /**
      * A peer stopped download or seeding on torrent
      *
-     * @param peer    The peer
+     * @param peer The peer
      */
     public void stopped(@NotNull Peer peer) {
         peerRepository.delete(peer);
@@ -118,5 +119,11 @@ public class AnnounceService {
     @Nullable
     public List<Peer> getPeers(@NotNull Torrent torrent) {
         return peerRepository.findAllByTorrentId(torrent.getTorrentId());
+    }
+
+    @Nullable
+    public Peer getPeer(@NotNull User user, @NotNull Torrent torrent, @NotNull String peerId) {
+        Optional<Peer> peer = peerRepository.findByUserIdAndTorrentIdAndPeerId(user.getUserId(), torrent.getTorrentId(), peerId);
+        return peer.orElse(null);
     }
 }
