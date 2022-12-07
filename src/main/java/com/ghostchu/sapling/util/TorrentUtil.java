@@ -4,7 +4,6 @@ import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
 import com.ghostchu.sapling.exception.*;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -50,12 +49,6 @@ public class TorrentUtil {
     private void init() throws BencodeException, TorrentException {
         this.dict = bencode.decode(this.data, Type.DICTIONARY);
         validate();
-    }
-
-    @SneakyThrows
-    public static void main(String[] args) {
-        File file = new File("E:\\Download\\[M-TEAM]VMware+vSphere+7.torrent");
-        System.out.println(new TorrentUtil(file).getInfoHash());
     }
 
     private void verifyAndCalcFiles() throws InvalidTorrentVerifyException, EmptyTorrentFileException {
