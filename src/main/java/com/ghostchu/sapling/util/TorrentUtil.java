@@ -18,7 +18,8 @@ import java.util.StringJoiner;
 
 public class TorrentUtil {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
-    private final Bencode bencode = new Bencode(StandardCharsets.ISO_8859_1);
+    private final Bencode bencode = new Bencode(StandardCharsets.UTF_8);
+    private final Bencode bencodeInfoHash = new Bencode(StandardCharsets.ISO_8859_1);
     private final byte[] data;
     private final Map<String, Long> fileList = new LinkedHashMap<>();
     private Map<String, Object> dict;
@@ -147,7 +148,8 @@ public class TorrentUtil {
 
     @NotNull
     public String getInfoHash() {
-        return HashUtil.sha1(bencode.encode((Map<?, ?>) this.dict.get("info")));
+        Map<String, Object> infoHashDat = bencodeInfoHash.decode(this.data, Type.DICTIONARY);
+        return HashUtil.sha1(bencodeInfoHash.encode((Map<?, ?>) infoHashDat.get("info")));
     }
 
     public byte[] save() {
