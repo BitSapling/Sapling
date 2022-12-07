@@ -119,7 +119,7 @@ public class User {
         return userId;
     }
 
-    public int getGroupId() {
+    public long getGroupId() {
         return groupId;
     }
 
