@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.announce;
+package com.github.bitsapling.sapling.util;
 
 import lombok.SneakyThrows;
 import org.apache.commons.validator.routines.InetAddressValidator;

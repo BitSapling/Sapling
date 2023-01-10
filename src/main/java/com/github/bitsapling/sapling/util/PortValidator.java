@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.announce;
+package com.github.bitsapling.sapling.util;
 
 public class PortValidator {
     private final static int PORT_MAX_RANGE = 65535;
