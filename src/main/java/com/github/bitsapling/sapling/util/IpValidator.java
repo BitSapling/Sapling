@@ -10,7 +10,23 @@ import java.net.UnknownHostException;
 
 public class IpValidator {
     private static final InetAddressValidator ipValidator = InetAddressValidator.getInstance();
+    private final static int PORT_MAX_RANGE = 65535;
+    private final static int PORT_MIN_RANGE = 10000;
 
+    /**
+     * Validate the port
+     *
+     * @param port the port to validate
+     * @return valid or not
+     */
+    public static boolean isPortValid(int port) {
+        // Usually the ports < 10000 may host a service, we need prevent client announce it
+        // may cause DDoS attacks
+        if (port > PORT_MAX_RANGE) {
+            return false;
+        }
+        return port >= PORT_MIN_RANGE;
+    }
     /**
      * Verify a IP address is valid
      *
@@ -20,7 +36,7 @@ public class IpValidator {
     // Suppress UnknownHostException, ipValidator make sure it must
     // be an ip address so it impossible to trigger the DNS lookup
     @SneakyThrows(UnknownHostException.class)
-    public static boolean isValid(String address) {
+    public static boolean isPortValid(String address) {
         if (!ipValidator.isValid(address)) {
             return false;
         }
