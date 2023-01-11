@@ -8,7 +8,8 @@ import java.util.Locale;
 public enum AnnounceEventType {
     STARTED("started"),
     COMPLETED("completed"),
-    STOPPED("stopped");
+    STOPPED("stopped"),
+    PAUSED("paused");
     private final String key;
     AnnounceEventType(String key){
         this.key = key;
