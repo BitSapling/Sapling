@@ -1,6 +1,6 @@
 package com.github.bitsapling.sapling.controller.announce;
 
-import com.github.bitsapling.sapling.exception.AnnounceException;
+import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.TrackerException;
 import com.github.bitsapling.sapling.model.BlacklistClient;
@@ -47,7 +47,7 @@ public class AnnounceController {
     }
 
     @GetMapping("/announce/{passkey}")
-    public void announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, AnnounceException {
+    public void announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, FixedAnnounceException {
         long start = timeOfDay();
 
         if (StringUtils.isEmpty(passkey)) {

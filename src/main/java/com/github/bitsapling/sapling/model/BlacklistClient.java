@@ -1,6 +1,6 @@
 package com.github.bitsapling.sapling.model;
 
-import com.github.bitsapling.sapling.exception.AnnounceException;
+import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -25,14 +25,14 @@ public class BlacklistClient {
             "Spider",
             "Unknown"
     };
-    public void checkClient(@NotNull HttpServletRequest request) throws AnnounceException, BrowserReadableAnnounceException {
+    public void checkClient(@NotNull HttpServletRequest request) throws FixedAnnounceException, BrowserReadableAnnounceException {
         String ua = request.getHeader("User-Agent");
         if(StringUtils.isEmpty(ua)){
-            throw new AnnounceException("Client didn't send user-agent to tracker server.");
+            throw new FixedAnnounceException("Client didn't send user-agent to tracker server.");
         }
         checkBrowser(ua);
         if(!checkAllowedClient(ua)){
-            throw new AnnounceException("Disallowed client: "+ua);
+            throw new FixedAnnounceException("Disallowed client: "+ua);
         }
     }
 
