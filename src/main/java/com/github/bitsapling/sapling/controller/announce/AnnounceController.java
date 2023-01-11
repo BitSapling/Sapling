@@ -84,7 +84,7 @@ public class AnnounceController {
             String peerId = gets.get("peer_id");
             //peerId = hasheval(peerId, 20, "peer_id");
             long left = Long.parseLong(gets.get("left"));
-            boolean seeder = left <= 0;
+            boolean seeder = left == 0;
             int port = Integer.parseInt(gets.get("port"));
             AnnounceEventType event = AnnounceEventType.valueOf(gets.get("event"));
             int numWant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"))).orElse("150"));
