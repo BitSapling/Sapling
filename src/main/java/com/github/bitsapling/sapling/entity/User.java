@@ -8,7 +8,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "users",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"username"})
+                @UniqueConstraint(columnNames = {"username"}),
+                @UniqueConstraint(columnNames = {"email"})
         }
 )
 public class User {
