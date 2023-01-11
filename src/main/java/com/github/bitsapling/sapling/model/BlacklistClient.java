@@ -1,10 +1,48 @@
 package com.github.bitsapling.sapling.model;
 
+import com.github.bitsapling.sapling.exception.AnnounceException;
+import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
+@Component
 public class BlacklistClient {
-    public boolean isBanned(@NotNull String userAgent){
-        // TODO: Database model
-        return userAgent.contains("Mozilla");
+    private static final String[] BROWSER_BOT_SOFTWARE_KEYWORDS = new String[]{
+            "Mozilla",
+            "Browser",
+            "Chrome",
+            "Safari",
+            "AppleWebKit",
+            "Opera",
+            "Links",
+            "Lynx",
+            "Bot",
+            "Crawler",
+            "Spider",
+            "Unknown"
+    };
+    public void checkClient(@NotNull HttpServletRequest request) throws AnnounceException, BrowserReadableAnnounceException {
+        String ua = request.getHeader("User-Agent");
+        if(StringUtils.isEmpty(ua)){
+            throw new AnnounceException("Client didn't send user-agent to tracker server.");
+        }
+        checkBrowser(ua);
+        if(!checkAllowedClient(ua)){
+            throw new AnnounceException("Disallowed client: "+ua);
+        }
+    }
+
+    private boolean checkAllowedClient(@NotNull String ua) {
+        return true;
+    }
+
+    private void checkBrowser(@NotNull String ua) throws BrowserReadableAnnounceException {
+        if(Arrays.stream(BROWSER_BOT_SOFTWARE_KEYWORDS).map(String::toLowerCase).anyMatch(ua::contains)){
+            throw new BrowserReadableAnnounceException("You must use a Bittorrent Client to connect this tracker.");
+        }
     }
 }
