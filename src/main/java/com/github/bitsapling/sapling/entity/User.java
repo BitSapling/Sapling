@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -12,6 +13,7 @@ import java.sql.Timestamp;
                 @UniqueConstraint(columnNames = {"email"})
         }
 )
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
