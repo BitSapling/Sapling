@@ -40,6 +40,14 @@ public class User {
     private String downloadBandwidth;
     @Column(name = "upload_bandwidth",nullable = false)
     private String uploadBandwidth;
+    @Column(name = "downloaded",nullable = false)
+    private String downloaded;
+    @Column(name = "uploaded",nullable = false)
+    private String uploaded;
+    @Column(name = "real_downloaded",nullable = false)
+    private String realDownloaded;
+    @Column(name = "real_uploaded",nullable = false)
+    private String realUploaded;
     @Column(name = "isp",nullable = false)
     private String isp;
     @Column(name = "karma",nullable = false)
