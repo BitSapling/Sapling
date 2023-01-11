@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.controller.announce;
 
+import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.TrackerException;
@@ -47,7 +48,7 @@ public class AnnounceController {
     }
 
     @GetMapping("/announce/{passkey}")
-    public void announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, FixedAnnounceException {
+    public void announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, FixedAnnounceException, BrowserReadableAnnounceException {
         long start = timeOfDay();
 
         if (StringUtils.isEmpty(passkey)) {
@@ -124,15 +125,13 @@ public class AnnounceController {
         }
     }
 
-    private void checkClient() throws InvalidAnnounceException {
+    private void checkClient() throws FixedAnnounceException, BrowserReadableAnnounceException {
         String method = request.getMethod();
         if (!method.equals("GET")) {
             throw new InvalidAnnounceException("Invalid request method: " + method);
         }
         String userAgent = request.getHeader("User-Agent");
-        if (blacklistClient.isBanned(userAgent)) {
-            throw new InvalidAnnounceException("Banned client: " + userAgent);
-        }
+        blacklistClient.checkClient(request);
     }
 
     private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {

@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.advice;
 
 import com.dampcake.bencode.Bencode;
+import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,5 +30,10 @@ public class GlobalControllerAdvice {
         dict.put("failure reason", exception.getMessage());
         dict.put("retry in", String.valueOf(exception.getRetryIn()));
         return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
+    }
+    @ExceptionHandler(value = BrowserReadableAnnounceException.class)
+    @ResponseBody
+    public String announceExceptionHandler(BrowserReadableAnnounceException exception){
+        return exception.getMessage();
     }
 }
