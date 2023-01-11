@@ -5,9 +5,12 @@ import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidPasskeyException;
 import com.github.bitsapling.sapling.exception.TrackerException;
 import com.github.bitsapling.sapling.model.BlacklistClient;
+import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +32,6 @@ public class AnnounceController {
     private static final Random random = new Random();
     private static final Pattern infoHashPattern = Pattern.compile("info_hash=(.*?)($|&)");
     private static final Pattern peerIdPattern = Pattern.compile("peer_id=(.*?)&");
-    private static final String[] ANNOUNCE_MUST_HAVE_PARAMS = new String[]{"info_hash", "peer_id", "port", "uploaded", "downloaded", "left", "event"};
     private final HttpServletRequest request;
     private final BlacklistClient blacklistClient;
 
@@ -68,13 +70,10 @@ public class AnnounceController {
             }
         }
         if (action.contains("announce")) {
+            checkAnnounceFields(gets);
             peerId = hasheval(peerId, 20, "peer_id");
             var seeder = left == 0 ? "yes" : "no";
-            for (String param : ANNOUNCE_MUST_HAVE_PARAMS) {
-                if (!gets.containsKey(param)) {
-                    throw new InvalidAnnounceException("Missing " + param + " parameter");
-                }
-            }
+
             var port = -1;
             try {
                 port = Integer.parseInt(gets.get("port"));
@@ -166,6 +165,25 @@ public class AnnounceController {
         } else {
             throw new TrackerException("Unknown action.");
         }
+    }
+
+    private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
+        if(StringUtils.isEmpty(gets.get("info_hash")))
+            throw new InvalidAnnounceException("Missing param: info_hash");
+        if(StringUtils.isEmpty(gets.get("peer_id")))
+            throw new InvalidAnnounceException("Missing param: peer_id");
+        if(StringUtils.isEmpty(gets.get("port")) || !StringUtils.isNumeric(gets.get("port")))
+            throw new InvalidAnnounceException("Missing/Invalid param: port");
+        if(StringUtils.isEmpty(gets.get("uploaded")) || !StringUtils.isNumeric(gets.get("uploaded")))
+            throw new InvalidAnnounceException("Missing/Invalid param: uploaded");
+        if(StringUtils.isEmpty(gets.get("downloaded")) || !StringUtils.isNumeric(gets.get("downloaded")))
+            throw new InvalidAnnounceException("Missing/Invalid param: downloaded");
+        if(StringUtils.isEmpty(gets.get("left")) || !StringUtils.isNumeric(gets.get("left")))
+            throw new InvalidAnnounceException("Missing/Invalid param: left");
+        if(StringUtils.isEmpty(gets.get("event")))
+            throw new InvalidAnnounceException("Missing param: event");
+        if(AnnounceEventType.fromName(gets.get("event")) == null)
+            throw new InvalidAnnounceException("Invalid param: event");
     }
 
     private void checkClient() throws InvalidAnnounceException {

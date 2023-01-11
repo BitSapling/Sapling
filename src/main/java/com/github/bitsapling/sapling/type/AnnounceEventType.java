@@ -20,7 +20,7 @@ public enum AnnounceEventType {
         return key;
     }
     @Nullable
-    public AnnounceEventType fromName(@NotNull String name){
+    public static AnnounceEventType fromName(@NotNull String name){
         name = name.toLowerCase(Locale.ROOT);
         for (AnnounceEventType type : values()){
             if (type.getKey().equals(name)){
