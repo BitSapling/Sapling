@@ -1,7 +1,14 @@
 package com.github.bitsapling.sapling.controller.announce;
 
+import com.github.bitsapling.sapling.exception.AnnounceException;
+import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
+import com.github.bitsapling.sapling.exception.InvalidPasskeyException;
 import com.github.bitsapling.sapling.exception.TrackerException;
+import com.github.bitsapling.sapling.model.BlacklistClient;
+import com.github.bitsapling.sapling.util.SafeUUID;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,37 +27,25 @@ import java.util.regex.Pattern;
 @Controller
 public class AnnounceController {
     private static final Random random = new Random();
-
-    @Data
-    public static class Setting {
-        boolean timeMe = false; // calculate execution times (requires log_debug)
-        boolean logDebug = false; // log debugging information using debuglog()
-        boolean logErrors = false; // log all errors sent using err()
-        String timestampFormat = "[d/m/y H:i:s]";
-        String logFile = "/var/www/debug.txt";
-        boolean gzip = true; // gzip the data sent to the clients
-        boolean allowOldProtocols = true; // allow no_peer_id and original protocols for compatibility
-        boolean allowGlobalScrape = false; // enable scrape-statistics for all torrents if no info_hash specified - wastes bandwidth on big trackers
-        int defaultGivePeers = 50; // how many peers to give to client by default
-        int maxGivePeers = 150; // maximum peers client may request
-        int announceInterval = random.nextInt(1800, 2400); // 30-40 min - spread load a bit on the webserver
-        boolean rateLimitation = true; // calculate the clients average upload-speed
-        int rateLimitationWarnUp = 2; // log a warning if exceeding this amount of MB/s
-        int rateLimitationErrUp = 60; // log an error and don't save stats for user if exceeding this amount of MB/s
-        boolean registerStats = true; // save transfer statistics for the users? [0-1 extra mysql-queries]
-        int uploadMultiplier = 1;
-        int downloadMultiplier = 1;
-        int passkeyLength = 32;
-    }
-
     private static final Pattern infoHashPattern = Pattern.compile("info_hash=(.*?)($|&)");
     private static final Pattern peerIdPattern = Pattern.compile("peer_id=(.*?)&");
+    private static final String[] ANNOUNCE_MUST_HAVE_PARAMS = new String[]{"info_hash", "peer_id", "port", "uploaded", "downloaded", "left", "event"};
+    private final HttpServletRequest request;
+    private final BlacklistClient blacklistClient;
 
-    public AnnounceController() {
+    public AnnounceController(@Autowired HttpServletRequest request, @Autowired BlacklistClient blacklistClient) {
+        this.request = request;
+        this.blacklistClient = blacklistClient;
     }
 
     @GetMapping("/{action}/{passkey}")
-    public void announce(@PathVariable String action, @PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException {
+    public void announce(@PathVariable String action, @PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, AnnounceException {
+        if (!SafeUUID.isDashesStrippedUUID(passkey)) {
+            throw new InvalidPasskeyException();
+        }
+
+        checkClient();
+
         String infoHash = gets.getOrDefault("info_hash", "");
         String peerId = gets.getOrDefault("peer_id", "");
         int left = Integer.parseInt(gets.getOrDefault("left", "-1"));
@@ -75,15 +70,9 @@ public class AnnounceController {
         if (action.contains("announce")) {
             peerId = hasheval(peerId, 20, "peer_id");
             var seeder = left == 0 ? "yes" : "no";
-            var vars = new String[]{
-                    "port",
-                    "uploaded",
-                    "downloaded",
-                    "left"
-            };
-            for (var var : vars) {
-                if (!gets.containsKey(var) || !gets.get(var).matches("^[a-zA-Z0-9]*$")) {
-                    throw new TrackerException("Invalid key: " + var + ".");
+            for (String param : ANNOUNCE_MUST_HAVE_PARAMS) {
+                if (!gets.containsKey(param)) {
+                    throw new InvalidAnnounceException("Missing " + param + " parameter");
                 }
             }
             var port = -1;
@@ -179,16 +168,34 @@ public class AnnounceController {
         }
     }
 
-    public void sendBencode() {
-        // TODO
+    private void checkClient() throws InvalidAnnounceException {
+        String method = request.getMethod();
+        if (!method.equals("GET")) {
+            throw new InvalidAnnounceException("Invalid request method: "+method);
+        }
+        String userAgent = request.getHeader("User-Agent");
+        if(blacklistClient.isBanned(userAgent)){
+            throw new InvalidAnnounceException("Banned client: "+userAgent);
+        }
     }
 
-    public void give_peers() {
-        // TODO
+    public long timeOfDay() {
+        return System.nanoTime() / 1000;
     }
 
-    public boolean connectable(String ip, int port) {
-        return false;
+    public String hasheval(String str, int len, String name) {
+        // TODO
+        return "";
+    }
+
+    public String getIp() {
+        // TODO
+        return "0.0.0.0";
+    }
+
+    public Set<Object> findPeer(String infoHash, int port, String ip) {
+        // TODO
+        return new HashSet<>();
     }
 
     public void debuglog(String log) {
@@ -205,26 +212,41 @@ public class AnnounceController {
         return Optional.empty();
     }
 
-    public Set<Object> findPeer(String infoHash, int port, String ip) {
+    public void give_peers() {
         // TODO
-        return new HashSet<>();
     }
 
-    public long timeOfDay() {
-        return System.nanoTime() / 1000;
+    public void sendBencode() {
+        // TODO
+    }
+
+    public boolean connectable(String ip, int port) {
+        return false;
     }
 
     public long time() {
         return System.currentTimeMillis() / 1000;
     }
 
-    public String hasheval(String str, int len, String name) {
-        // TODO
-        return "";
-    }
-
-    public String getIp() {
-        // TODO
-        return "0.0.0.0";
+    @Data
+    public static class Setting {
+        boolean timeMe = false; // calculate execution times (requires log_debug)
+        boolean logDebug = false; // log debugging information using debuglog()
+        boolean logErrors = false; // log all errors sent using err()
+        String timestampFormat = "[d/m/y H:i:s]";
+        String logFile = "/var/www/debug.txt";
+        boolean gzip = true; // gzip the data sent to the clients
+        boolean allowOldProtocols = true; // allow no_peer_id and original protocols for compatibility
+        boolean allowGlobalScrape = false; // enable scrape-statistics for all torrents if no info_hash specified - wastes bandwidth on big trackers
+        int defaultGivePeers = 50; // how many peers to give to client by default
+        int maxGivePeers = 150; // maximum peers client may request
+        int announceInterval = random.nextInt(1800, 2400); // 30-40 min - spread load a bit on the webserver
+        boolean rateLimitation = true; // calculate the clients average upload-speed
+        int rateLimitationWarnUp = 2; // log a warning if exceeding this amount of MB/s
+        int rateLimitationErrUp = 60; // log an error and don't save stats for user if exceeding this amount of MB/s
+        boolean registerStats = true; // save transfer statistics for the users? [0-1 extra mysql-queries]
+        int uploadMultiplier = 1;
+        int downloadMultiplier = 1;
+        int passkeyLength = 32;
     }
 }
