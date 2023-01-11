@@ -39,4 +39,8 @@ public class SafeUUID {
     public static boolean isUUID(@NotNull String str) {
         return str.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     }
+
+    public static boolean isDashesStrippedUUID(@NotNull String str){
+        return str.matches("[0-9a-fA-F]{32}");
+    }
 }
