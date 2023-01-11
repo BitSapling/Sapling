@@ -10,6 +10,7 @@ import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
  * Thanks for the WTFPL :)
  */
 @Controller
+@Slf4j
 public class AnnounceController {
     private static final Random random = new Random();
     private static final Pattern infoHashPattern = Pattern.compile("info_hash=(.*?)($|&)");
@@ -42,7 +44,7 @@ public class AnnounceController {
     @GetMapping("/{action}/{passkey}")
     public void announce(@PathVariable String action, @PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, AnnounceException {
         if(StringUtils.isEmpty(action)){
-            throw new InvalidAnnounceException("Invalid action");
+            throw new InvalidAnnounceException("Invalid action.");
         }
 
         if(StringUtils.isEmpty(passkey)){
@@ -50,7 +52,7 @@ public class AnnounceController {
         }
 
         if (!SafeUUID.isDashesStrippedUUID(passkey)) {
-            throw new InvalidAnnounceException("Invalid passkey");
+            throw new InvalidAnnounceException("Invalid passkey.");
         }
 
         checkClient();
