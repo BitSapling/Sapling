@@ -130,7 +130,6 @@ public class AnnounceController {
         if (!method.equals("GET")) {
             throw new InvalidAnnounceException("Invalid request method: " + method);
         }
-        String userAgent = request.getHeader("User-Agent");
         blacklistClient.checkClient(request);
     }
 
@@ -189,6 +188,7 @@ public class AnnounceController {
 
     public long timeOfDay() {
         return System.nanoTime() / 1000;
+
     }
 
     public void sendBencode() {
