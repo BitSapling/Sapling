@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.model;
+package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 @Component
-public class BlacklistClient {
+public class BlacklistClientService {
     private static final String[] BROWSER_BOT_SOFTWARE_KEYWORDS = new String[]{
             "Mozilla",
             "Browser",

@@ -4,7 +4,7 @@ import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.TrackerException;
-import com.github.bitsapling.sapling.model.BlacklistClient;
+import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
@@ -35,9 +35,9 @@ public class AnnounceController {
     private static final Pattern infoHashPattern = Pattern.compile("info_hash=(.*?)($|&)");
     private static final Pattern peerIdPattern = Pattern.compile("peer_id=(.*?)&");
     private final HttpServletRequest request;
-    private final BlacklistClient blacklistClient;
+    private final BlacklistClientService blacklistClient;
 
-    public AnnounceController(@Autowired HttpServletRequest request, @Autowired BlacklistClient blacklistClient) {
+    public AnnounceController(@Autowired HttpServletRequest request, @Autowired BlacklistClientService blacklistClient) {
         this.request = request;
         this.blacklistClient = blacklistClient;
     }
