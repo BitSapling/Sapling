@@ -41,13 +41,16 @@ public class AnnounceController {
         this.blacklistClient = blacklistClient;
     }
 
-    @GetMapping("/{action}/{passkey}")
-    public void announce(@PathVariable String action, @PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, AnnounceException {
-        if(StringUtils.isEmpty(action)){
-            throw new InvalidAnnounceException("Invalid action.");
-        }
+    @GetMapping("/scrape/{passkey}")
+    public void scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
+        // TODO
+    }
 
-        if(StringUtils.isEmpty(passkey)){
+    @GetMapping("/announce/{passkey}")
+    public void announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, AnnounceException {
+        long start = timeOfDay();
+
+        if (StringUtils.isEmpty(passkey)) {
             throw new InvalidAnnounceException("You must re-download the torrent from tracker for seeding.");
         }
 
@@ -57,92 +60,67 @@ public class AnnounceController {
 
         checkClient();
 
+        Setting setting = getSettings();
 
-//        String infoHash = gets.getOrDefault("info_hash", "");
-//        String peerId = gets.getOrDefault("peer_id", "");
-//        int left = Integer.parseInt(gets.getOrDefault("left", "-1"));
-//        var setting = new Setting();
-//        var start = timeOfDay();
-        /*var keys = requestUri.split("/");
-        if (keys.length < 3 || keys[2].length() != setting.passkeyLength || keys[2].matches("^[a-zA-Z0-9]*$")) {
-            throw new TrackerException("Invalid passkey. Re-download torrent!");
-        }*/
-//        if (infoHash.length() < 4) {
-//            var matcher = infoHashPattern.matcher(infoHash);
-//            if (matcher.find()) {
-//                infoHash = URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);
-//            }
-//        }
-//        if (peerId.length() < 4) {
-//            var matcher = peerIdPattern.matcher(peerId);
-//            if (matcher.matches()) {
-//                peerId = URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8);
-//            }
-//        }
-        if (action.contains("announce")) {
-            checkAnnounceFields(gets);
-            String peerId = gets.get("peer_id");
-            //peerId = hasheval(peerId, 20, "peer_id");
-            long left = Long.parseLong(gets.get("left"));
-            boolean seeder = left == 0;
-            int port = Integer.parseInt(gets.get("port"));
-            AnnounceEventType event = AnnounceEventType.valueOf(gets.get("event"));
-            int numWant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"))).orElse("150"));
-            boolean noPeerId = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("nopeerid"), gets.get("no_peerid"), gets.get("no_peer_id"))).orElse("0"));
-            boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
-            boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
-            String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
+        checkAnnounceFields(gets);
+        String peerId = gets.get("peer_id");
+        //peerId = hasheval(peerId, 20, "peer_id");
+        long left = Long.parseLong(gets.get("left"));
+        boolean seeder = left == 0;
+        int port = Integer.parseInt(gets.get("port"));
+        AnnounceEventType event = AnnounceEventType.valueOf(gets.get("event"));
+        int numWant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"))).orElse("150"));
+        boolean noPeerId = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("nopeerid"), gets.get("no_peerid"), gets.get("no_peer_id"))).orElse("0"));
+        boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
+        boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
+        String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
+        String infoHash = gets.get("info_hash");
 
-            var peers = findPeer(infoHash, port, ip);
-            if (peers.size() == 0) { // peer not found - insert into database, but only if not event=stopped
-                if (setting.logDebug) {
-                    debuglog("announce: peer not found!");
-                }
-                if (event.equals("stopped")) {
-                    throw new TrackerException("Client sent stop, but peer not found!");
-                }
-                var user = gatherUser(passkey).orElseThrow(() -> new TrackerException("Permission denied."));
-                var torrent = gatherTorrent(infoHash).orElseThrow(() -> new TrackerException("Torrent does not exist on this tracker."));
+        var peers = findPeer(infoHash, port, peerIp);
+        if (peers.size() == 0) { // peer not found - insert into database, but only if not event=stopped
+            if (setting.logDebug) {
+                debuglog("announce: peer not found!");
+            }
+            if (event == AnnounceEventType.STOPPED) {
+                throw new TrackerException("Client sent stop, but peer not found!");
+            }
+            var user = gatherUser(passkey).orElseThrow(() -> new TrackerException("Permission denied."));
+            var torrent = gatherTorrent(infoHash).orElseThrow(() -> new TrackerException("Torrent does not exist on this tracker."));
 
-                var timesCompleted = false;
-                var timesStarted = false;
-                var timesUpdated = false;
-                if (event.equals("completed") && left == 0) {
-                    timesCompleted = true;
-                } else if (event.equals("started")) {// && left == 0) { //TODO: start size check
-                    timesStarted = true;
-                } else {
-                    timesUpdated = true;
-                }
-                // TODO: update torrent status
-                if (seeder.equals("yes")) {
-                    // TODO: update seeder status
-                } else {
-                    // TODO: update leecher status
-                }
-            } else if (peers.size() == 1) {
-                if (setting.rateLimitation) {
-                    // TODO: rate detection
-                }
-                if (setting.registerStats) { // TODO: check if there is changes
-
-                }
-                give_peers();
+            var timesCompleted = false;
+            var timesStarted = false;
+            var timesUpdated = false;
+            if (event == AnnounceEventType.COMPLETED && left == 0) {
+                timesCompleted = true;
+            } else if (event == AnnounceEventType.STARTED) {// && left == 0) { //TODO: start size check
+                timesStarted = true;
             } else {
-                // we hit multiple? but that's IMPOSSIBLE! ;)
-                if (setting.logDebug) {
-                    debuglog("announce: got multiple targets in peer table!");
-                }
-                throw new TrackerException("Got multiple targets in peer table!");
+                timesUpdated = true;
             }
+            // TODO: update torrent status
+            if (seeder) {
+                // TODO: update seeder status
+            } else {
+                // TODO: update leecher status
+            }
+        } else if (peers.size() == 1) {
+            if (setting.rateLimitation) {
+                // TODO: rate detection
+            }
+            if (setting.registerStats) { // TODO: check if there is changes
 
-            if (setting.timeMe && setting.logDebug) {
-                debuglog("announce: " + (timeOfDay() - start) + " us");
             }
-        } else if (action.contains("scrape")) {
-            sendBencode();
+            give_peers();
         } else {
-            throw new TrackerException("Unknown action.");
+            // we hit multiple? but that's IMPOSSIBLE! ;)
+            if (setting.logDebug) {
+                debuglog("announce: got multiple targets in peer table!");
+            }
+            throw new TrackerException("Got multiple targets in peer table!");
+        }
+
+        if (setting.timeMe && setting.logDebug) {
+            debuglog("announce: " + (timeOfDay() - start) + " us");
         }
     }
 
@@ -234,6 +212,11 @@ public class AnnounceController {
 
     public long time() {
         return System.currentTimeMillis() / 1000;
+    }
+
+    public Setting getSettings() {
+        // TODO
+        return new Setting();
     }
 
     @Data
