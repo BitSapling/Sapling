@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "torrents",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"infoHash"})
+                @UniqueConstraint(columnNames = {"info_hash"})
         }
 )
 @Data
