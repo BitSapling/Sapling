@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.sql.Timestamp;
 @Entity
-@Table(name = "peers",
+@Table(name = "torrents",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"infoHash"})
         }
