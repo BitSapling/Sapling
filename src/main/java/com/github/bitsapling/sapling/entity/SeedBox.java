@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Table(name = "seedbox",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"infoHash"})
+                @UniqueConstraint(columnNames = {"address"})
         }
 )
 @Data
