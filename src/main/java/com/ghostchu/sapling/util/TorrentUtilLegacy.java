@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class TorrentUtil {
+public class TorrentUtilLegacy {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
     private final Bencode bencode = new Bencode(StandardCharsets.UTF_8);
     private final Bencode bencodeInfoHash = new Bencode(StandardCharsets.ISO_8859_1);
@@ -24,24 +24,24 @@ public class TorrentUtil {
     private Map<String, Object> dict;
     private long totalSize;
 
-    public TorrentUtil(File file) throws IOException, BencodeException, TorrentException {
+    public TorrentUtilLegacy(File file) throws IOException, BencodeException, TorrentException {
         this.data = Files.readAllBytes(file.toPath());
         init();
     }
 
-    public TorrentUtil(InputStream stream) throws IOException, BencodeException, TorrentException {
+    public TorrentUtilLegacy(InputStream stream) throws IOException, BencodeException, TorrentException {
         this.data = stream.readAllBytes();
         init();
     }
 
-    public TorrentUtil(URL url) throws IOException, BencodeException, TorrentException {
+    public TorrentUtilLegacy(URL url) throws IOException, BencodeException, TorrentException {
         try (InputStream stream = url.openStream()) {
             this.data = stream.readAllBytes();
         }
         init();
     }
 
-    public TorrentUtil(byte[] data) throws BencodeException, TorrentException {
+    public TorrentUtilLegacy(byte[] data) throws BencodeException, TorrentException {
         this.data = data;
         init();
     }

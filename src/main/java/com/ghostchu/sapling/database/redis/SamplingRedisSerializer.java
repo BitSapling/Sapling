@@ -1,6 +1,6 @@
 package com.ghostchu.sapling.database.redis;
 
-import com.nimbusds.jose.shaded.gson.Gson;
+import com.google.gson.Gson;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 

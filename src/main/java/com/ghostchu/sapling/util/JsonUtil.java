@@ -1,6 +1,6 @@
 package com.ghostchu.sapling.util;
 
-import com.nimbusds.jose.shaded.gson.Gson;
+import com.google.gson.Gson;
 import org.jetbrains.annotations.NotNull;
 
 public class JsonUtil {

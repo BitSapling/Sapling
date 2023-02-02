@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByEmail(@NotNull String email);
 
     @NotNull
-    Optional<User> findByPasskeyEqualsIgnoreCase(@NotNull UUID passkey);
+    Optional<User> findByPasskeyEquals(@NotNull UUID passkey);
 
     @NotNull
     List<User> findAllByGroupId(long groupId);

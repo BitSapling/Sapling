@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "torrents")
@@ -47,16 +46,17 @@ public class Torrent {
     @Column(name = "torrent_status")
     @NotNull
     private TorrentStatus torrentStatus;
-    @Column(name = "fields")
-    @NotNull
-    private Map<Integer, Object> fields;
+    //    @Column(name = "fields")
+//    @NotNull
+//    private Map<String, Object> fields;
     @Column(name = "tags")
     @NotNull
-    private List<Integer> tags;
+    @OneToMany
+    private List<Tag> tags;
     @Column(name = "promotion_id")
     private long promotionId;
 
-    public Torrent(long torrentId, long userId, @NotNull String infoHash, @NotNull String title, @NotNull String subTitle, @Nullable String nfoFile, @NotNull String description, int category, int creatorGroup, int media, int encoding, int resolution, boolean anonymous, @NotNull TorrentStatus torrentStatus, @NotNull List<Integer> tags, @NotNull Map<Integer, Object> fields) {
+    public Torrent(long torrentId, long userId, @NotNull String infoHash, @NotNull String title, @NotNull String subTitle, @Nullable String nfoFile, @NotNull String description, int category, int creatorGroup, int media, int encoding, int resolution, boolean anonymous, @NotNull TorrentStatus torrentStatus, @NotNull List<Tag> tags) {
         this.torrentId = torrentId;
         this.userId = userId;
         this.infoHash = infoHash;
@@ -72,7 +72,7 @@ public class Torrent {
         this.torrentStatus = torrentStatus;
         this.anonymous = anonymous;
         this.tags = tags;
-        this.fields = fields;
+        //  this.fields = fields;
     }
 
     public Torrent() {
@@ -175,21 +175,21 @@ public class Torrent {
         this.anonymous = anonymous;
     }
 
-    public @NotNull List<Integer> getTags() {
+    public @NotNull List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(@NotNull List<Integer> tags) {
+    public void setTags(@NotNull List<Tag> tags) {
         this.tags = tags;
     }
 
-    public @NotNull Map<Integer, Object> getFields() {
-        return fields;
-    }
-
-    public void setFields(@NotNull Map<Integer, Object> fields) {
-        this.fields = fields;
-    }
+//    public @NotNull Map<Integer, Object> getFields() {
+//        return fields;
+//    }
+//
+//    public void setFields(@NotNull Map<Integer, Object> fields) {
+//        this.fields = fields;
+//    }
 
     public @NotNull TorrentStatus getTorrentStatus() {
         return torrentStatus;

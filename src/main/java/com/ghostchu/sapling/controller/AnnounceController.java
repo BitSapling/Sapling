@@ -86,8 +86,6 @@ public class AnnounceController {
                 return error(lang.parse(ConstMetadata.DEFAULT_LOCALE, "announce.invalid_ip", ip));
             if (ipv4 == null && ipValidator.isValidInet4Address(ip)) ipv4 = ip;
             if (ipv6 == null && ipValidator.isValidInet6Address(ip)) ipv6 = ip;
-            if (punishmentService.isBanned(ip, ipv4, ipv6))
-                throw new PeerBannedException(lang.parse(ConstMetadata.DEFAULT_LOCALE, "announce.banned", ip + " or " + ipv4 + " or " + ipv6));
             // Check necessary params
             Validate.notNull(passKeyStr, lang.parse(ConstMetadata.DEFAULT_LOCALE, "announce.missing_key", "passkey"));
             UUID passkey = SafeUUID.fromString(passKeyStr);
@@ -108,6 +106,9 @@ public class AnnounceController {
             if (numberOfPeers3 != null) wantedPeers = numberOfPeers3;
             wantedPeers = Math.min(wantedPeers, MAX_PEERS);
             boolean useCompatResponse = compact != null && compact == 1;
+            // Check of peer has been banned
+            if (punishmentService.isBanned(ip, ipv4, ipv6))
+                throw new PeerBannedException(lang.parse(ConstMetadata.DEFAULT_LOCALE, "announce.banned", ip + " or " + ipv4 + " or " + ipv6));
             return processAnnounce(passkey, infoHash, peerId, event, port, downloaded, uploaded, left, useCompatResponse, noPeerId, ipv4, ipv6, wantedPeers);
         } catch (Exception e) {
             return error(e.getMessage());
