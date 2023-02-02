@@ -8,6 +8,7 @@ public class SaplingApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SaplingApplication.class, args);
+
     }
 
 }

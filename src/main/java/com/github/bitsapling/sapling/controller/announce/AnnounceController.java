@@ -1,12 +1,14 @@
 package com.github.bitsapling.sapling.controller.announce;
 
 import com.dampcake.bencode.Bencode;
-import com.github.bitsapling.sapling.entity.Peer;
-import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.entity.*;
 import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
+import com.github.bitsapling.sapling.repository.PermissionRepository;
+import com.github.bitsapling.sapling.repository.PromotionPolicyRepository;
+import com.github.bitsapling.sapling.repository.UserGroupRepository;
 import com.github.bitsapling.sapling.repository.UserRepository;
 import com.github.bitsapling.sapling.service.AnnounceService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
@@ -27,7 +29,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -56,21 +61,81 @@ public class AnnounceController {
     private AnnounceService announceBackgroundJob;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserGroupRepository userGroupRepository;
+    @Autowired
+    private PermissionRepository permissionRepository;
+    @Autowired
+    private PromotionPolicyRepository promotionPolicyRepository;
 
-    @GetMapping("/scrape/{passkey}")
+    @GetMapping("/prepare")
+    public void prepare() {
+        Permission permission = new Permission();
+        permission.setId(1);
+        permission.setCode("torrent:announce");
+        permission.setDisplayName("Torrent 宣告");
+        permissionRepository.save(permission);
+        PromotionPolicy promotionPolicy = new PromotionPolicy();
+        promotionPolicy.setId(1);
+        promotionPolicy.setDownloadRatio(1);
+        promotionPolicy.setUploadRatio(1);
+        promotionPolicy.setDisplayName("System - NullSafe");
+        promotionPolicyRepository.save(promotionPolicy);
+        UserGroup group = new UserGroup();
+        group.setId(1);
+        group.setPromotionPolicy(promotionPolicy);
+        group.setPermissions(List.of(permission));
+        group.setDisplayName("System - Default");
+        userGroupRepository.save(group);
+        User user = new User(
+                1,
+                "test@test.com",
+                "test",
+                "test",
+                group,
+                new UUID(0,0).toString(),
+                Timestamp.from(Instant.now()),
+                "test",
+                "test",
+                "test",
+                "test",
+                "test",
+                "test",
+                0,
+                0,
+                0,
+                0,
+                "test",
+                new BigDecimal(0),
+                0
+        );
+        userRepository.save(user);
+        Torrent torrent = new Torrent();
+        torrent.setId(1);
+        torrent.setPromotionPolicy(promotionPolicy);
+        torrent.setInfoHash("7256d7ba52269295d4c478e8c0833306747afb6d");
+        torrent.setUser(userRepository.findById(1L).orElseThrow());
+        torrent.setAnonymous(false);
+        torrent.setCreatedAt(Timestamp.from(Instant.now()));
+        torrent.setUpdatedAt(Timestamp.from(Instant.now()));
+    }
+
+    @GetMapping("/scrape")
     public void scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
         // TODO
     }
 
-    @GetMapping("/announce/{passkey}")
-    public String announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
+    @GetMapping("/announce")
+    public String announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
+        log.debug("Gets: " + gets);
         long start = timeOfDay();
+        String passkey = gets.get("passkey");
 
         if (StringUtils.isEmpty(passkey)) {
             throw new InvalidAnnounceException("You must re-download the torrent from tracker for seeding.");
         }
 
-        if (!SafeUUID.isDashesStrippedUUID(passkey)) {
+        if (!SafeUUID.isUUID(passkey)) {
             throw new InvalidAnnounceException("Invalid passkey.");
         }
 
@@ -80,26 +145,29 @@ public class AnnounceController {
         //String peerIdHash = Hashing.murmur3_128().hashString(peerId, StandardCharsets.UTF_8).toString();
         long left = Long.parseLong(gets.get("left"));
         int port = Integer.parseInt(gets.get("port"));
-        AnnounceEventType event = AnnounceEventType.valueOf(gets.get("event"));
+        AnnounceEventType event = AnnounceEventType.fromName(gets.get("event"));
         int numWant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"))).orElse("150"));
         numWant = Math.min(numWant, 300);
         boolean noPeerId = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("nopeerid"), gets.get("no_peerid"), gets.get("no_peer_id"))).orElse("0"));
         boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
         String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
+        // WTF, what are you sending for qBittorrent? infoHash=rV׺R&����x���3tz�m
         String infoHash = gets.get("info_hash");
         long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
         long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
         int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
 
         // User permission checks
+        log.debug("Passkey: "+passkey);
         User user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
         if (!user.getGroup().hasPermission("torrent:announce")) {
             throw new InvalidAnnounceException("Permission Denied");
         }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
-        announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant,request.getHeader("User-Agent")));
+        announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+        log.debug("Sending peers to "+peerId);
         return generatePeersResponse(peerId, infoHash, numWant, compact);
         // TODO check whether user have permission to download
 
@@ -162,7 +230,7 @@ public class AnnounceController {
         if (!method.equals("GET")) {
             throw new InvalidAnnounceException("Invalid request method: " + method);
         }
-        if(request.getHeader("User-Agent") == null){
+        if (request.getHeader("User-Agent") == null) {
             throw new InvalidAnnounceException("Bad client: User-Agent cannot be empty");
         }
         //blacklistClient.checkClient(request);

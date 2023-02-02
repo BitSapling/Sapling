@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.repository;
 
 import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.entity.UserGroup;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -15,5 +16,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByPasskey(@NotNull String passkey);
     List<User> findByEmailContains(@NotNull String emailPart);
     List<User> findByUsernameContains(@NotNull String usernamePart);
-    List<User> findByRole(@NotNull String role);
+    List<User> findByGroup(@NotNull UserGroup group);
 }

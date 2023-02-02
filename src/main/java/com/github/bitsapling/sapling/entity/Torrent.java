@@ -19,8 +19,9 @@ public class Torrent {
     private long id;
     @Column(name = "info_hash", nullable = false)
     private String infoHash;
-    @Column(name = "user_id", nullable = false)
-    private long userId;
+    @PrimaryKeyJoinColumn(name = "user")
+    @OneToOne(cascade = CascadeType.ALL)
+    private User user;
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "sub_title", nullable = false)
@@ -43,8 +44,8 @@ public class Torrent {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @Column(name = "promotion_policy")
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn(name = "promotion_policy")
     private PromotionPolicy promotionPolicy;
     @Column(name = "description_type", nullable = false)
     private int descriptionType;

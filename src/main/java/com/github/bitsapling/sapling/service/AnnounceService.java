@@ -34,7 +34,15 @@ public class AnnounceService {
     private PeersRepository peersRepository;
 
     public AnnounceService() {
-
+        Thread thread = new Thread(()-> {
+            try {
+                handleTasks();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void schedule(@NotNull AnnounceTask announceTask) throws AnnounceBusyException {
@@ -50,7 +58,11 @@ public class AnnounceService {
             AnnounceTask task = taskQueue.take();
             executor.getAnnounceExecutor().submit(() -> {
                 log.debug("Handling task: {}", task);
-                handleTask(task);
+                try {
+                    handleTask(task);
+                }catch (Exception e){
+                    log.error("Error handling task: {}", task, e);
+                }
             });
         }
     }
@@ -94,6 +106,7 @@ public class AnnounceService {
 
     @NotNull
     private Peer createNewPeer(AnnounceTask task) {
+        log.debug("Info hash for searching torrent: {}",task.infoHash());
         Torrent torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
         return new Peer(
                 UUID.randomUUID(),

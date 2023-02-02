@@ -1,7 +1,9 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -14,6 +16,8 @@ import java.sql.Timestamp;
         }
 )
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,18 +29,18 @@ public class User {
     private String passwordHash;
     @Column(name = "username",nullable = false)
     private String username;
-    @Column(name = "group",nullable = false)
-    @OneToOne
+    @PrimaryKeyJoinColumn(name = "group")
+    @OneToOne(cascade = CascadeType.ALL)
     private UserGroup group;
     @Column(name = "passkey",nullable = false)
     private String passkey;
     @Column(name = "create_at",nullable = false)
     private Timestamp createdAt;
-    @Column(name = "avatar")
+    @Column(name = "avatar",nullable = false)
     private String avatar;
-    @Column(name = "custom_title")
+    @Column(name = "custom_title",nullable = false)
     private String customTitle;
-    @Column(name = "signature")
+    @Column(name = "signature",nullable = false)
     private String signature;
     @Column(name = "language",nullable = false)
     private String language;

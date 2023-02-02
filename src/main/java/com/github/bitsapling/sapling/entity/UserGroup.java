@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Entity
-@Table(name = "groups",
+@Table(name = "user_groups",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"}),
 
@@ -18,12 +18,14 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)
     private long id;
-    @Column(name = "code")
-    @OneToMany
+    @Column(name = "display_name", nullable = false)
+    private String displayName;
+    @OneToMany(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn(name="permissions")
     private List<Permission> permissions;
 
-    @Column(name = "promotion_policy")
-    @OneToOne
+    @PrimaryKeyJoinColumn(name = "promotion_policy")
+    @OneToOne(cascade = CascadeType.ALL)
     private PromotionPolicy promotionPolicy;
 
     public boolean hasPermission(String permission){

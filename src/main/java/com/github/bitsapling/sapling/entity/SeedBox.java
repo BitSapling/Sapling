@@ -17,8 +17,10 @@ public class SeedBox {
     private long id;
     @Column(name = "address", nullable = false)
     private String address;
-    @Column(name = "download_multipler")
-    private Double downloadMultiplier;
-    @Column(name = "upload_multipler")
-    private Double uploadMultiplier;
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn(name = "download_policy")
+    private PromotionPolicy downloadMultiplier;
+    @OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn(name = "download_policy")
+    private PromotionPolicy uploadMultiplier;
 }

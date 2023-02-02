@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Peer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "uuid", nullable = false)
     private UUID uuid;
     @Column(name = "ip", nullable = false)
@@ -36,15 +36,15 @@ public class Peer {
     private long uploaded;
     @Column(name = "downloaded", nullable = false)
     private long downloaded;
-    @Column(name = "left", nullable = false)
+    @Column(name = "to_go", nullable = false)
     private long left;
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
-    @Column(name = "torrent", nullable = false)
-    @OneToOne
+    @PrimaryKeyJoinColumn(name = "torrent")
+    @OneToOne(cascade = CascadeType.ALL)
     private Torrent torrent;
-    @Column(name = "user", nullable = false)
-    @OneToOne
+    @PrimaryKeyJoinColumn(name="user")
+    @OneToOne(cascade = CascadeType.ALL)
     private User user;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
