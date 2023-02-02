@@ -2,18 +2,19 @@ package com.github.bitsapling.sapling.controller.announce;
 
 import com.dampcake.bencode.Bencode;
 import com.github.bitsapling.sapling.entity.Peer;
+import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
-import com.github.bitsapling.sapling.exception.TrackerException;
+import com.github.bitsapling.sapling.repository.UserRepository;
+import com.github.bitsapling.sapling.service.AnnounceService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
-import com.github.bitsapling.sapling.type.IPFormatRequirement;
 import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
-import com.google.common.hash.Hashing;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,10 @@ public class AnnounceController {
     private BlacklistClientService blacklistClientService;
     @Autowired
     private PeerService peerService;
+    @Autowired
+    private AnnounceService announceBackgroundJob;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/scrape/{passkey}")
     public void scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
@@ -58,7 +63,7 @@ public class AnnounceController {
     }
 
     @GetMapping("/announce/{passkey}")
-    public String announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws TrackerException, FixedAnnounceException, BrowserReadableAnnounceException {
+    public String announce(@PathVariable String passkey, @RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
         long start = timeOfDay();
 
         if (StringUtils.isEmpty(passkey)) {
@@ -68,12 +73,12 @@ public class AnnounceController {
         if (!SafeUUID.isDashesStrippedUUID(passkey)) {
             throw new InvalidAnnounceException("Invalid passkey.");
         }
+
         checkClient();
         checkAnnounceFields(gets);
         String peerId = gets.get("peer_id");
-        String peerIdHash = Hashing.murmur3_128().hashString(peerId, StandardCharsets.UTF_8).toString();
+        //String peerIdHash = Hashing.murmur3_128().hashString(peerId, StandardCharsets.UTF_8).toString();
         long left = Long.parseLong(gets.get("left"));
-        boolean seeder = left == 0;
         int port = Integer.parseInt(gets.get("port"));
         AnnounceEventType event = AnnounceEventType.valueOf(gets.get("event"));
         int numWant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"))).orElse("150"));
@@ -83,11 +88,20 @@ public class AnnounceController {
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
         String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
         String infoHash = gets.get("info_hash");
+        long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
+        long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
+        int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
 
+        // User permission checks
+        User user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
+        if (!user.getGroup().hasPermission("torrent:announce")) {
+            throw new InvalidAnnounceException("Permission Denied");
+        }
+        // User had permission to announce torrents
+        // Create an announce tasks and drop into background, end this request as fast as possible
+        announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant,request.getHeader("User-Agent")));
+        return generatePeersResponse(peerId, infoHash, numWant, compact);
         // TODO check whether user have permission to download
-
-        return generatePeersResponse(peerIdHash, infoHash, numWant, compact);
-
 
 //
 //        if (peers.size() == 0) { // peer not found - insert into database, but only if not event=stopped
@@ -137,17 +151,21 @@ public class AnnounceController {
 //        }
     }
 
+
     public long timeOfDay() {
         return System.nanoTime() / 1000;
 
     }
 
-    private void checkClient() throws FixedAnnounceException, BrowserReadableAnnounceException {
+    private void checkClient() throws FixedAnnounceException {
         String method = request.getMethod();
         if (!method.equals("GET")) {
             throw new InvalidAnnounceException("Invalid request method: " + method);
         }
-        blacklistClient.checkClient(request);
+        if(request.getHeader("User-Agent") == null){
+            throw new InvalidAnnounceException("Bad client: User-Agent cannot be empty");
+        }
+        //blacklistClient.checkClient(request);
     }
 
     private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
@@ -190,22 +208,22 @@ public class AnnounceController {
     }
 
     @NotNull
-    private String generatePeersResponseCompat(String peerIdHash, String infoHash, int numWant) {
+    private String generatePeersResponseCompat(String peerId, String infoHash, int numWant) {
         // TODO: What the fuck
         // http://bittorrent.org/beps/bep_0023.html
-        Map<IPFormatRequirement, List<Map<String, String>>> peers = gatherPeers(peerIdHash, infoHash, numWant, true);
+        PeerResult peers = gatherPeers(peerId, infoHash, numWant);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
         dict.put("min interval", randomInterval());
-        dict.put("peers", peers.get(IPFormatRequirement.IPV4));
-        dict.put("peers6", peers.get(IPFormatRequirement.IPV6));
+        dict.put("peers", peers.peers());
+        dict.put("peers6", peers.peers6());
         return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
     }
 
     @NotNull
-    private String generatePeersResponseNonCompat(String peerIdHash, String infoHash, int numWant, boolean noPeerId) {
-        PeerResult peers = gatherPeers(peerIdHash, infoHash, numWant);
-        List<Map<String,String>> peerList = new ArrayList<>();
+    private String generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
+        PeerResult peers = gatherPeers(peerId, infoHash, numWant);
+        List<Map<String, String>> peerList = new ArrayList<>();
         List<Peer> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
         for (Peer peer : allPeers) {
@@ -224,15 +242,15 @@ public class AnnounceController {
     }
 
     @NotNull
-    private PeerResult gatherPeers(@NotNull String peerIdHashExclude, @NotNull String infoHash, int numWant) {
+    private PeerResult gatherPeers(@NotNull String peerId, @NotNull String infoHash, int numWant) {
         List<Peer> torrentPeers = peerService.fetchPeers(infoHash, numWant);
         // Remove itself
-        torrentPeers.removeIf(peer -> peer.getPeerIdHash().equals(peerIdHashExclude));
-        List<Peer> v4 = torrentPeers.stream().filter(peer->ipValidator.isValidInet4Address(peer.getIp())).toList();
-        List<Peer> v6 = torrentPeers.stream().filter(peer->ipValidator.isValidInet6Address(peer.getIp())).toList();
+        torrentPeers.removeIf(peer -> peer.getPeerId().equals(peerId));
+        List<Peer> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
+        List<Peer> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
         long completed = torrentPeers.stream().filter(Peer::isSeeder).count();
         long incompleted = torrentPeers.size() - completed;
-        return new PeerResult(v4,v6,completed,incompleted);
+        return new PeerResult(v4, v6, completed, incompleted);
     }
 
     private String randomInterval() {

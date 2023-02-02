@@ -1,0 +1,16 @@
+server:
+  port: 8081
+sa-token:
+  token-name: sapling-token
+  timeout: 2592000
+  activity-timeout: -1
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: true
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/sapling?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    username: sapling
+    password: sapling

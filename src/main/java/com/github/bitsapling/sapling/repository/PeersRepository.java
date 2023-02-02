@@ -11,7 +11,9 @@ import java.util.UUID;
 @Repository
 public interface PeersRepository extends CrudRepository<Peer, UUID> {
     Optional<Peer> findByIpAndPortAndInfoHash(@NotNull String ip, int port, @NotNull String infoHash);
+    Optional<Peer> findByPeerIdAndInfoHash(@NotNull String peerId, @NotNull String infoHash);
     List<Peer> findPeersByInfoHash(@NotNull String infoHash);
     List<Peer> findPeersByUserId(long userId);
     List<Peer> findPeersByTorrentId(long torrentId);
+    void deletePeerByInfoHashAndPeerId(String infoHash, String peerId);
 }
