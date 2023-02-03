@@ -15,6 +15,7 @@ import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.InfoHashUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
+import com.google.common.collect.Iterators;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.SequenceInputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -36,7 +40,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Translated from <a href="https://github.com/swetorrentking/rartracker/blob/master/tracker.php">here</a>
@@ -91,48 +94,9 @@ public class AnnounceController {
         group.setPermissionEntities(List.of(permissionEntity));
         group.setDisplayName("System - Default");
         userGroupRepository.save(group);
-        UserEntity user = new UserEntity(
-                1L,
-                "test@test.com",
-                "test",
-                "test",
-                group,
-                new UUID(0, 0).toString(),
-                Timestamp.from(Instant.now()),
-                "test",
-                "test",
-                "test",
-                "test",
-                "test",
-                "test",
-                0,
-                0,
-                0,
-                0,
-                "test",
-                new BigDecimal(0),
-                0
-        );
+        UserEntity user = new UserEntity(1L, "test@test.com", "test", "test", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
         userRepository.save(user);
-        TorrentEntity torrent = new TorrentEntity(
-                1L,
-                "7256d7ba52269295d4c478e8c0833306747afb6d",
-                user,
-                "测试种子",
-                "Test Torrent",
-                10000,
-                0,
-                Timestamp.from(Instant.now()),
-                Timestamp.from(Instant.now()),
-                false,
-                false,
-                false,
-                false,
-                0,
-                promotionPolicy,
-                0,
-                "这是描述"
-        );
+        TorrentEntity torrent = new TorrentEntity(1L, "7256d7ba52269295d4c478e8c0833306747afb6d", user, "测试种子", "Test Torrent", 10000, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false, false, false, false, 0, promotionPolicy, 0, "这是描述");
         torrentRepository.save(torrent);
 
     }
@@ -243,10 +207,8 @@ public class AnnounceController {
     }
 
     private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
-        if (StringUtils.isEmpty(gets.get("info_hash")))
-            throw new InvalidAnnounceException("Missing param: info_hash");
-        if (StringUtils.isEmpty(gets.get("peer_id")))
-            throw new InvalidAnnounceException("Missing param: peer_id");
+        if (StringUtils.isEmpty(gets.get("info_hash"))) throw new InvalidAnnounceException("Missing param: info_hash");
+        if (StringUtils.isEmpty(gets.get("peer_id"))) throw new InvalidAnnounceException("Missing param: peer_id");
         if (StringUtils.isEmpty(gets.get("port")) || !StringUtils.isNumeric(gets.get("port")))
             throw new InvalidAnnounceException("Missing/Invalid param: port");
         if (StringUtils.isEmpty(gets.get("uploaded")) || !StringUtils.isNumeric(gets.get("uploaded")))
@@ -290,7 +252,7 @@ public class AnnounceController {
         dict.put("interval", randomInterval());
         dict.put("min interval", randomInterval());
 
-        dict.put("peers", peers.peers().stream().map(peer -> {
+        try (var v4 = new SequenceInputStream(Iterators.asEnumeration(peers.peers().stream().map(peer -> {
             String ip = peer.getIp();
             // checked before
             assert ipValidator.isValidInet4Address(ip);
@@ -298,15 +260,20 @@ public class AnnounceController {
                 byte[] ips = new byte[6];
                 System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 4);
                 int in = peer.getPort();
-                ips[4] = (byte) (in & 0xFF);
-                ips[5] = (byte) ((in >> 8) & 0xFF);
-                return new String(ips, BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
+                ips[4] = (byte) ((in >>> 8) & 0xFF);
+                ips[5] = (byte) (in & 0xFF);
+                return ips;
             } catch (UnknownHostException e) {
                 // not logically possible
                 throw new RuntimeException(e);
             }
-        }).collect(Collectors.toList()));
-        dict.put("peers6", peers.peers6().stream().map(peer -> {
+        }).map(ByteArrayInputStream::new).iterator()))) {
+            dict.put("peers", new String(v4.readAllBytes(), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (var v6 = new SequenceInputStream(Iterators.asEnumeration(peers.peers6().stream().map(peer -> {
             String ip = peer.getIp();
             // checked before
             assert ipValidator.isValidInet6Address(ip);
@@ -314,14 +281,19 @@ public class AnnounceController {
                 byte[] ips = new byte[18];
                 System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 16);
                 int in = peer.getPort();
-                ips[16] = (byte) (in & 0xFF);
-                ips[17] = (byte) ((in >> 8) & 0xFF);
-                return new String(ips, BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
+                ips[16] = (byte) ((in >>> 8) & 0xFF);
+                ips[17] = (byte) (in & 0xFF);
+                return ips;
             } catch (UnknownHostException e) {
                 // not logically possible
                 throw new RuntimeException(e);
             }
-        }).collect(Collectors.toList()));
+        }).map(ByteArrayInputStream::new).iterator()))) {
+            dict.put("peers6", new String(v6.readAllBytes(), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
     }
 
