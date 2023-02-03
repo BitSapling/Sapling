@@ -102,6 +102,9 @@ public class AnnounceService {
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         userRepository.save(user);
         log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
+        if(task.event() == AnnounceEventType.STOPPED){
+            peersRepository.delete(peer);
+        }
     }
 
     @NotNull
@@ -119,8 +122,9 @@ public class AnnounceService {
                 task.downloaded(),
                 task.left(),
                 false,
-                torrent,
-                task.user(),
+                task.passKey(),
+//                torrent,
+//                task.user(),
                 Instant.now()
         );
     }
@@ -129,7 +133,7 @@ public class AnnounceService {
             @NotNull String ip, int port, @NotNull String infoHash, @NotNull String peerId,
             long uploaded, long downloaded, long left, @NotNull AnnounceEventType event,
             int numWant, UserEntity user, boolean compact, boolean noPeerId,
-            boolean supportCrypto, int redundant, String userAgent
+            boolean supportCrypto, int redundant, String userAgent, String passKey
     ) {
 
     }

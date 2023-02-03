@@ -9,7 +9,9 @@ public enum AnnounceEventType {
     STARTED("started"),
     COMPLETED("completed"),
     STOPPED("stopped"),
-    PAUSED("paused");
+    PAUSED("paused"),
+
+    UNKNOWN("unknown");
     private final String key;
     AnnounceEventType(String key){
         this.key = key;
@@ -19,14 +21,14 @@ public enum AnnounceEventType {
     public String getKey() {
         return key;
     }
-    @Nullable
-    public static AnnounceEventType fromName(@NotNull String name){
+    public static @NotNull AnnounceEventType fromName(@Nullable String name){
+        if(name == null) return UNKNOWN;
         name = name.toLowerCase(Locale.ROOT);
         for (AnnounceEventType type : values()){
             if (type.getKey().equals(name)){
                 return type;
             }
         }
-        return null;
+        return UNKNOWN;
     }
 }

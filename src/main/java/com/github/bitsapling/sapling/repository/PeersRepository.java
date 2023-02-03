@@ -15,6 +15,6 @@ public interface PeersRepository extends CrudRepository<PeerEntity, Long> {
     Optional<PeerEntity> findByIpAndPortAndInfoHash(@NotNull String ip, int port, @NotNull String infoHash);
     Optional<PeerEntity> findByPeerIdAndInfoHash(@NotNull String peerId, @NotNull String infoHash);
     List<PeerEntity> findPeersByInfoHash(@NotNull String infoHash);
-    List<PeerEntity> findPeersByUserId(long userId);
+    //List<PeerEntity> findPeersByUserId(long userId);
     void deletePeerByInfoHashAndPeerId(String infoHash, String peerId);
 }

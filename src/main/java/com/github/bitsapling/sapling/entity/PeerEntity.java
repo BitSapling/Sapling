@@ -41,12 +41,8 @@ public class PeerEntity {
     private long left;
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
-    @JoinColumn(name = "torrent")
-    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private TorrentEntity torrent;
-    @JoinColumn(name = "user")
-    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private UserEntity user;
+    @Column(name = "passkey", nullable = false)
+    private String passKey;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
 }

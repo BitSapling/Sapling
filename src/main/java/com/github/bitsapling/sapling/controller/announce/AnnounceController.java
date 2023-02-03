@@ -157,13 +157,16 @@ public class AnnounceController {
         // Create an announce tasks and drop into background, end this request as fast as possible
         if (ipv4 != null) {
             for (String v4 : ipv4) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
             }
         }
         if (ipv6 != null) {
             for (String v6 : ipv6) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
             }
+        }
+        if(peerIp != null) {
+            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
         }
         log.debug("Sending peers to " + peerId);
         String peers = generatePeersResponse(peerId, infoHash, numWant, compact);
@@ -217,10 +220,10 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Missing/Invalid param: downloaded");
         if (StringUtils.isEmpty(gets.get("left")) || !StringUtils.isNumeric(gets.get("left")))
             throw new InvalidAnnounceException("Missing/Invalid param: left");
-        if (StringUtils.isEmpty(gets.get("event")))
-            throw new InvalidAnnounceException("Missing param: event; Please update or change your client.");
-        if (AnnounceEventType.fromName(gets.get("event")) == null)
-            throw new InvalidAnnounceException("Invalid param: event");
+//        if (StringUtils.isEmpty(gets.get("event")))
+//            throw new InvalidAnnounceException("Missing param: event; Please update or change your client.");
+//        if (AnnounceEventType.fromName(gets.get("event")) == null)
+//            throw new InvalidAnnounceException("Invalid param: event");
         String numwant = MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"));
         if (!StringUtils.isEmpty(numwant) && !StringUtils.isNumeric(numwant)) {
             throw new InvalidAnnounceException("Invalid optional param: numwant");
