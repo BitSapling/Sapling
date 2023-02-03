@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,8 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+@Transactional
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)
@@ -30,8 +32,8 @@ public class User {
     @Column(name = "username",nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group")
-    @OneToOne(cascade = CascadeType.ALL)
-    private UserGroup group;
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    private UserGroupEntity group;
     @Column(name = "passkey",nullable = false)
     private String passkey;
     @Column(name = "create_at",nullable = false)
@@ -63,7 +65,7 @@ public class User {
     @Column(name = "invite_slot",nullable = false)
     private int inviteSlot;
 
-    public UserGroup getGroup() {
+    public UserGroupEntity getGroup() {
         return group;
     }
 }

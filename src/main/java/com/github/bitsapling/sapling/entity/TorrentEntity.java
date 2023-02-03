@@ -1,7 +1,10 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
@@ -11,8 +14,11 @@ import java.sql.Timestamp;
                 @UniqueConstraint(columnNames = {"info_hash"})
         }
 )
+@Transactional
 @Data
-public class Torrent {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TorrentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -20,8 +26,8 @@ public class Torrent {
     @Column(name = "info_hash", nullable = false)
     private String infoHash;
     @PrimaryKeyJoinColumn(name = "user")
-    @OneToOne(cascade = CascadeType.ALL)
-    private User user;
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    private UserEntity user;
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "sub_title", nullable = false)
@@ -44,9 +50,9 @@ public class Torrent {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "promotion_policy")
-    private PromotionPolicy promotionPolicy;
+    private PromotionPolicyEntity promotionPolicy;
     @Column(name = "description_type", nullable = false)
     private int descriptionType;
     @Column(name = "description", nullable = false)

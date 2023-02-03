@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 @Entity
@@ -9,18 +10,19 @@ import lombok.Data;
                 @UniqueConstraint(columnNames = {"address"})
         }
 )
+@Transactional
 @Data
-public class SeedBox {
+public class SeedBoxEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
     @Column(name = "address", nullable = false)
     private String address;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "download_policy")
-    private PromotionPolicy downloadMultiplier;
-    @OneToOne(cascade = CascadeType.ALL)
+    private PromotionPolicyEntity downloadMultiplier;
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "download_policy")
-    private PromotionPolicy uploadMultiplier;
+    private PromotionPolicyEntity uploadMultiplier;
 }

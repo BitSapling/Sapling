@@ -1,12 +1,12 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(name = "peers",
@@ -17,11 +17,12 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Peer {
+@Transactional
+public class PeerEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "uuid", nullable = false)
-    private UUID uuid;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private long id;
     @Column(name = "ip", nullable = false)
     private String ip;
     @Column(name = "port", nullable = false)
@@ -41,11 +42,11 @@ public class Peer {
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
     @PrimaryKeyJoinColumn(name = "torrent")
-    @OneToOne(cascade = CascadeType.ALL)
-    private Torrent torrent;
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    private TorrentEntity torrent;
     @PrimaryKeyJoinColumn(name="user")
-    @OneToOne(cascade = CascadeType.ALL)
-    private User user;
+    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    private UserEntity user;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
 }

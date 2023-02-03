@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 @Entity
@@ -10,8 +11,9 @@ import lombok.Data;
                 @UniqueConstraint(columnNames = {"code"})
         }
 )
+@Transactional
 @Data
-public class Permission {
+public class PermissionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)

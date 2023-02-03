@@ -6,10 +6,7 @@ import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
-import com.github.bitsapling.sapling.repository.PermissionRepository;
-import com.github.bitsapling.sapling.repository.PromotionPolicyRepository;
-import com.github.bitsapling.sapling.repository.UserGroupRepository;
-import com.github.bitsapling.sapling.repository.UserRepository;
+import com.github.bitsapling.sapling.repository.*;
 import com.github.bitsapling.sapling.service.AnnounceService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.PeerService;
@@ -69,28 +66,30 @@ public class AnnounceController {
     private PermissionRepository permissionRepository;
     @Autowired
     private PromotionPolicyRepository promotionPolicyRepository;
+    @Autowired
+    private TorrentRepository torrentRepository;
 
     @GetMapping("/prepare")
     public void prepare() {
-        Permission permission = new Permission();
-        permission.setId(1);
-        permission.setCode("torrent:announce");
-        permission.setDisplayName("Torrent 宣告");
-        permissionRepository.save(permission);
-        PromotionPolicy promotionPolicy = new PromotionPolicy();
-        promotionPolicy.setId(1);
+        PermissionEntity permissionEntity = new PermissionEntity();
+        permissionEntity.setId(0);
+        permissionEntity.setCode("torrent:announce");
+        permissionEntity.setDisplayName("Torrent 宣告");
+        permissionRepository.save(permissionEntity);
+        PromotionPolicyEntity promotionPolicy = new PromotionPolicyEntity();
+        promotionPolicy.setId(0);
         promotionPolicy.setDownloadRatio(1);
         promotionPolicy.setUploadRatio(1);
         promotionPolicy.setDisplayName("System - NullSafe");
         promotionPolicyRepository.save(promotionPolicy);
-        UserGroup group = new UserGroup();
-        group.setId(1);
+        UserGroupEntity group = new UserGroupEntity();
+        group.setId(0);
         group.setPromotionPolicy(promotionPolicy);
-        group.setPermissions(List.of(permission));
+        group.setPermissionEntities(List.of(permissionEntity));
         group.setDisplayName("System - Default");
         userGroupRepository.save(group);
-        User user = new User(
-                1,
+        UserEntity user = new UserEntity(
+                1L,
                 "test@test.com",
                 "test",
                 "test",
@@ -112,14 +111,27 @@ public class AnnounceController {
                 0
         );
         userRepository.save(user);
-        Torrent torrent = new Torrent();
-        torrent.setId(1);
-        torrent.setPromotionPolicy(promotionPolicy);
-        torrent.setInfoHash("7256d7ba52269295d4c478e8c0833306747afb6d");
-        torrent.setUser(userRepository.findById(1L).orElseThrow());
-        torrent.setAnonymous(false);
-        torrent.setCreatedAt(Timestamp.from(Instant.now()));
-        torrent.setUpdatedAt(Timestamp.from(Instant.now()));
+        TorrentEntity torrent = new TorrentEntity(
+                1L,
+                "7256d7ba52269295d4c478e8c0833306747afb6d",
+                user,
+                "测试种子",
+                "Test Torrent",
+                10000,
+                0,
+                Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()),
+                false,
+                false,
+                false,
+                false,
+                0,
+                promotionPolicy,
+                0,
+                "这是描述"
+                );
+        torrentRepository.save(torrent);
+
     }
 
     @GetMapping("/test")
@@ -169,10 +181,10 @@ public class AnnounceController {
 
         // User permission checks
         log.debug("Passkey: " + passkey);
-        User user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
-        if (!user.getGroup().hasPermission("torrent:announce")) {
-            throw new InvalidAnnounceException("Permission Denied");
-        }
+        UserEntity user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
+//        if (!user.getGroup().hasPermission("torrent:announce")) {
+//            throw new InvalidAnnounceException("Permission Denied");
+//        }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
         announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
@@ -320,9 +332,9 @@ public class AnnounceController {
     private String generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
         PeerResult peers = gatherPeers(peerId, infoHash, numWant);
         List<Map<String, String>> peerList = new ArrayList<>();
-        List<Peer> allPeers = new ArrayList<>(peers.peers());
+        List<PeerEntity> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
-        for (Peer peer : allPeers) {
+        for (PeerEntity peer : allPeers) {
             Map<String, String> peerMap = new HashMap<>();
             if (!noPeerId) {
                 peerMap.put("peer id", peer.getPeerId());
@@ -339,12 +351,12 @@ public class AnnounceController {
 
     @NotNull
     private PeerResult gatherPeers(@NotNull String peerId, @NotNull String infoHash, int numWant) {
-        List<Peer> torrentPeers = peerService.fetchPeers(infoHash, numWant);
+        List<PeerEntity> torrentPeers = peerService.fetchPeers(infoHash, numWant);
         // Remove itself
         torrentPeers.removeIf(peer -> peer.getPeerId().equals(peerId));
-        List<Peer> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
-        List<Peer> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
-        long completed = torrentPeers.stream().filter(Peer::isSeeder).count();
+        List<PeerEntity> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
+        List<PeerEntity> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
+        long completed = torrentPeers.stream().filter(PeerEntity::isSeeder).count();
         long incompleted = torrentPeers.size() - completed;
         return new PeerResult(v4, v6, completed, incompleted);
     }
@@ -353,7 +365,7 @@ public class AnnounceController {
         return String.valueOf(random.nextInt(MIN_INTERVAL, MAX_INTERVAL));
     }
 
-    record PeerResult(@NotNull List<Peer> peers, List<Peer> peers6, long complete, long incomplete) {
+    record PeerResult(@NotNull List<PeerEntity> peers, List<PeerEntity> peers6, long complete, long incomplete) {
     }
 
     @Data

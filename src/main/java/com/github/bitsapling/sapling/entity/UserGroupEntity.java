@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.Data;
 
 import java.util.List;
@@ -13,23 +14,24 @@ import java.util.List;
         }
 )
 @Data
-public class UserGroup {
+@Transactional
+public class UserGroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",nullable = false)
     private long id;
     @Column(name = "display_name", nullable = false)
     private String displayName;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name="permissions")
-    private List<Permission> permissions;
+    private List<PermissionEntity> permissionEntities;
 
     @PrimaryKeyJoinColumn(name = "promotion_policy")
-    @OneToOne(cascade = CascadeType.ALL)
-    private PromotionPolicy promotionPolicy;
+    @OneToOne(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
+    private PromotionPolicyEntity promotionPolicy;
 
     public boolean hasPermission(String permission){
-        for (Permission perm : permissions) {
+        for (PermissionEntity perm : permissionEntities) {
             if(perm.getCode().equals(permission)) {
                 return true;
             }

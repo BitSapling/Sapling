@@ -1,6 +1,6 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.entity.Peer;
+import com.github.bitsapling.sapling.entity.PeerEntity;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import com.github.bitsapling.sapling.util.RandomUtil;
 import jakarta.transaction.Transactional;
@@ -19,8 +19,8 @@ public class PeerService {
     private PeersRepository repository;
 
     @NotNull
-    public List<Peer> fetchPeers(@NotNull String infoHash, int numWant) {
-        List<Peer> allPeers = repository.findPeersByInfoHash(infoHash);
+    public List<PeerEntity> fetchPeers(@NotNull String infoHash, int numWant) {
+        List<PeerEntity> allPeers = repository.findPeersByInfoHash(infoHash);
         return RandomUtil.getRandomElements(allPeers, numWant);
     }
 
