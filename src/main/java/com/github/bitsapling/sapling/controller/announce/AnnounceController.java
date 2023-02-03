@@ -15,6 +15,7 @@ import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.BooleanUtil;
+import com.github.bitsapling.sapling.util.InfoHashUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,7 +95,7 @@ public class AnnounceController {
                 "test",
                 "test",
                 group,
-                new UUID(0,0).toString(),
+                new UUID(0, 0).toString(),
                 Timestamp.from(Instant.now()),
                 "test",
                 "test",
@@ -127,6 +129,7 @@ public class AnnounceController {
 
     @GetMapping("/announce")
     public String announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
+        log.debug("Query String: {}", request.getQueryString());
         log.debug("Gets: " + gets);
         long start = timeOfDay();
         String passkey = gets.get("passkey");
@@ -152,14 +155,15 @@ public class AnnounceController {
         boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
         String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
-        // WTF, what are you sending for qBittorrent? infoHash=rV׺R&����x���3tz�m
-        String infoHash = gets.get("info_hash");
+        String infoHash = InfoHashUtil.parseInfoHash(readInfoHash(request.getQueryString()));
+        log.debug("Decoded info_hash: {}",infoHash);
+        log.debug("Info Hash Length: {}", infoHash.getBytes(StandardCharsets.UTF_8).length);
         long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
         long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
         int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
 
         // User permission checks
-        log.debug("Passkey: "+passkey);
+        log.debug("Passkey: " + passkey);
         User user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
         if (!user.getGroup().hasPermission("torrent:announce")) {
             throw new InvalidAnnounceException("Permission Denied");
@@ -167,7 +171,7 @@ public class AnnounceController {
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
         announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
-        log.debug("Sending peers to "+peerId);
+        log.debug("Sending peers to " + peerId);
         return generatePeersResponse(peerId, infoHash, numWant, compact);
         // TODO check whether user have permission to download
 
@@ -217,6 +221,23 @@ public class AnnounceController {
 //        if (setting.timeMe && setting.logDebug) {
 //            debuglog("announce: " + (timeOfDay() - start) + " us");
 //        }
+    }
+
+    @Nullable
+    private String readInfoHash(String queryString) {
+        // This is a workaround for binary encoded info_hash data.
+        String[] queryStrings = queryString.split("&");
+        for (String string : queryStrings) {
+            String[] args = string.split("=");
+            if (args.length != 2) {
+                continue;
+            }
+            String key = args[0];
+            if (key.equals("info_hash")) {
+                return args[1];
+            }
+        }
+        return null;
     }
 
 
