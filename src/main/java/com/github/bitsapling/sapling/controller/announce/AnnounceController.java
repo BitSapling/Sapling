@@ -16,6 +16,7 @@ import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.InfoHashUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
+import com.google.common.collect.Iterators;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.Timestamp;
@@ -115,7 +117,7 @@ public class AnnounceController {
                 byte[] ip = new byte[4];
                 byte[] port = new byte[2];
                 try {
-                    while(stream.available() != 0){
+                    while (stream.available() != 0) {
                         stream.read(ip);
                         stream.read(port);
                         log.debug("IP: {}; Port: {}", InetAddress.getByAddress(ip), EndianUtils.readSwappedUnsignedShort(new ByteArrayInputStream(port)));
@@ -275,7 +277,7 @@ public class AnnounceController {
         } else {
             resp = generatePeersResponseNonCompat(peerIdHash, infoHash, numWant, compact);
         }
-        log.info("Resp: {}",resp);
+        log.info("Resp: {}", resp);
         return resp;
     }
 
@@ -289,28 +291,63 @@ public class AnnounceController {
         dict.put("min interval", randomInterval());
         dict.put("complete", peers.complete());
         dict.put("incomplete", peers.incomplete());
-        List<String> peersv4 = new ArrayList<>();
-        List<String> peersv6 = new ArrayList<>();
-        ByteArrayOutputStream streamv4 = new ByteArrayOutputStream();
-        for (PeerEntity peer : peers.peers()) {
-            writeCompactStream(streamv4, InetAddress.getByName(peer.getIp()), peer.getPort());
+
+        try (var v4 = new SequenceInputStream(Iterators.asEnumeration(peers.peers().stream().map(peer -> {
+            String ip = peer.getIp();
+            // checked before
+            assert ipValidator.isValidInet4Address(ip);
+            try {
+                byte[] ips = new byte[6];
+                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 4);
+                int in = peer.getPort();
+                ips[4] = (byte) ((in >>> 8) & 0xFF);
+                ips[5] = (byte) (in & 0xFF);
+                return ips;
+            } catch (UnknownHostException e) {
+                // not logically possible
+                throw new RuntimeException(e);
+            }
+        }).map(ByteArrayInputStream::new).iterator()))) {
+            StringBuilder ip = new StringBuilder();
+            for (byte b : v4.readAllBytes()) {
+                ip.append((char) b);
+            }
+            dict.put("peers", ip.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-//        ByteArrayOutputStream streamv6 = new ByteArrayOutputStream();
-//        for (PeerEntity peer : peers.peers6()) {
-//            try (streamv6) {
-//                writeCompactStream(streamv6, InetAddress.getByName(peer.getIp()),  peer.getPort());
-//                //peersv6.add(stream.toString(StandardCharsets.ISO_8859_1));
-//            }
-//        }
-        dict.put("peers", streamv4.toString(StandardCharsets.ISO_8859_1));
-        //dict.put("peers6", streamv6.toString(StandardCharsets.ISO_8859_1));
+
+        try (var v6 = new SequenceInputStream(Iterators.asEnumeration(peers.peers6().stream().map(peer -> {
+            String ip = peer.getIp();
+            // checked before
+            assert ipValidator.isValidInet6Address(ip);
+            try {
+                byte[] ips = new byte[18];
+                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 16);
+                int in = peer.getPort();
+                ips[16] = (byte) ((in >>> 8) & 0xFF);
+                ips[17] = (byte) (in & 0xFF);
+                return ips;
+            } catch (UnknownHostException e) {
+                // not logically possible
+                throw new RuntimeException(e);
+            }
+        }).map(ByteArrayInputStream::new).iterator()))) {
+            StringBuilder ip = new StringBuilder();
+            for (byte b : v6.readAllBytes()) {
+                ip.append((char) b);
+            }
+            dict.put("peers6", ip.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return dict;
     }
 
     private void writeCompactStream(ByteArrayOutputStream stream, InetAddress address, int port) throws IOException {
         byte[] ip = address.getAddress();
         byte[] portArray = new byte[2];
-        if(ip.length != 4) {
+        if (ip.length != 4) {
             return;
         }
 
@@ -322,7 +359,7 @@ public class AnnounceController {
         stream.write(ip);
         stream.write(portArray);
         stream.flush();
-        log.debug("stream size: {}",stream.size());
+        log.debug("stream size: {}", stream.size());
     }
 
     // write a java Integer into Unsigned Short
@@ -334,16 +371,16 @@ public class AnnounceController {
     @NotNull
     private Map<String, Object> generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
         PeerResult peers = gatherPeers(peerId, infoHash, numWant);
-        List<Map<String, String>> peerList = new ArrayList<>();
+        List<Map<String, Object>> peerList = new ArrayList<>();
         List<PeerEntity> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
         for (PeerEntity peer : allPeers) {
-            Map<String, String> peerMap = new LinkedHashMap<>();
+            Map<String, Object> peerMap = new LinkedHashMap<>();
             if (!noPeerId) {
                 peerMap.put("peer id", peer.getPeerId());
             }
             peerMap.put("ip", peer.getIp());
-            peerMap.put("port", String.valueOf(peer.getPort()));
+            peerMap.put("port", peer.getPort());
             peerList.add(peerMap);
         }
         Map<String, Object> dict = new HashMap<>();
@@ -366,8 +403,8 @@ public class AnnounceController {
         return new PeerResult(v4, v6, completed, incompleted);
     }
 
-    private String randomInterval() {
-        return String.valueOf(random.nextInt(MIN_INTERVAL, MAX_INTERVAL));
+    private int randomInterval() {
+        return random.nextInt(MIN_INTERVAL, MAX_INTERVAL);
     }
 
     record PeerResult(@NotNull List<PeerEntity> peers, List<PeerEntity> peers6, long complete, long incomplete) {
