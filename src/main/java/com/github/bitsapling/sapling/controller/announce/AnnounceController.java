@@ -32,11 +32,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Translated from <a href="https://github.com/swetorrentking/rartracker/blob/master/tracker.php">here</a>
@@ -129,7 +132,7 @@ public class AnnounceController {
 
     @GetMapping("/scrape")
     public String scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
-         return "scrape still todo!";
+        return "scrape still todo!";
     }
 
     @GetMapping("/announce")
@@ -161,7 +164,7 @@ public class AnnounceController {
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
         String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
         String infoHash = InfoHashUtil.parseInfoHash(readInfoHash(request.getQueryString()));
-        log.debug("Decoded info_hash: {}",infoHash);
+        log.debug("Decoded info_hash: {}", infoHash);
         log.debug("Info Hash Length: {}", infoHash.getBytes(StandardCharsets.UTF_8).length);
         long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
         long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
@@ -177,8 +180,8 @@ public class AnnounceController {
         // Create an announce tasks and drop into background, end this request as fast as possible
         announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
         log.debug("Sending peers to " + peerId);
-        String peers =  generatePeersResponse(peerId, infoHash, numWant, compact);
-        log.debug("Peers Bencoded: {}",peers);
+        String peers = generatePeersResponse(peerId, infoHash, numWant, compact);
+        log.debug("Peers Bencoded: {}", peers);
         return peers;
         // TODO check whether user have permission to download
 
@@ -311,8 +314,39 @@ public class AnnounceController {
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
         dict.put("min interval", randomInterval());
-        dict.put("peers", peers.peers());
-        dict.put("peers6", peers.peers6());
+
+        dict.put("peers", peers.peers().stream().map(peer -> {
+            String ip = peer.getIp();
+            // checked before
+            assert ipValidator.isValidInet4Address(ip);
+            try {
+                byte[] ips = new byte[6];
+                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 4);
+                int in = peer.getPort();
+                ips[4] = (byte) (in & 0xFF);
+                ips[5] = (byte) ((in >> 8) & 0xFF);
+                return ips;
+            } catch (UnknownHostException e) {
+                // not logically possible
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList()));
+        dict.put("peers6", peers.peers6().stream().map(peer -> {
+            String ip = peer.getIp();
+            // checked before
+            assert ipValidator.isValidInet6Address(ip);
+            try {
+                byte[] ips = new byte[18];
+                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 16);
+                int in = peer.getPort();
+                ips[16] = (byte) (in & 0xFF);
+                ips[17] = (byte) ((in >> 8) & 0xFF);
+                return ips;
+            } catch (UnknownHostException e) {
+                // not logically possible
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList()));
         return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
     }
 
