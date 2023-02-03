@@ -26,10 +26,10 @@ import org.apache.commons.validator.routines.InetAddressValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  * <p>
  * Thanks for the WTFPL :)
  */
-@Controller
+@RestController
 @Slf4j
 public class AnnounceController {
     private static final Random random = new Random();
@@ -122,9 +122,14 @@ public class AnnounceController {
         torrent.setUpdatedAt(Timestamp.from(Instant.now()));
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "Controller Registered!";
+    }
+
     @GetMapping("/scrape")
-    public void scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
-        // TODO
+    public String scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
+         return "scrape still todo!";
     }
 
     @GetMapping("/announce")
@@ -172,7 +177,9 @@ public class AnnounceController {
         // Create an announce tasks and drop into background, end this request as fast as possible
         announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
         log.debug("Sending peers to " + peerId);
-        return generatePeersResponse(peerId, infoHash, numWant, compact);
+        String peers =  generatePeersResponse(peerId, infoHash, numWant, compact);
+        log.debug("Peers Bencoded: {}",peers);
+        return peers;
         // TODO check whether user have permission to download
 
 //

@@ -47,7 +47,7 @@ public class AnnounceService {
 
     public void schedule(@NotNull AnnounceTask announceTask) throws AnnounceBusyException {
         try {
-            taskQueue.add(announceTask);
+            //taskQueue.add(announceTask);
         } catch (IllegalStateException exception) {
             throw new AnnounceBusyException();
         }
