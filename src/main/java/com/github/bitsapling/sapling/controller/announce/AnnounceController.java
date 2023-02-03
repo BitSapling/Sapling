@@ -300,7 +300,7 @@ public class AnnounceController {
                 int in = peer.getPort();
                 ips[4] = (byte) (in & 0xFF);
                 ips[5] = (byte) ((in >> 8) & 0xFF);
-                return ips;
+                return new String(ips, BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
             } catch (UnknownHostException e) {
                 // not logically possible
                 throw new RuntimeException(e);
@@ -316,7 +316,7 @@ public class AnnounceController {
                 int in = peer.getPort();
                 ips[16] = (byte) (in & 0xFF);
                 ips[17] = (byte) ((in >> 8) & 0xFF);
-                return ips;
+                return new String(ips, BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
             } catch (UnknownHostException e) {
                 // not logically possible
                 throw new RuntimeException(e);
