@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.announce;
 
 import com.dampcake.bencode.Bencode;
+import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.entity.*;
 import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
@@ -15,27 +16,27 @@ import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.InfoHashUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
-import com.google.common.collect.Iterators;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.EndianUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.SequenceInputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -101,9 +102,32 @@ public class AnnounceController {
 
     }
 
+    @SneakyThrows
     @GetMapping("/test")
     public String test() {
-        return "Controller Registered!";
+        File file = new File("response.txt");
+        Bencode bencode = new Bencode(StandardCharsets.ISO_8859_1);
+        Map<String, Object> map = bencode.decode(Files.readAllBytes(file.toPath()), Type.DICTIONARY);
+        map.forEach((key, value) -> {
+            log.debug("Key: {}", key, value);
+            if (key.equals("peers")) {
+                ByteArrayInputStream stream = new ByteArrayInputStream(((String) value).getBytes(StandardCharsets.ISO_8859_1));
+                byte[] ip = new byte[4];
+                byte[] port = new byte[2];
+                try {
+                    while(stream.available() != 0){
+                        stream.read(ip);
+                        stream.read(port);
+                        log.debug("IP: {}; Port: {}", InetAddress.getByAddress(ip), EndianUtils.readSwappedUnsignedShort(new ByteArrayInputStream(port)));
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        });
+        return "test";
     }
 
     @GetMapping("/scrape")
@@ -112,7 +136,7 @@ public class AnnounceController {
     }
 
     @GetMapping("/announce")
-    public String announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
+    public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException, IOException {
         log.debug("Query String: {}", request.getQueryString());
         log.debug("Gets: " + gets);
         String[] ipv4 = request.getParameterValues("ipv4");
@@ -165,13 +189,19 @@ public class AnnounceController {
                 announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
             }
         }
-        if(peerIp != null) {
+        if (peerIp != null) {
             announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
         }
         log.debug("Sending peers to " + peerId);
-        String peers = generatePeersResponse(peerId, infoHash, numWant, compact);
+        String peers = new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(generatePeersResponse(peerId, infoHash, numWant, compact)), StandardCharsets.ISO_8859_1);
         log.debug("Peers Bencoded: {}", peers);
-        return peers;
+        //Files.write(new File("output.txt").toPath(),BITTORRENT_STANDARD_BENCODE_ENCODER.encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
+//        return ResponseEntity.ok()
+//                .header("Content-Type", "text/plain; charset=utf-8")
+//                .body(Files.readString(new File("response.txt").toPath(), StandardCharsets.ISO_8859_1));
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/plain; charset=utf-8")
+                .body(peers);
 //        // TODO check whether user have permission to download
     }
 
@@ -238,76 +268,77 @@ public class AnnounceController {
     }
 
     @NotNull
-    private String generatePeersResponse(String peerIdHash, String infoHash, int numWant, boolean compact) {
+    private Map<String, Object> generatePeersResponse(String peerIdHash, String infoHash, int numWant, boolean compact) throws IOException {
+        Map<String, Object> resp;
         if (compact) {
-            return generatePeersResponseCompat(peerIdHash, infoHash, numWant);
+            resp = generatePeersResponseCompat(peerIdHash, infoHash, numWant);
         } else {
-            return generatePeersResponseNonCompat(peerIdHash, infoHash, numWant, compact);
+            resp = generatePeersResponseNonCompat(peerIdHash, infoHash, numWant, compact);
         }
+        log.info("Resp: {}",resp);
+        return resp;
     }
 
     @NotNull
-    private String generatePeersResponseCompat(String peerId, String infoHash, int numWant) {
+    private Map<String, Object> generatePeersResponseCompat(String peerId, String infoHash, int numWant) throws IOException {
         // TODO: What the fuck
         // http://bittorrent.org/beps/bep_0023.html
         PeerResult peers = gatherPeers(peerId, infoHash, numWant);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
         dict.put("min interval", randomInterval());
+        dict.put("complete", peers.complete());
+        dict.put("incomplete", peers.incomplete());
+        List<String> peersv4 = new ArrayList<>();
+        List<String> peersv6 = new ArrayList<>();
+        ByteArrayOutputStream streamv4 = new ByteArrayOutputStream();
+        for (PeerEntity peer : peers.peers()) {
+            writeCompactStream(streamv4, InetAddress.getByName(peer.getIp()), peer.getPort());
+        }
+//        ByteArrayOutputStream streamv6 = new ByteArrayOutputStream();
+//        for (PeerEntity peer : peers.peers6()) {
+//            try (streamv6) {
+//                writeCompactStream(streamv6, InetAddress.getByName(peer.getIp()),  peer.getPort());
+//                //peersv6.add(stream.toString(StandardCharsets.ISO_8859_1));
+//            }
+//        }
+        dict.put("peers", streamv4.toString(StandardCharsets.ISO_8859_1));
+        //dict.put("peers6", streamv6.toString(StandardCharsets.ISO_8859_1));
+        return dict;
+    }
 
-        try (var v4 = new SequenceInputStream(Iterators.asEnumeration(peers.peers().stream().map(peer -> {
-            String ip = peer.getIp();
-            // checked before
-            assert ipValidator.isValidInet4Address(ip);
-            try {
-                byte[] ips = new byte[6];
-                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 4);
-                int in = peer.getPort();
-                ips[4] = (byte) ((in >>> 8) & 0xFF);
-                ips[5] = (byte) (in & 0xFF);
-                return ips;
-            } catch (UnknownHostException e) {
-                // not logically possible
-                throw new RuntimeException(e);
-            }
-        }).map(ByteArrayInputStream::new).iterator()))) {
-            dict.put("peers", new String(v4.readAllBytes(), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void writeCompactStream(ByteArrayOutputStream stream, InetAddress address, int port) throws IOException {
+        byte[] ip = address.getAddress();
+        byte[] portArray = new byte[2];
+        if(ip.length != 4) {
+            return;
         }
 
-        try (var v6 = new SequenceInputStream(Iterators.asEnumeration(peers.peers6().stream().map(peer -> {
-            String ip = peer.getIp();
-            // checked before
-            assert ipValidator.isValidInet6Address(ip);
-            try {
-                byte[] ips = new byte[18];
-                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 16);
-                int in = peer.getPort();
-                ips[16] = (byte) ((in >>> 8) & 0xFF);
-                ips[17] = (byte) (in & 0xFF);
-                return ips;
-            } catch (UnknownHostException e) {
-                // not logically possible
-                throw new RuntimeException(e);
-            }
-        }).map(ByteArrayInputStream::new).iterator()))) {
-            dict.put("peers6", new String(v6.readAllBytes(), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // convert Integer port into Unsigned Short and put into portArray
+        portArray[0] = (byte) (port & 0xFF);
+        portArray[1] = (byte) ((port >> 8) & 0xFF);
 
-        return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
+
+        stream.write(ip);
+        stream.write(portArray);
+        stream.flush();
+        log.debug("stream size: {}",stream.size());
+    }
+
+    // write a java Integer into Unsigned Short
+    public void writeSwappedInteger(OutputStream stream, int value) throws IOException {
+        stream.write((byte) (value & 0xFF));
+        stream.write((byte) ((value >> 8) & 0xFF));
     }
 
     @NotNull
-    private String generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
+    private Map<String, Object> generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
         PeerResult peers = gatherPeers(peerId, infoHash, numWant);
         List<Map<String, String>> peerList = new ArrayList<>();
         List<PeerEntity> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
         for (PeerEntity peer : allPeers) {
-            Map<String, String> peerMap = new HashMap<>();
+            Map<String, String> peerMap = new LinkedHashMap<>();
             if (!noPeerId) {
                 peerMap.put("peer id", peer.getPeerId());
             }
@@ -317,15 +348,17 @@ public class AnnounceController {
         }
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
+        dict.put("complete", peers.complete());
+        dict.put("incomplete", peers.incomplete());
         dict.put("peers", peerList);
-        return new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(dict), BITTORRENT_STANDARD_BENCODE_ENCODER.getCharset());
+        return dict;
     }
 
     @NotNull
     private PeerResult gatherPeers(@NotNull String peerId, @NotNull String infoHash, int numWant) {
         List<PeerEntity> torrentPeers = peerService.fetchPeers(infoHash, numWant);
         // Remove itself
-        torrentPeers.removeIf(peer -> peer.getPeerId().equals(peerId));
+        // torrentPeers.removeIf(peer -> peer.getPeerId().equals(peerId));
         List<PeerEntity> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
         List<PeerEntity> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
         long completed = torrentPeers.stream().filter(PeerEntity::isSeeder).count();

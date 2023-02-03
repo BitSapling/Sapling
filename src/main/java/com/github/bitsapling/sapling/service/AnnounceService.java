@@ -56,7 +56,6 @@ public class AnnounceService {
         while (true) {
             AnnounceTask task = taskQueue.take();
             executor.getAnnounceExecutor().submit(() -> {
-                log.debug("Handling task: {}", task);
                 try {
                     handleTask(task);
                 } catch (Exception e) {
@@ -75,8 +74,8 @@ public class AnnounceService {
                 task.port(),
                 task.infoHash()).orElseGet(() -> createNewPeer(task));
         TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
-        log.debug("Task data: {}",task);
-        log.debug("Peer data: {}",peer);
+        //log.debug("Task data: {}",task);
+        //log.debug("Peer data: {}",peer);
         peer.setUploaded(task.uploaded());
         peer.setDownloaded(task.downloaded());
         peer.setLeft(task.left());
@@ -101,7 +100,7 @@ public class AnnounceService {
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         userRepository.save(user);
-        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
+//        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
         if(task.event() == AnnounceEventType.STOPPED){
             peersRepository.delete(peer);
         }
@@ -110,7 +109,7 @@ public class AnnounceService {
     @NotNull
     private PeerEntity createNewPeer(AnnounceTask task) {
         log.debug("Creating a new peer for: {}", task.infoHash());
-        TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
+       // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
         return new PeerEntity(
                 0,
                 task.ip(),
