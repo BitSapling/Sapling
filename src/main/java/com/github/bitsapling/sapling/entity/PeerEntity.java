@@ -11,7 +11,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "peers",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"ip", "peer_id", "info_hash"})
+                @UniqueConstraint(columnNames = {"ip", "port", "info_hash"})
         }
 )
 @Data
@@ -41,11 +41,11 @@ public class PeerEntity {
     private long left;
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
-    @PrimaryKeyJoinColumn(name = "torrent")
-    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
-    private TorrentEntity torrent;
+//    @PrimaryKeyJoinColumn(name = "torrent")
+//    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+//    private TorrentEntity torrent;
     @PrimaryKeyJoinColumn(name="user")
-    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     private UserEntity user;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;

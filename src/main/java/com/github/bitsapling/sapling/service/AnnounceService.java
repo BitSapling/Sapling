@@ -33,7 +33,7 @@ public class AnnounceService {
     private PeersRepository peersRepository;
 
     public AnnounceService() {
-        Thread thread = new Thread(()-> {
+        Thread thread = new Thread(() -> {
             try {
                 handleTasks();
             } catch (InterruptedException e) {
@@ -59,7 +59,7 @@ public class AnnounceService {
                 log.debug("Handling task: {}", task);
                 try {
                     handleTask(task);
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.error("Error handling task: {}", task, e);
                 }
             });
@@ -70,12 +70,13 @@ public class AnnounceService {
         // Multi-threaded
         UserEntity user = task.user();
         // Register torrent into peers
-        PeerEntity peer = peersRepository.findByPeerIdAndInfoHash(task.peerId(), task.infoHash()).orElseGet(() -> createNewPeer(task));
+        PeerEntity peer = peersRepository.findByIpAndPortAndInfoHash(
+                task.ip(),
+                task.port(),
+                task.infoHash()).orElseGet(() -> createNewPeer(task));
         TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
-        peer.setIp(task.ip());
-        peer.setPort(task.port());
-        peer.setPeerId(task.peerId());
-        peer.setUserAgent(task.userAgent());
+        log.debug("Task data: {}",task);
+        log.debug("Peer data: {}",peer);
         peer.setUploaded(task.uploaded());
         peer.setDownloaded(task.downloaded());
         peer.setLeft(task.left());
@@ -105,8 +106,7 @@ public class AnnounceService {
 
     @NotNull
     private PeerEntity createNewPeer(AnnounceTask task) {
-        log.debug("Info hash for searching torrent: {}",task.infoHash());
-        TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
+        log.debug("Creating a new peer for: {}", task.infoHash());
         return new PeerEntity(
                 0,
                 task.ip(),
@@ -114,11 +114,10 @@ public class AnnounceService {
                 task.infoHash(),
                 task.peerId(),
                 task.userAgent(),
-                0,
-                0,
-                0,
+                task.uploaded(),
+                task.downloaded(),
+                task.left(),
                 false,
-                torrent,
                 task.user(),
                 Instant.now()
         );

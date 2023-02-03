@@ -22,12 +22,12 @@ public class UserGroupEntity {
     private long id;
     @Column(name = "display_name", nullable = false)
     private String displayName;
-    @OneToMany(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name="permissions")
     private List<PermissionEntity> permissionEntities;
 
     @PrimaryKeyJoinColumn(name = "promotion_policy")
-    @OneToOne(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
 
     public boolean hasPermission(String permission){

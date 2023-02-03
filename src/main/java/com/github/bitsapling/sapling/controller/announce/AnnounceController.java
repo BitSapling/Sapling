@@ -132,7 +132,7 @@ public class AnnounceController {
                 promotionPolicy,
                 0,
                 "这是描述"
-                );
+        );
         torrentRepository.save(torrent);
 
     }
@@ -151,7 +151,8 @@ public class AnnounceController {
     public String announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException {
         log.debug("Query String: {}", request.getQueryString());
         log.debug("Gets: " + gets);
-        long start = timeOfDay();
+        String[] ipv4 = request.getParameterValues("ipv4");
+        String[] ipv6 = request.getParameterValues("ipv6");
         String passkey = gets.get("passkey");
 
         if (StringUtils.isEmpty(passkey)) {
@@ -190,59 +191,21 @@ public class AnnounceController {
 //        }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
-        announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+        if (ipv4 != null) {
+            for (String v4 : ipv4) {
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+            }
+        }
+        if (ipv6 != null) {
+            for (String v6 : ipv6) {
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent")));
+            }
+        }
         log.debug("Sending peers to " + peerId);
         String peers = generatePeersResponse(peerId, infoHash, numWant, compact);
         log.debug("Peers Bencoded: {}", peers);
         return peers;
-        // TODO check whether user have permission to download
-
-//
-//        if (peers.size() == 0) { // peer not found - insert into database, but only if not event=stopped
-//            if (setting.logDebug) {
-//                debuglog("announce: peer not found!");
-//            }
-//            if (event == AnnounceEventType.STOPPED) {
-//                throw new TrackerException("Client sent stop, but peer not found!");
-//            }
-//            var user = gatherUser(passkey).orElseThrow(() -> new TrackerException("Permission denied."));
-//            var torrent = gatherTorrent(infoHash).orElseThrow(() -> new TrackerException("Torrent does not exist on this tracker."));
-//
-//            var timesCompleted = false;
-//            var timesStarted = false;
-//            var timesUpdated = false;
-//            if (event == AnnounceEventType.COMPLETED && left == 0) {
-//                timesCompleted = true;
-//            } else if (event == AnnounceEventType.STARTED) {// && left == 0) { //TODO: start size check
-//                timesStarted = true;
-//            } else {
-//                timesUpdated = true;
-//            }
-//            // TODO: update torrent status
-//            if (seeder) {
-//                // TODO: update seeder status
-//            } else {
-//                // TODO: update leecher status
-//            }
-//        } else if (peers.size() == 1) {
-//            if (setting.rateLimitation) {
-//                // TODO: rate detection
-//            }
-//            if (setting.registerStats) { // TODO: check if there is changes
-//
-//            }
-//            give_peers();
-//        } else {
-//            // we hit multiple? but that's IMPOSSIBLE! ;)
-//            if (setting.logDebug) {
-//                debuglog("announce: got multiple targets in peer table!");
-//            }
-//            throw new TrackerException("Got multiple targets in peer table!");
-//        }
-//
-//        if (setting.timeMe && setting.logDebug) {
-//            debuglog("announce: " + (timeOfDay() - start) + " us");
-//        }
+//        // TODO check whether user have permission to download
     }
 
     @Nullable

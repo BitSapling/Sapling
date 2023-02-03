@@ -19,10 +19,10 @@ public class SeedBoxEntity {
     private long id;
     @Column(name = "address", nullable = false)
     private String address;
-    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "download_policy")
     private PromotionPolicyEntity downloadMultiplier;
-    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn(name = "download_policy")
     private PromotionPolicyEntity uploadMultiplier;
 }

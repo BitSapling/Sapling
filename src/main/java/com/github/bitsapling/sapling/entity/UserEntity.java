@@ -32,7 +32,7 @@ public class UserEntity {
     @Column(name = "username",nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group")
-    @OneToOne(cascade = CascadeType.REFRESH ,fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     private UserGroupEntity group;
     @Column(name = "passkey",nullable = false)
     private String passkey;
