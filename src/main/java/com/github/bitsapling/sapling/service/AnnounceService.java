@@ -107,6 +107,7 @@ public class AnnounceService {
     @NotNull
     private PeerEntity createNewPeer(AnnounceTask task) {
         log.debug("Creating a new peer for: {}", task.infoHash());
+        TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
         return new PeerEntity(
                 0,
                 task.ip(),
@@ -118,6 +119,7 @@ public class AnnounceService {
                 task.downloaded(),
                 task.left(),
                 false,
+                torrent,
                 task.user(),
                 Instant.now()
         );

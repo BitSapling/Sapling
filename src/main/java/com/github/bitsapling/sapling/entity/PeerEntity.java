@@ -41,11 +41,11 @@ public class PeerEntity {
     private long left;
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
-//    @PrimaryKeyJoinColumn(name = "torrent")
-//    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
-//    private TorrentEntity torrent;
-    @PrimaryKeyJoinColumn(name="user")
-    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @JoinColumn(name = "torrent")
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private TorrentEntity torrent;
+    @JoinColumn(name = "user")
+    @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private UserEntity user;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
