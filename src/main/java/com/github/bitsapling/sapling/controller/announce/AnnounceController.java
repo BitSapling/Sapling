@@ -8,6 +8,7 @@ import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
+import com.github.bitsapling.sapling.objects.Torrent;
 import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.service.*;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
@@ -60,6 +61,9 @@ public class AnnounceController {
     private AnnounceService announceBackgroundJob;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TorrentService torrentService;
     @GetMapping("/prepare")
     public void prepare() {
 
@@ -166,20 +170,26 @@ public class AnnounceController {
         if (!StpUtil.hasPermission(user.getId(), "torrent:announce")) {
             throw new InvalidAnnounceException("Permission Denied");
         }
+
+        Torrent torrent = torrentService.getTorrent(infoHash);
+        if(torrent == null){
+            throw new InvalidAnnounceException("Torrent not registered on this tracker");
+        }
+
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
         if (ipv4 != null) {
             for (String v4 : ipv4) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey,torrent));
             }
         }
         if (ipv6 != null) {
             for (String v6 : ipv6) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
+                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey,torrent));
             }
         }
         if (peerIp != null) {
-            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
+            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey,torrent));
         }
         log.debug("Sending peers to " + peerId);
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));

@@ -50,6 +50,10 @@ public class PeerService {
         return entities.stream().map(this::convert).toList();
     }
 
+    public void save(@NotNull Peer peer){
+        repository.save(convert(peer));
+    }
+
     public void delete(@NotNull Peer peer) {
         //repository.delete(convert(peer));
         repository.deleteById(peer.getId());

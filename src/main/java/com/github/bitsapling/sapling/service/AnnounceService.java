@@ -66,34 +66,34 @@ public class AnnounceService {
         // Multi-threaded
         User user = task.user();
         // Register torrent into peers
-        Peer peer = peerService.getPeer(task.ip(),task.port(), task.infoHash());
-        if(peer == null){
+        Peer peer = peerService.getPeer(task.ip(), task.port(), task.infoHash());
+        if (peer == null) {
             peer = createNewPeer(task);
         }
 
-        Torrent torrent = torrentService.getTorrent(task.infoHash());
-        if(torrent == null){
-            throw new NoSuchElementException();
-        }
-        peer.setUploaded(task.uploaded());
-        peer.setDownloaded(task.downloaded());
+        Torrent torrent = task.torrent();
+        long lastUploaded = peer.getUploaded();
+        long lastDownload = peer.getDownloaded();
+        long uploadedOffset = task.uploaded() - lastUploaded;
+        long downloadedOffset = task.downloaded() - lastDownload;
+        if (uploadedOffset < 0) uploadedOffset = task.uploaded();
+        if (downloadedOffset < 0) downloadedOffset = task.downloaded();
+
+        peer.setUploaded(task.uploaded() + uploadedOffset);
+        peer.setDownloaded(task.downloaded() + downloadedOffset);
         peer.setLeft(task.left());
         peer.setSeeder(task.left() == 0);
         peer.setUpdateAt(Instant.now());
-        torrentService.save(torrent);
+        peerService.save(peer);
 
-        // Statistics and update of user data
-        long uploadOffset = task.uploaded() - user.getRealUploaded();
-        long downloadOffset = task.downloaded() - user.getRealDownloaded();
-        // Client statistics reset?
-        if (uploadOffset < 0) uploadOffset = task.uploaded();
-        if (downloadOffset < 0) downloadOffset = task.downloaded();
         // Update real user data
-        user.setRealDownloaded(user.getRealDownloaded() + downloadOffset);
-        user.setRealUploaded(user.getRealUploaded() + uploadOffset);
+        user.setRealDownloaded(user.getRealDownloaded() + lastDownload);
+        user.setRealUploaded(user.getRealUploaded() + lastUploaded);
         // Apply user promotion policy
-        long promotionUploadOffset = user.getGroup().getPromotionPolicy().applyUploadRatio(uploadOffset);
-        long promotionDownloadOffset = user.getGroup().getPromotionPolicy().applyDownloadRatio(downloadOffset);
+
+
+        long promotionUploadOffset = user.getGroup().getPromotionPolicy().applyUploadRatio(lastDownload);
+        long promotionDownloadOffset = user.getGroup().getPromotionPolicy().applyDownloadRatio(lastUploaded);
         // Apply torrent promotion policy
         promotionUploadOffset = torrent.getPromotionPolicy().applyUploadRatio(promotionUploadOffset);
         promotionDownloadOffset = torrent.getPromotionPolicy().applyDownloadRatio(promotionDownloadOffset);
@@ -102,8 +102,8 @@ public class AnnounceService {
 
         userService.save(user);
 //        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
-        if(task.event() == AnnounceEventType.STOPPED){
-            if(peer.getId() != 0) {
+        if (task.event() == AnnounceEventType.STOPPED) {
+            if (peer.getId() != 0) {
                 peerService.delete(peer);
             }
         }
@@ -112,7 +112,7 @@ public class AnnounceService {
     @NotNull
     private Peer createNewPeer(AnnounceTask task) {
         log.debug("Creating a new peer for: {}", task.infoHash());
-       // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
+        // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
 
         return new Peer(
                 0,
@@ -134,7 +134,7 @@ public class AnnounceService {
             @NotNull String ip, int port, @NotNull String infoHash, @NotNull String peerId,
             long uploaded, long downloaded, long left, @NotNull AnnounceEventType event,
             int numWant, User user, boolean compact, boolean noPeerId,
-            boolean supportCrypto, int redundant, String userAgent, String passKey
+            boolean supportCrypto, int redundant, String userAgent, String passKey, Torrent torrent
     ) {
 
     }
