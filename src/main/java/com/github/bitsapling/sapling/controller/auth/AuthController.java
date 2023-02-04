@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.restapi;
+package com.github.bitsapling.sapling.controller.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.exception.LoginException;
@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @Slf4j
 public class AuthController {
     @Autowired
