@@ -197,14 +197,9 @@ public class AnnounceController {
         log.debug("Sending peers to " + peerId);
         String peers = new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(generatePeersResponse(peerId, infoHash, numWant, compact)), StandardCharsets.ISO_8859_1);
         log.debug("Peers Bencoded: {}", peers);
-        //Files.write(new File("output.txt").toPath(),BITTORRENT_STANDARD_BENCODE_ENCODER.encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
-//        return ResponseEntity.ok()
-//                .header("Content-Type", "text/plain; charset=utf-8")
-//                .body(Files.readString(new File("response.txt").toPath(), StandardCharsets.ISO_8859_1));
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=utf-8")
                 .body(peers);
-//        // TODO check whether user have permission to download
     }
 
     @Nullable
