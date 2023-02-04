@@ -55,38 +55,8 @@ public class AnnounceController {
     private AnnounceService announceBackgroundJob;
     @Autowired
     private UserService userService;
-
     @Autowired
     private TorrentService torrentService;
-    @GetMapping("/prepare")
-    public void prepare() {
-
-//        PermissionEntity permissionEntity = new PermissionEntity();
-//        permissionEntity.setId(0);
-//        permissionEntity.setCode("torrent:announce");
-//        permissionEntity.setDef(true);
-//        permissionRepository.save(permissionEntity);
-//        PromotionPolicyEntity promotionPolicy = new PromotionPolicyEntity();
-//        promotionPolicy.setId(0);
-//        promotionPolicy.setDownloadRatio(1);
-//        promotionPolicy.setUploadRatio(1);
-//        promotionPolicy.setDisplayName("System - NullSafe");
-//        promotionPolicyRepository.save(promotionPolicy);
-//        UserGroupEntity group = new UserGroupEntity();
-//        group.setId(0);
-//        group.setPromotionPolicy(promotionPolicy);
-//        List<PermissionEntity> permissionEntities = new ArrayList<>();
-//        permissionEntities.add(permissionEntity);
-//        group.setPermissionEntities(permissionEntities);
-//        group.setDisplayName("System - Default");
-//        userGroupRepository.save(group);
-//        UserEntity user = new UserEntity(1L, "test@test.com", "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6", "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
-//        userRepository.save(user);
-//        TorrentEntity torrent = new TorrentEntity(1L, "7256d7ba52269295d4c478e8c0833306747afb6d", user, "测试种子", "Test Torrent", 10000, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false, false, false, false, 0, promotionPolicy, 0, "这是描述");
-//        torrentRepository.save(torrent);
-
-    }
-
     @SneakyThrows
     @GetMapping("/test")
     public String test() {
