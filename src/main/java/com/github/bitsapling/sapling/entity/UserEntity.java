@@ -34,7 +34,7 @@ public class UserEntity {
     private String passwordHash;
     @Column(name = "username", nullable = false)
     private String username;
-    @PrimaryKeyJoinColumn
+    @PrimaryKeyJoinColumn(name = "group",referencedColumnName = "id")
     @Cascade(CascadeType.SAVE_UPDATE)
     @ManyToOne(fetch = FetchType.EAGER)
     private UserGroupEntity group;
@@ -70,7 +70,6 @@ public class UserEntity {
     private int inviteSlot;
     @Column(name = "seeding_time", nullable = false)
     private Duration seedingTime;
-
     public UserGroupEntity getGroup() {
         return group;
     }
