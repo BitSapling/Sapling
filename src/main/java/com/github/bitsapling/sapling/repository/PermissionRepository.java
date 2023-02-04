@@ -10,5 +10,4 @@ import java.util.Optional;
 @Repository
 public interface PermissionRepository extends CrudRepository<PermissionEntity, Long> {
     Optional<PermissionEntity> findByCode(@NotNull String code);
-    Optional<PermissionEntity> findByDisplayName(@NotNull String displayName);
 }

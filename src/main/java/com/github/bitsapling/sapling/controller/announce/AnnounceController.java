@@ -2,15 +2,13 @@ package com.github.bitsapling.sapling.controller.announce;
 
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;
-import com.github.bitsapling.sapling.entity.*;
+import com.github.bitsapling.sapling.entity.PeerEntity;
 import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
-import com.github.bitsapling.sapling.repository.*;
-import com.github.bitsapling.sapling.service.AnnounceService;
-import com.github.bitsapling.sapling.service.BlacklistClientService;
-import com.github.bitsapling.sapling.service.PeerService;
+import com.github.bitsapling.sapling.objects.User;
+import com.github.bitsapling.sapling.service.*;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.*;
 import com.google.common.collect.Iterators;
@@ -33,13 +31,10 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.SequenceInputStream;
-import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -66,41 +61,37 @@ public class AnnounceController {
     @Autowired
     private AnnounceService announceBackgroundJob;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
-    private UserGroupRepository userGroupRepository;
+    private PermissionService permissionService;
     @Autowired
-    private PermissionRepository permissionRepository;
-    @Autowired
-    private PromotionPolicyRepository promotionPolicyRepository;
-    @Autowired
-    private TorrentRepository torrentRepository;
+    private TorrentService torrentService;
 
     @GetMapping("/prepare")
     public void prepare() {
-        PermissionEntity permissionEntity = new PermissionEntity();
-        permissionEntity.setId(0);
-        permissionEntity.setCode("torrent:announce");
-        permissionEntity.setDisplayName("Torrent 宣告");
-        permissionRepository.save(permissionEntity);
-        PromotionPolicyEntity promotionPolicy = new PromotionPolicyEntity();
-        promotionPolicy.setId(0);
-        promotionPolicy.setDownloadRatio(1);
-        promotionPolicy.setUploadRatio(1);
-        promotionPolicy.setDisplayName("System - NullSafe");
-        promotionPolicyRepository.save(promotionPolicy);
-        UserGroupEntity group = new UserGroupEntity();
-        group.setId(0);
-        group.setPromotionPolicy(promotionPolicy);
-        List<PermissionEntity> permissionEntities = new ArrayList<>();
-        permissionEntities.add(permissionEntity);
-        group.setPermissionEntities(permissionEntities);
-        group.setDisplayName("System - Default");
-        userGroupRepository.save(group);
-        UserEntity user = new UserEntity(1L, "test@test.com", "test", "test", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
-        userRepository.save(user);
-        TorrentEntity torrent = new TorrentEntity(1L, "7256d7ba52269295d4c478e8c0833306747afb6d", user, "测试种子", "Test Torrent", 10000, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false, false, false, false, 0, promotionPolicy, 0, "这是描述");
-        torrentRepository.save(torrent);
+//        PermissionEntity permissionEntity = new PermissionEntity();
+//        permissionEntity.setId(0);
+//        permissionEntity.setCode("torrent:announce");
+//        permissionEntity.setDef(true);
+//        permissionRepository.save(permissionEntity);
+//        PromotionPolicyEntity promotionPolicy = new PromotionPolicyEntity();
+//        promotionPolicy.setId(0);
+//        promotionPolicy.setDownloadRatio(1);
+//        promotionPolicy.setUploadRatio(1);
+//        promotionPolicy.setDisplayName("System - NullSafe");
+//        promotionPolicyRepository.save(promotionPolicy);
+//        UserGroupEntity group = new UserGroupEntity();
+//        group.setId(0);
+//        group.setPromotionPolicy(promotionPolicy);
+//        List<PermissionEntity> permissionEntities = new ArrayList<>();
+//        permissionEntities.add(permissionEntity);
+//        group.setPermissionEntities(permissionEntities);
+//        group.setDisplayName("System - Default");
+//        userGroupRepository.save(group);
+//        UserEntity user = new UserEntity(1L, "test@test.com", "test", "test", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
+//        userRepository.save(user);
+//        TorrentEntity torrent = new TorrentEntity(1L, "7256d7ba52269295d4c478e8c0833306747afb6d", user, "测试种子", "Test Torrent", 10000, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false, false, false, false, 0, promotionPolicy, 0, "这是描述");
+//        torrentRepository.save(torrent);
 
     }
 
@@ -174,7 +165,10 @@ public class AnnounceController {
 
         // User permission checks
         log.debug("Passkey: " + passkey);
-        UserEntity user = userRepository.findByPasskey(passkey).orElseThrow(() -> new InvalidAnnounceException("Unauthorized"));
+        User user = userService.getUserByPasskey(passkey);
+        if (user == null) {
+            throw new InvalidAnnounceException("Unauthorized");
+        }
 //        if (!user.getGroup().hasPermission("torrent:announce")) {
 //            throw new InvalidAnnounceException("Permission Denied");
 //        }

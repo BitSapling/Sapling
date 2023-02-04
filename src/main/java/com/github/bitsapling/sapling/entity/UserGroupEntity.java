@@ -2,7 +2,11 @@ package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.util.List;
 
@@ -15,24 +19,28 @@ import java.util.List;
 )
 @Data
 @Transactional
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserGroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",nullable = false)
+    @Column(name = "id", nullable = false)
     private long id;
     @Column(name = "display_name", nullable = false)
     private String displayName;
-    @OneToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
     @PrimaryKeyJoinColumn
     private List<PermissionEntity> permissionEntities;
 
     @PrimaryKeyJoinColumn
-    @ManyToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @ManyToOne(fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
 
-    public boolean hasPermission(String permission){
+    public boolean hasPermission(String permission) {
         for (PermissionEntity perm : permissionEntities) {
-            if(perm.getCode().equals(permission)) {
+            if (perm.getCode().equals(permission)) {
                 return true;
             }
         }

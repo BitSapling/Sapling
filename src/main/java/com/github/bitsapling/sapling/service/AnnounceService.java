@@ -1,12 +1,9 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.entity.PeerEntity;
-import com.github.bitsapling.sapling.entity.TorrentEntity;
-import com.github.bitsapling.sapling.entity.UserEntity;
 import com.github.bitsapling.sapling.exception.AnnounceBusyException;
-import com.github.bitsapling.sapling.repository.PeersRepository;
-import com.github.bitsapling.sapling.repository.TorrentRepository;
-import com.github.bitsapling.sapling.repository.UserRepository;
+import com.github.bitsapling.sapling.objects.Peer;
+import com.github.bitsapling.sapling.objects.Torrent;
+import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +23,11 @@ public class AnnounceService {
     @Autowired
     private ExecutorUtil executor;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
-    private TorrentRepository torrentRepository;
+    private PeerService peerService;
     @Autowired
-    private PeersRepository peersRepository;
+    private TorrentService torrentService;
 
     public AnnounceService() {
         Thread thread = new Thread(() -> {
@@ -67,21 +64,24 @@ public class AnnounceService {
 
     private void handleTask(AnnounceTask task) throws NoSuchElementException {
         // Multi-threaded
-        UserEntity user = task.user();
+        User user = task.user();
         // Register torrent into peers
-        PeerEntity peer = peersRepository.findByIpAndPortAndInfoHash(
-                task.ip(),
-                task.port(),
-                task.infoHash()).orElseGet(() -> createNewPeer(task));
-        TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
-        //log.debug("Task data: {}",task);
-        //log.debug("Peer data: {}",peer);
+        Peer peer = peerService.getPeer(task.ip(),task.port(), task.infoHash());
+        if(peer == null){
+            peer = createNewPeer(task);
+        }
+
+        Torrent torrent = torrentService.getTorrent(task.infoHash());
+        if(torrent == null){
+            throw new NoSuchElementException();
+        }
         peer.setUploaded(task.uploaded());
         peer.setDownloaded(task.downloaded());
         peer.setLeft(task.left());
         peer.setSeeder(task.left() == 0);
         peer.setUpdateAt(Instant.now());
-        peersRepository.save(peer);
+        torrentService.save(torrent);
+
         // Statistics and update of user data
         long uploadOffset = task.uploaded() - user.getRealUploaded();
         long downloadOffset = task.downloaded() - user.getRealDownloaded();
@@ -99,31 +99,31 @@ public class AnnounceService {
         promotionDownloadOffset = torrent.getPromotionPolicy().applyDownloadRatio(promotionDownloadOffset);
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
-        userRepository.save(user);
+
+        userService.save(user);
 //        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
         if(task.event() == AnnounceEventType.STOPPED){
-            peersRepository.delete(peer);
+            peerService.delete(peer);
         }
     }
 
     @NotNull
-    private PeerEntity createNewPeer(AnnounceTask task) {
+    private Peer createNewPeer(AnnounceTask task) {
         log.debug("Creating a new peer for: {}", task.infoHash());
        // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
-        return new PeerEntity(
+
+        return new Peer(
                 0,
                 task.ip(),
                 task.port(),
                 task.infoHash(),
                 task.peerId(),
                 task.userAgent(),
+                task.passKey(),
                 task.uploaded(),
                 task.downloaded(),
                 task.left(),
-                false,
-                task.passKey(),
-//                torrent,
-//                task.user(),
+                task.left() == 0,
                 Instant.now()
         );
     }
@@ -131,7 +131,7 @@ public class AnnounceService {
     public record AnnounceTask(
             @NotNull String ip, int port, @NotNull String infoHash, @NotNull String peerId,
             long uploaded, long downloaded, long left, @NotNull AnnounceEventType event,
-            int numWant, UserEntity user, boolean compact, boolean noPeerId,
+            int numWant, User user, boolean compact, boolean noPeerId,
             boolean supportCrypto, int redundant, String userAgent, String passKey
     ) {
 

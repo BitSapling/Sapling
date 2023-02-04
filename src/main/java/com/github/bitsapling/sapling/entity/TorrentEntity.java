@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
 
@@ -26,7 +28,8 @@ public class TorrentEntity {
     @Column(name = "info_hash", nullable = false)
     private String infoHash;
     @PrimaryKeyJoinColumn
-    @ManyToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
     @Column(name = "title", nullable = false)
     private String title;
@@ -50,7 +53,8 @@ public class TorrentEntity {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @ManyToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE)
+    @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private PromotionPolicyEntity promotionPolicy;
     @Column(name = "description_type", nullable = false)

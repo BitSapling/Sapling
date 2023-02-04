@@ -45,4 +45,6 @@ public class PeerEntity {
     private String passKey;
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
+
+
 }
