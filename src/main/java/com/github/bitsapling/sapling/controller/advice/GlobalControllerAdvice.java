@@ -81,6 +81,4 @@ public class GlobalControllerAdvice {
                         "message", exception.getMessage())
                 );
     }
-
-
 }

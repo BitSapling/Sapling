@@ -1,26 +1,28 @@
 package com.github.bitsapling.sapling.controller;
 
-import com.github.bitsapling.sapling.objects.Permission;
-import com.github.bitsapling.sapling.objects.PromotionPolicy;
-import com.github.bitsapling.sapling.objects.User;
-import com.github.bitsapling.sapling.objects.UserGroup;
-import com.github.bitsapling.sapling.service.PermissionService;
-import com.github.bitsapling.sapling.service.PromotionService;
-import com.github.bitsapling.sapling.service.UserGroupService;
-import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.entity.PeerEntity;
+import com.github.bitsapling.sapling.entity.TorrentEntity;
+import com.github.bitsapling.sapling.objects.*;
+import com.github.bitsapling.sapling.repository.PeersRepository;
+import com.github.bitsapling.sapling.repository.TorrentRepository;
+import com.github.bitsapling.sapling.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.UUID;
 
-@RestController("/debug")
+@RestController
 @Slf4j
 public class DebugController {
     @Autowired
@@ -31,8 +33,74 @@ public class DebugController {
     private UserGroupService userGroupService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TorrentService torrentService;
+    @Autowired
+    private PeerService peerService;
+    @Autowired
+    private PeersRepository peersRepository;
+    @Autowired
+    private TorrentRepository torrentRepository;
+    @Autowired
+    private AnnouncePerformanceMonitorService announcePerformanceMonitorService;
+    @Autowired
+    private AnnounceService announceService;
+    
+    private String page;
 
-    @GetMapping("/initTables")
+    {
+        try {
+            page = Files.readString(new File("landing-debug.html").toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/")
+    public String torrents() throws IOException {
+        log.debug("Accepted");
+        long startTime = System.currentTimeMillis();
+        StringJoiner peersJoiner = new StringJoiner("\n\n");
+        StringJoiner torrentsJoiner = new StringJoiner("\n\n");
+        List<Torrent> torrents = new ArrayList<>();
+        List<Peer> peers = new ArrayList<>();
+        log.debug("Accepting torrents");
+        long dbTimeStart = System.currentTimeMillis();
+        for (TorrentEntity entity : torrentRepository.findAll()) {
+            Torrent torrent = torrentService.convert(entity);
+            torrents.add(torrent);
+            torrentsJoiner.add(torrent.toString());
+        }
+        log.debug("Accepting peers");
+        for (PeerEntity entity : peersRepository.findAll()) {
+            Peer peer = peerService.convert(entity);
+            Peer copiedPeer = new Peer(peer.getId(),peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
+                    peer.getUserAgent(), "<passkey-removed>", peer.getUploaded(),
+                    peer.getDownloaded(), peer.getLeft(), peer.isSeeder(), peer.getUpdateAt(),
+                    peer.getSeedingTime());
+            peersJoiner.add(copiedPeer.toString());
+            peers.add(peer);
+        }
+        long dbTimeEnd = System.currentTimeMillis() - dbTimeStart;
+        log.debug("Replacing");
+        String resp = page.replace("%%torrents_amount%%", String.valueOf(torrents.size()));
+        resp = resp.replace("%%peers_amount%%", String.valueOf(peers.size()));
+        resp = resp.replace("%%announce_reqs%%", String.valueOf(announcePerformanceMonitorService.getAnnounceTimes().size()));
+        resp = resp.replace("%%announce_ms%%", String.valueOf(announcePerformanceMonitorService.avgMs()));
+        resp = resp.replace("%%startup_date%%", announcePerformanceMonitorService.getStartTime().toString());
+        resp = resp.replace("%%announce_count%%", String.valueOf(announcePerformanceMonitorService.getHandled()));
+        resp = resp.replace("%%announce_jobs%%", String.valueOf(announceService.getTaskQueue().size()));
+        resp = resp.replace("%%peers_list%%", peersJoiner.toString());
+        resp = resp.replace("%%torrents_list%%", torrentsJoiner.toString());
+        resp = resp.replace("%%debug_page_db_consumed%%", String.valueOf(dbTimeEnd));
+        resp = resp.replace("%%debug_page_consumed%%", String.valueOf(System.currentTimeMillis() - startTime));
+        resp = resp.replace("%%announce_job_avg%%", String.valueOf(announcePerformanceMonitorService.avgJobMs()));
+
+        log.debug("Done!");
+        return resp;
+    }
+
+    @GetMapping("/debug/initTables")
     public String initTables() {
         Permission permission = new Permission(0, "torrent:announce", true);
         permissionService.save(permission);
@@ -89,5 +157,19 @@ public class DebugController {
         userService.save(user2);
         log.info("创建测试用户 2 成功");
         return "初始化基本数据库测试内容成功";
+    }
+
+    // A function that censor half of original string to *
+    public String censor(String original) {
+        StringBuilder result = new StringBuilder();
+        int length = original.length();
+        for (int i = 0; i < length; i++) {
+            if (i % 2 == 0) {
+                result.append(original.charAt(i));
+            } else {
+                result.append("*");
+            }
+        }
+        return result.toString();
     }
 }

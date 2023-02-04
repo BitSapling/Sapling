@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -28,7 +29,9 @@ public class AnnounceService {
     @Autowired
     private PeerService peerService;
     @Autowired
-    private TorrentService torrentService;
+    private AnnouncePerformanceMonitorService monitorService;
+
+    private Instant lastCleanup = Instant.now().minus(11, ChronoUnit.MINUTES);
 
     public AnnounceService() {
         Thread thread = new Thread(() -> {
@@ -55,7 +58,10 @@ public class AnnounceService {
             AnnounceTask task = taskQueue.take();
             executor.getAnnounceExecutor().submit(() -> {
                 try {
+                    long start = System.nanoTime();
                     handleTask(task);
+                    monitorService.recordJobStats(System.nanoTime() - start);
+
                 } catch (Exception e) {
                     log.error("Error handling task: {}", task, e);
                 }
@@ -103,7 +109,6 @@ public class AnnounceService {
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime().plus(Duration.between(lastUpdateAt, Instant.now())));
-
         userService.save(user);
 //        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
         if (task.event() == AnnounceEventType.STOPPED) {
@@ -111,13 +116,17 @@ public class AnnounceService {
                 peerService.delete(peer);
             }
         }
+        if(lastCleanup.until(Instant.now(), ChronoUnit.MINUTES) >= 10){
+            log.debug("Cleaning up...");
+            lastCleanup = Instant.now();
+            peerService.cleanup();
+        }
     }
 
     @NotNull
     private Peer createNewPeer(AnnounceTask task) {
         log.debug("Creating a new peer for: {}", task.infoHash());
         // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
-
         return new Peer(
                 0,
                 task.ip(),
@@ -133,6 +142,10 @@ public class AnnounceService {
                 Instant.now(),
                 Duration.ZERO
         );
+    }
+
+    public BlockingDeque<AnnounceTask> getTaskQueue() {
+        return taskQueue;
     }
 
     public record AnnounceTask(

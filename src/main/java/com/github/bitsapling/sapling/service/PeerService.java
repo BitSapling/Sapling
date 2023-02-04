@@ -3,28 +3,27 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.PeerEntity;
 import com.github.bitsapling.sapling.objects.Peer;
 import com.github.bitsapling.sapling.repository.PeersRepository;
-import com.github.bitsapling.sapling.util.RandomUtil;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 @Repository
 @Transactional
+@Slf4j
 public class PeerService {
     @Autowired
     private PeersRepository repository;
-
-    @NotNull
-    public List<PeerEntity> fetchPeers(@NotNull String infoHash, int numWant) {
-        List<PeerEntity> allPeers = repository.findPeersByInfoHash(infoHash);
-        return RandomUtil.getRandomElements(allPeers, numWant);
-    }
 
     @Nullable
     public Peer getPeer(@NotNull String ip, int port, @NotNull String infoHash) {
@@ -35,25 +34,19 @@ public class PeerService {
         return convert(entity);
     }
 
-    @Nullable
-    public Peer getPeer(long id) {
-        PeerEntity entity = repository.findById(id).orElse(null);
-        if (entity == null) {
-            return null;
-        }
-        return convert(entity);
-    }
-
     @NotNull
+    @Cacheable(cacheNames = "peers", key = "#infoHash")
     public List<Peer> getPeers(@NotNull String infoHash) {
         List<PeerEntity> entities = repository.findPeersByInfoHash(infoHash);
         return entities.stream().map(this::convert).toList();
     }
 
-    public void save(@NotNull Peer peer){
+    @CacheEvict(cacheNames = "peers", key = "#peer.infoHash")
+    public void save(@NotNull Peer peer) {
         repository.save(convert(peer));
     }
 
+    @CacheEvict(cacheNames = "peers", allEntries = true)
     public void delete(@NotNull Peer peer) {
         //repository.delete(convert(peer));
         repository.deleteById(peer.getId());
@@ -97,4 +90,12 @@ public class PeerService {
         );
     }
 
+    public void cleanup() {
+        repository.findAll().forEach(peer->{
+            if(peer.getUpdateAt().until(Instant.now(), ChronoUnit.MINUTES) > 80){
+                log.debug("Deleting peer due inactivate: {}", peer);
+                repository.delete(peer);
+            }
+        });
+    }
 }

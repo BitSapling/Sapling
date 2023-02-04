@@ -1,8 +1,8 @@
 package com.github.bitsapling.sapling.util;
 
 import com.dampcake.bencode.Bencode;
-import com.github.bitsapling.sapling.entity.PeerEntity;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
+import com.github.bitsapling.sapling.objects.Peer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,9 +30,9 @@ public class BencodeUtil {
         return UTF8_STANDARD;
     }
 
-    public static String compactPeers(Collection<PeerEntity> peers, boolean isV6) throws RetryableAnnounceException {
+    public static String compactPeers(Collection<Peer> peers, boolean isV6) throws RetryableAnnounceException {
         ByteBuffer buffer = ByteBuffer.allocate((isV6 ? 18 : 6) * peers.size());
-        for (PeerEntity peer : peers) {
+        for (Peer peer : peers) {
             String ip = peer.getIp();
             try {
                 for (byte address : InetAddress.getByName(ip).getAddress()) {
