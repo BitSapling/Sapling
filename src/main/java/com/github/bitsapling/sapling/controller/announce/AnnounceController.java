@@ -264,7 +264,7 @@ public class AnnounceController {
     private Map<String, Object> generatePeersResponseCompat(String peerId, String infoHash, int numWant) throws IOException {
         // TODO: What the fuck
         // http://bittorrent.org/beps/bep_0023.html
-        PeerResult peers = gatherPeers(peerId, infoHash, numWant);
+        PeerResult peers = gatherPeers(infoHash, numWant);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
         dict.put("min interval", randomInterval());
@@ -317,7 +317,7 @@ public class AnnounceController {
 
     @NotNull
     private Map<String, Object> generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
-        PeerResult peers = gatherPeers(peerId, infoHash, numWant);
+        PeerResult peers = gatherPeers(infoHash, numWant);
         List<Map<String, Object>> peerList = new ArrayList<>();
         List<PeerEntity> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
@@ -339,10 +339,8 @@ public class AnnounceController {
     }
 
     @NotNull
-    private PeerResult gatherPeers(@NotNull String peerId, @NotNull String infoHash, int numWant) {
+    private PeerResult gatherPeers(@NotNull String infoHash, int numWant) {
         List<PeerEntity> torrentPeers = peerService.fetchPeers(infoHash, numWant);
-        // Remove itself
-        // torrentPeers.removeIf(peer -> peer.getPeerId().equals(peerId));
         List<PeerEntity> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
         List<PeerEntity> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
         long completed = torrentPeers.stream().filter(PeerEntity::isSeeder).count();
