@@ -26,7 +26,7 @@ public class GlobalControllerAdvice {
         Map<String, String> dict = new HashMap<>();
         dict.put("failure reason", classUtil.getClassSimpleName(exception.getClass()) + ": " + exception.getMessage());
         dict.put("retry in", "never");
-        return ResponseEntity.internalServerError()
+        return ResponseEntity.ok()
                 .body(BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict)));
     }
 
@@ -36,7 +36,7 @@ public class GlobalControllerAdvice {
         Map<String, String> dict = new HashMap<>();
         dict.put("failure reason", classUtil.getClassSimpleName(exception.getClass()) + ": " + exception.getMessage());
         dict.put("retry in", String.valueOf(exception.getRetryIn()));
-        return ResponseEntity.internalServerError()
+        return ResponseEntity.ok()
                 .body(BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict)));
     }
 
