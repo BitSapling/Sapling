@@ -1,7 +1,5 @@
 package com.github.bitsapling.sapling.controller.announce;
 
-import cn.dev33.satoken.SaManager;
-import cn.dev33.satoken.spring.SaTokenContextForSpring;
 import cn.dev33.satoken.stp.StpUtil;
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;

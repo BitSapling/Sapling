@@ -1,6 +1,8 @@
 package com.github.bitsapling.sapling.controller.advice;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
+import com.github.bitsapling.sapling.exception.LoginException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.util.BencodeUtil;
 import com.github.bitsapling.sapling.util.ClassUtil;
@@ -37,48 +39,48 @@ public class GlobalControllerAdvice {
         return ResponseEntity.internalServerError()
                 .body(BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict)));
     }
-//
-//    @ExceptionHandler(value = Exception.class)
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> apiExceptionHandler(Exception exception) {
-//        return ResponseEntity.internalServerError()
-//                .body(
-//                        Map.of("status", "error",
-//                                "type", classUtil.getClassSimpleName(exception.getClass()),
-//                                "message", exception.getMessage())
-//                );
-//    }
-//
-//    @ExceptionHandler(value = IllegalArgumentException.class)
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
-//        return ResponseEntity.internalServerError()
-//                .body(
-//                        Map.of("status", "error",
-//                                "type", classUtil.getClassSimpleName(exception.getClass()),
-//                                "message", exception.getMessage())
-//                );
-//    }
-//
-//    @ExceptionHandler(value = NotLoginException.class)
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotLoginException exception) {
-//        return ResponseEntity.status(401)
-//                .body(Map.of("status", "error",
-//                        "type", classUtil.getClassSimpleName(exception.getClass()),
-//                        "message", exception.getMessage())
-//                );
-//    }
-//
-//    @ExceptionHandler(value = LoginException.class)
-//    @ResponseBody
-//    public ResponseEntity<Map<String, Object>> loginExceptionHandler(LoginException exception) {
-//        return ResponseEntity.status(401)
-//                .body(Map.of("status", "error",
-//                        "type", classUtil.getClassSimpleName(exception.getClass()),
-//                        "message", exception.getMessage())
-//                );
-//    }
+
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> apiExceptionHandler(Exception exception) {
+        return ResponseEntity.internalServerError()
+                .body(
+                        Map.of("status", "error",
+                                "type", classUtil.getClassSimpleName(exception.getClass()),
+                                "message", exception.getMessage())
+                );
+    }
+
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
+        return ResponseEntity.internalServerError()
+                .body(
+                        Map.of("status", "error",
+                                "type", classUtil.getClassSimpleName(exception.getClass()),
+                                "message", exception.getMessage())
+                );
+    }
+
+    @ExceptionHandler(value = NotLoginException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotLoginException exception) {
+        return ResponseEntity.status(401)
+                .body(Map.of("status", "error",
+                        "type", classUtil.getClassSimpleName(exception.getClass()),
+                        "message", exception.getMessage())
+                );
+    }
+
+    @ExceptionHandler(value = LoginException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> loginExceptionHandler(LoginException exception) {
+        return ResponseEntity.status(401)
+                .body(Map.of("status", "error",
+                        "type", classUtil.getClassSimpleName(exception.getClass()),
+                        "message", exception.getMessage())
+                );
+    }
 
 
 }
