@@ -240,15 +240,12 @@ public class AnnounceController {
         if (StringUtils.isEmpty(gets.get("left")) || !StringUtils.isNumeric(gets.get("left")))
             throw new InvalidAnnounceException("Missing/Invalid param: left");
         String numwant = MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"));
-        if (!StringUtils.isEmpty(numwant) && !StringUtils.isNumeric(numwant)) {
+        if (!StringUtils.isEmpty(numwant) && !StringUtils.isNumeric(numwant))
             throw new InvalidAnnounceException("Invalid optional param: numwant");
-        }
-        if (!StringUtils.isEmpty(gets.get("compact")) && !StringUtils.isNumeric(gets.get("compact"))) {
+        if (!StringUtils.isEmpty(gets.get("compact")) && !StringUtils.isNumeric(gets.get("compact")))
             throw new InvalidAnnounceException("Invalid optional param: compact");
-        }
-        if (!StringUtils.isEmpty(gets.get("corrupt")) && !StringUtils.isNumeric(gets.get("corrupt"))) {
+        if (!StringUtils.isEmpty(gets.get("corrupt")) && !StringUtils.isNumeric(gets.get("corrupt")))
             throw new InvalidAnnounceException("Invalid optional param: corrupt");
-        }
     }
 
     @NotNull
