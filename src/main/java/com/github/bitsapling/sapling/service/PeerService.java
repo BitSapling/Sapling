@@ -73,7 +73,8 @@ public class PeerService {
                 entity.getDownloaded(),
                 entity.getLeft(),
                 entity.isSeeder(),
-                entity.getUpdateAt()
+                entity.getUpdateAt(),
+                entity.getSeedingTime()
         );
     }
 
@@ -91,7 +92,8 @@ public class PeerService {
                 peer.getLeft(),
                 peer.isSeeder(),
                 peer.getPassKey(),
-                peer.getUpdateAt()
+                peer.getUpdateAt(),
+                peer.getSeedingTime()
         );
     }
 

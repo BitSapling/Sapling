@@ -10,6 +10,7 @@ import org.hibernate.annotations.CascadeType;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.Duration;
 
 @Entity
 @Table(name = "users",
@@ -67,6 +68,8 @@ public class UserEntity {
     private BigDecimal karma;
     @Column(name = "invite_slot", nullable = false)
     private int inviteSlot;
+    @Column(name = "seeding_time", nullable = false)
+    private Duration seedingTime;
 
     public UserGroupEntity getGroup() {
         return group;
