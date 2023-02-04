@@ -3,15 +3,14 @@ package com.github.bitsapling.sapling.controller.announce;
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.entity.PeerEntity;
-import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
+import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.service.*;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.*;
-import com.google.common.collect.Iterators;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.SequenceInputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -129,7 +126,7 @@ public class AnnounceController {
     }
 
     @GetMapping("/announce")
-    public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, AnnounceBusyException, IOException {
+    public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, RetryableAnnounceException, IOException {
         log.debug("Query String: {}", request.getQueryString());
         log.debug("Gets: " + gets);
         String[] ipv4 = request.getParameterValues("ipv4");
@@ -243,7 +240,7 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponse(String peerIdHash, String infoHash, int numWant, boolean compact) throws IOException {
+    private Map<String, Object> generatePeersResponse(String peerIdHash, String infoHash, int numWant, boolean compact) throws IOException, RetryableAnnounceException {
         Map<String, Object> resp;
         if (compact) {
             resp = generatePeersResponseCompat(peerIdHash, infoHash, numWant);
@@ -255,7 +252,7 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponseCompat(String peerId, String infoHash, int numWant) throws IOException {
+    private Map<String, Object> generatePeersResponseCompat(String peerId, String infoHash, int numWant) throws RetryableAnnounceException {
         // TODO: What the fuck
         // http://bittorrent.org/beps/bep_0023.html
         PeerResult peers = gatherPeers(infoHash, numWant);
@@ -264,47 +261,9 @@ public class AnnounceController {
         dict.put("min interval", randomInterval());
         dict.put("complete", peers.complete());
         dict.put("incomplete", peers.incomplete());
-
-        try (var v4 = new SequenceInputStream(Iterators.asEnumeration(peers.peers().stream().map(peer -> {
-            String ip = peer.getIp();
-            // checked before
-            assert ipValidator.isValidInet4Address(ip);
-            try {
-                byte[] ips = new byte[6];
-                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 4);
-                int in = peer.getPort();
-                ips[4] = (byte) ((in >>> 8) & 0xFF);
-                ips[5] = (byte) (in & 0xFF);
-                return ips;
-            } catch (UnknownHostException e) {
-                // not logically possible
-                throw new RuntimeException(e);
-            }
-        }).map(ByteArrayInputStream::new).iterator()))) {
-            dict.put("peers", BencodeUtil.convertToString(v4.readAllBytes()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (var v6 = new SequenceInputStream(Iterators.asEnumeration(peers.peers6().stream().map(peer -> {
-            String ip = peer.getIp();
-            // checked before
-            assert ipValidator.isValidInet6Address(ip);
-            try {
-                byte[] ips = new byte[18];
-                System.arraycopy(InetAddress.getByName(ip).getAddress(), 0, ips, 0, 16);
-                int in = peer.getPort();
-                ips[16] = (byte) ((in >>> 8) & 0xFF);
-                ips[17] = (byte) (in & 0xFF);
-                return ips;
-            } catch (UnknownHostException e) {
-                // not logically possible
-                throw new RuntimeException(e);
-            }
-        }).map(ByteArrayInputStream::new).iterator()))) {
-            dict.put("peers6", BencodeUtil.convertToString(v6.readAllBytes()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        dict.put("peers", BencodeUtil.compactPeers(peers.peers(), false));
+        if (peers.peers6().size() > 0) {
+            dict.put("peers6", BencodeUtil.compactPeers(peers.peers6(), true));
         }
         return dict;
     }
