@@ -36,12 +36,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
-
-/**
- * Translated from <a href="https://github.com/swetorrentking/rartracker/blob/master/tracker.php">here</a>
- * <p>
- * Thanks for the WTFPL :)
- */
 @RestController
 @Slf4j
 public class AnnounceController {
