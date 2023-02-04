@@ -20,7 +20,7 @@ public class AccountRegisterController {
 
     @GetMapping("/register")
     public ResponsePojo register() {
-
+        return new EmailInUseErrorPojo();
     }
     @Getter
     static class RegistrationClosedErrorPojo extends ResponsePojo {
