@@ -10,7 +10,6 @@ import org.hibernate.annotations.CascadeType;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.Duration;
 
 @Entity
 @Table(name = "users",
