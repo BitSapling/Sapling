@@ -5,9 +5,6 @@ import at.favre.lib.crypto.bcrypt.LongPasswordStrategies;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.util.Version;
 
 import java.nio.charset.StandardCharsets;
 
