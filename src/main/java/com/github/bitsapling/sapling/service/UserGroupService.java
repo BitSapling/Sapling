@@ -22,35 +22,29 @@ public class UserGroupService {
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroupEntity -> new UserGroup(
                 userGroupEntity.getId(),
+                userGroupEntity.getCode(),
                 userGroupEntity.getDisplayName(),
                 userGroupEntity.getPermissionEntities().stream()
                         .map(perm -> permissionService.getPermission(perm.getId())).toList(),
                 promotionService.convert(userGroupEntity.getPromotionPolicy())
+               // , userGroupEntity.getInherited().stream().map(this::convert).toList()
         )).orElse(null);
     }
 
     public void save(@NotNull UserGroup userGroup) {
-        repository.save(new UserGroupEntity(
-                userGroup.getId(),
-                userGroup.getDisplayName(),
-                userGroup.getPermissionEntities().stream()
-                        .map(perm -> new PermissionEntity(
-                                perm.getId(),
-                                perm.getCode(),
-                                perm.isDef()
-                        )).toList(),
-                promotionService.convert(userGroup.getPromotionPolicy())
-        ));
+        repository.save(convert(userGroup));
     }
 
     @NotNull
     public UserGroup convert(@NotNull UserGroupEntity group) {
         return new UserGroup(
                 group.getId(),
+                group.getCode(),
                 group.getDisplayName(),
                 group.getPermissionEntities().stream()
                         .map(perm -> permissionService.getPermission(perm.getId())).toList(),
                 promotionService.convert(group.getPromotionPolicy())
+               //, group.getInherited().stream().map(this::convert).toList()
         );
     }
 
@@ -58,6 +52,7 @@ public class UserGroupService {
     public UserGroupEntity convert(@NotNull UserGroup group) {
         return new UserGroupEntity(
                 group.getId(),
+                group.getCode(),
                 group.getDisplayName(),
                 group.getPermissionEntities().stream()
                         .map(perm -> new PermissionEntity(
@@ -66,6 +61,7 @@ public class UserGroupService {
                                 perm.isDef()
                         )).toList(),
                 promotionService.convert(group.getPromotionPolicy())
+                //, group.getInherited().stream().map(this::convert).toList()
         );
     }
 }

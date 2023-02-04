@@ -35,6 +35,15 @@ public class PeerService {
         return convert(entity);
     }
 
+    @Nullable
+    public Peer getPeer(long id) {
+        PeerEntity entity = repository.findById(id).orElse(null);
+        if (entity == null) {
+            return null;
+        }
+        return convert(entity);
+    }
+
     @NotNull
     public List<Peer> getPeers(@NotNull String infoHash) {
         List<PeerEntity> entities = repository.findPeersByInfoHash(infoHash);

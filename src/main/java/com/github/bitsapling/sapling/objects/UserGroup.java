@@ -8,8 +8,10 @@ import java.util.List;
 @Data
 public class UserGroup {
     private final long id;
+    private String code;
     private String displayName;
     private List<Permission> permissionEntities;
     private PromotionPolicy promotionPolicy;
+   // private List<UserGroup> inherited;
 
 }

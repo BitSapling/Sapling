@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.controller.announce;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.entity.PeerEntity;
@@ -62,11 +63,6 @@ public class AnnounceController {
     private AnnounceService announceBackgroundJob;
     @Autowired
     private UserService userService;
-    @Autowired
-    private PermissionService permissionService;
-    @Autowired
-    private TorrentService torrentService;
-
     @GetMapping("/prepare")
     public void prepare() {
 //        PermissionEntity permissionEntity = new PermissionEntity();
@@ -169,9 +165,9 @@ public class AnnounceController {
         if (user == null) {
             throw new InvalidAnnounceException("Unauthorized");
         }
-//        if (!user.getGroup().hasPermission("torrent:announce")) {
-//            throw new InvalidAnnounceException("Permission Denied");
-//        }
+        if (!StpUtil.hasPermission(user.getId(), "torrent:announce")) {
+            throw new InvalidAnnounceException("Permission Denied");
+        }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
         if (ipv4 != null) {

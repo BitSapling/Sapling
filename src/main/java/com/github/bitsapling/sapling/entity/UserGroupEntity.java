@@ -26,6 +26,8 @@ public class UserGroupEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private long id;
+    @Column(name = "code", nullable = false)
+    private String code;
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany(fetch = FetchType.EAGER)
@@ -37,6 +39,11 @@ public class UserGroupEntity {
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @ManyToOne(fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
+
+//    @PrimaryKeyJoinColumn
+//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+//    @OneToMany(fetch = FetchType.EAGER)
+//    private List<UserGroupEntity> inherited;
 
     public boolean hasPermission(String permission) {
         for (PermissionEntity perm : permissionEntities) {

@@ -103,7 +103,9 @@ public class AnnounceService {
         userService.save(user);
 //        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
         if(task.event() == AnnounceEventType.STOPPED){
-            peerService.delete(peer);
+            if(peer.getId() != 0) {
+                peerService.delete(peer);
+            }
         }
     }
 
