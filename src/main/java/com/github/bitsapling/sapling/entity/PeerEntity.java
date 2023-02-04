@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.Instant;
 
 @Entity
@@ -46,5 +47,6 @@ public class PeerEntity {
     @Column(name = "update_at", nullable = false)
     private Instant updateAt;
 
-
+    @Column(name = "seeding_time", nullable = false)
+    private Duration seedingTime;
 }

@@ -70,7 +70,8 @@ public class UserService {
                 user.getRealUploaded(),
                 user.getIsp(),
                 user.getKarma(),
-                user.getInviteSlot());
+                user.getInviteSlot(),
+                user.getSeedingTime());
     }
 
     @NotNull
@@ -95,6 +96,7 @@ public class UserService {
                 entity.getRealUploaded(),
                 entity.getIsp(),
                 entity.getKarma(),
-                entity.getInviteSlot());
+                entity.getInviteSlot(),
+                entity.getSeedingTime());
     }
 }

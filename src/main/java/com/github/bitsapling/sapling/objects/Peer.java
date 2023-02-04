@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.Duration;
 import java.time.Instant;
 @AllArgsConstructor
 @Data
@@ -19,4 +20,5 @@ public class Peer {
     private long left;
     private boolean seeder;
     private Instant updateAt;
+    private Duration seedingTime;
 }

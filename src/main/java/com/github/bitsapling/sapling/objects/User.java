@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 @AllArgsConstructor
 @Data
@@ -28,4 +29,5 @@ public class User {
     private String isp;
     private BigDecimal karma;
     private int inviteSlot;
+    private Duration seedingTime;
 }
