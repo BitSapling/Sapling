@@ -1,5 +1,7 @@
 package com.github.bitsapling.sapling.controller.announce;
 
+import cn.dev33.satoken.SaManager;
+import cn.dev33.satoken.spring.SaTokenContextForSpring;
 import cn.dev33.satoken.stp.StpUtil;
 import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.Type;
@@ -62,6 +64,7 @@ public class AnnounceController {
     private UserService userService;
     @GetMapping("/prepare")
     public void prepare() {
+
 //        PermissionEntity permissionEntity = new PermissionEntity();
 //        permissionEntity.setId(0);
 //        permissionEntity.setCode("torrent:announce");
@@ -81,7 +84,7 @@ public class AnnounceController {
 //        group.setPermissionEntities(permissionEntities);
 //        group.setDisplayName("System - Default");
 //        userGroupRepository.save(group);
-//        UserEntity user = new UserEntity(1L, "test@test.com", "test", "test", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
+//        UserEntity user = new UserEntity(1L, "test@test.com", "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6", "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
 //        userRepository.save(user);
 //        TorrentEntity torrent = new TorrentEntity(1L, "7256d7ba52269295d4c478e8c0833306747afb6d", user, "测试种子", "Test Torrent", 10000, 0, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), false, false, false, false, 0, promotionPolicy, 0, "这是描述");
 //        torrentRepository.save(torrent);
@@ -148,7 +151,7 @@ public class AnnounceController {
         boolean noPeerId = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("nopeerid"), gets.get("no_peerid"), gets.get("no_peer_id"))).orElse("0"));
         boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
-        String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(request.getRemoteAddr());
+        String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(IPUtil.getRequestIp(request));
         String infoHash = InfoHashUtil.parseInfoHash(readInfoHash(request.getQueryString()));
         log.debug("Decoded info_hash: {}", infoHash);
         log.debug("Info Hash Length: {}", infoHash.getBytes(StandardCharsets.UTF_8).length);
