@@ -31,8 +31,8 @@ public class UserEntity {
     private String passwordHash;
     @Column(name = "username",nullable = false)
     private String username;
-    @PrimaryKeyJoinColumn(name = "group")
-    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn
+    @ManyToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     private UserGroupEntity group;
     @Column(name = "passkey",nullable = false)
     private String passkey;

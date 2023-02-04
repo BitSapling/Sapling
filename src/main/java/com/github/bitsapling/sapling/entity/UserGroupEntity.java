@@ -23,11 +23,11 @@ public class UserGroupEntity {
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
-    @PrimaryKeyJoinColumn(name="permissions")
+    @PrimaryKeyJoinColumn
     private List<PermissionEntity> permissionEntities;
 
-    @PrimaryKeyJoinColumn(name = "promotion_policy")
-    @OneToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn
+    @ManyToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
 
     public boolean hasPermission(String permission){

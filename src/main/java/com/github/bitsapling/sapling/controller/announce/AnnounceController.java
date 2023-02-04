@@ -12,13 +12,9 @@ import com.github.bitsapling.sapling.service.AnnounceService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
-import com.github.bitsapling.sapling.util.BooleanUtil;
-import com.github.bitsapling.sapling.util.InfoHashUtil;
-import com.github.bitsapling.sapling.util.MiscUtil;
-import com.github.bitsapling.sapling.util.SafeUUID;
+import com.github.bitsapling.sapling.util.*;
 import com.google.common.collect.Iterators;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.EndianUtils;
@@ -33,7 +29,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.SequenceInputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -55,7 +54,6 @@ public class AnnounceController {
     private static final Random random = new Random();
     private static final Pattern infoHashPattern = Pattern.compile("info_hash=(.*?)($|&)");
     private static final Pattern peerIdPattern = Pattern.compile("peer_id=(.*?)&");
-    private static final Bencode BITTORRENT_STANDARD_BENCODE_ENCODER = new Bencode(StandardCharsets.ISO_8859_1);
     private static final InetAddressValidator ipValidator = InetAddressValidator.getInstance();
     private static final int MIN_INTERVAL = 60 * 60 * 15;
     private static final int MAX_INTERVAL = 60 * 60 * 45;
@@ -94,7 +92,9 @@ public class AnnounceController {
         UserGroupEntity group = new UserGroupEntity();
         group.setId(0);
         group.setPromotionPolicy(promotionPolicy);
-        group.setPermissionEntities(List.of(permissionEntity));
+        List<PermissionEntity> permissionEntities = new ArrayList<>();
+        permissionEntities.add(permissionEntity);
+        group.setPermissionEntities(permissionEntities);
         group.setDisplayName("System - Default");
         userGroupRepository.save(group);
         UserEntity user = new UserEntity(1L, "test@test.com", "test", "test", group, new UUID(0, 0).toString(), Timestamp.from(Instant.now()), "test", "test", "test", "test", "test", "test", 0, 0, 0, 0, "test", new BigDecimal(0), 0);
@@ -156,7 +156,6 @@ public class AnnounceController {
         checkClient();
         checkAnnounceFields(gets);
         String peerId = gets.get("peer_id");
-        //String peerIdHash = Hashing.murmur3_128().hashString(peerId, StandardCharsets.UTF_8).toString();
         long left = Long.parseLong(gets.get("left"));
         int port = Integer.parseInt(gets.get("port"));
         AnnounceEventType event = AnnounceEventType.fromName(gets.get("event"));
@@ -195,7 +194,7 @@ public class AnnounceController {
             announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey));
         }
         log.debug("Sending peers to " + peerId);
-        String peers = new String(BITTORRENT_STANDARD_BENCODE_ENCODER.encode(generatePeersResponse(peerId, infoHash, numWant, compact)), StandardCharsets.ISO_8859_1);
+        String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
         log.debug("Peers Bencoded: {}", peers);
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=utf-8")
@@ -219,12 +218,6 @@ public class AnnounceController {
         return null;
     }
 
-
-    public long timeOfDay() {
-        return System.nanoTime() / 1000;
-
-    }
-
     private void checkClient() throws FixedAnnounceException {
         String method = request.getMethod();
         if (!method.equals("GET")) {
@@ -233,7 +226,6 @@ public class AnnounceController {
         if (request.getHeader("User-Agent") == null) {
             throw new InvalidAnnounceException("Bad client: User-Agent cannot be empty");
         }
-        //blacklistClient.checkClient(request);
     }
 
     private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
@@ -247,10 +239,6 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Missing/Invalid param: downloaded");
         if (StringUtils.isEmpty(gets.get("left")) || !StringUtils.isNumeric(gets.get("left")))
             throw new InvalidAnnounceException("Missing/Invalid param: left");
-//        if (StringUtils.isEmpty(gets.get("event")))
-//            throw new InvalidAnnounceException("Missing param: event; Please update or change your client.");
-//        if (AnnounceEventType.fromName(gets.get("event")) == null)
-//            throw new InvalidAnnounceException("Invalid param: event");
         String numwant = MiscUtil.anyNotNull(gets.get("numwant"), gets.get("num want"), gets.get("num_want"));
         if (!StringUtils.isEmpty(numwant) && !StringUtils.isNumeric(numwant)) {
             throw new InvalidAnnounceException("Invalid optional param: numwant");
@@ -261,7 +249,6 @@ public class AnnounceController {
         if (!StringUtils.isEmpty(gets.get("corrupt")) && !StringUtils.isNumeric(gets.get("corrupt"))) {
             throw new InvalidAnnounceException("Invalid optional param: corrupt");
         }
-
     }
 
     @NotNull
@@ -303,11 +290,7 @@ public class AnnounceController {
                 throw new RuntimeException(e);
             }
         }).map(ByteArrayInputStream::new).iterator()))) {
-            StringBuilder ip = new StringBuilder();
-            for (byte b : v4.readAllBytes()) {
-                ip.append((char) b);
-            }
-            dict.put("peers", ip.toString());
+            dict.put("peers", BencodeUtil.convertToString(v4.readAllBytes()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -328,39 +311,11 @@ public class AnnounceController {
                 throw new RuntimeException(e);
             }
         }).map(ByteArrayInputStream::new).iterator()))) {
-            StringBuilder ip = new StringBuilder();
-            for (byte b : v6.readAllBytes()) {
-                ip.append((char) b);
-            }
-            dict.put("peers6", ip.toString());
+            dict.put("peers6", BencodeUtil.convertToString(v6.readAllBytes()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return dict;
-    }
-
-    private void writeCompactStream(ByteArrayOutputStream stream, InetAddress address, int port) throws IOException {
-        byte[] ip = address.getAddress();
-        byte[] portArray = new byte[2];
-        if (ip.length != 4) {
-            return;
-        }
-
-        // convert Integer port into Unsigned Short and put into portArray
-        portArray[0] = (byte) (port & 0xFF);
-        portArray[1] = (byte) ((port >> 8) & 0xFF);
-
-
-        stream.write(ip);
-        stream.write(portArray);
-        stream.flush();
-        log.debug("stream size: {}", stream.size());
-    }
-
-    // write a java Integer into Unsigned Short
-    public void writeSwappedInteger(OutputStream stream, int value) throws IOException {
-        stream.write((byte) (value & 0xFF));
-        stream.write((byte) ((value >> 8) & 0xFF));
     }
 
     @NotNull
@@ -403,27 +358,5 @@ public class AnnounceController {
     }
 
     record PeerResult(@NotNull List<PeerEntity> peers, List<PeerEntity> peers6, long complete, long incomplete) {
-    }
-
-    @Data
-    public static class Setting {
-        boolean timeMe = false; // calculate execution times (requires log_debug)
-        boolean logDebug = false; // log debugging information using debuglog()
-        boolean logErrors = false; // log all errors sent using err()
-        String timestampFormat = "[d/m/y H:i:s]";
-        String logFile = "/var/www/debug.txt";
-        boolean gzip = true; // gzip the data sent to the clients
-        boolean allowOldProtocols = true; // allow no_peer_id and original protocols for compatibility
-        boolean allowGlobalScrape = false; // enable scrape-statistics for all torrents if no info_hash specified - wastes bandwidth on big trackers
-        int defaultGivePeers = 50; // how many peers to give to client by default
-        int maxGivePeers = 150; // maximum peers client may request
-        int announceInterval = random.nextInt(1800, 2400); // 30-40 min - spread load a bit on the webserver
-        boolean rateLimitation = true; // calculate the clients average upload-speed
-        int rateLimitationWarnUp = 2; // log a warning if exceeding this amount of MB/s
-        int rateLimitationErrUp = 60; // log an error and don't save stats for user if exceeding this amount of MB/s
-        boolean registerStats = true; // save transfer statistics for the users? [0-1 extra mysql-queries]
-        int uploadMultiplier = 1;
-        int downloadMultiplier = 1;
-        int passkeyLength = 32;
     }
 }

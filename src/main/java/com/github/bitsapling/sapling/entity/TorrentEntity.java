@@ -25,8 +25,8 @@ public class TorrentEntity {
     private long id;
     @Column(name = "info_hash", nullable = false)
     private String infoHash;
-    @PrimaryKeyJoinColumn(name = "user")
-    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn
+    @ManyToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
     private UserEntity user;
     @Column(name = "title", nullable = false)
     private String title;
@@ -50,8 +50,8 @@ public class TorrentEntity {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @OneToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
-    @PrimaryKeyJoinColumn(name = "promotion_policy")
+    @ManyToOne(cascade = CascadeType.MERGE ,fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn
     private PromotionPolicyEntity promotionPolicy;
     @Column(name = "description_type", nullable = false)
     private int descriptionType;
