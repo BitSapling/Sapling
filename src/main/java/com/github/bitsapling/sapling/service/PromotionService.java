@@ -6,6 +6,9 @@ import com.github.bitsapling.sapling.repository.PromotionPolicyRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,6 +19,7 @@ public class PromotionService {
     private PromotionPolicyRepository repository;
 
     @Nullable
+    @Cacheable(cacheNames = "promotion_policy", key = "#id")
     public PromotionPolicy getPromotionPolicy(long id) {
         Optional<PromotionPolicyEntity> entity = repository.findById(id);
         return entity.map(this::convert).orElse(null);
@@ -40,7 +44,9 @@ public class PromotionService {
                 object.getDownloadRatio()
         );
     }
-
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "promotion_policy", key="#promotionPolicy.id")
+    })
     public void save(@NotNull PromotionPolicy promotionPolicy) {
         PromotionPolicyEntity entity = new PromotionPolicyEntity(
                 promotionPolicy.getId(),

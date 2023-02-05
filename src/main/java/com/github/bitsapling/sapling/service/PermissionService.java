@@ -7,6 +7,9 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,7 @@ public class PermissionService {
     }
 
     @Nullable
+    @Cacheable(value = "permission", key = "#id")
     public Permission getPermission(long id) {
         Optional<PermissionEntity> permission = repository.findById(id);
         if (permission.isPresent()) {
@@ -47,6 +51,7 @@ public class PermissionService {
     }
 
     @Nullable
+    @Cacheable(value = "permission", key = "'code='.concat(#code)")
     public Permission getPermission(@NotNull String code) {
         Optional<PermissionEntity> permission = repository.findByCode(code);
         if (permission.isPresent()) {
@@ -55,7 +60,10 @@ public class PermissionService {
         }
         return null;
     }
-
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "permission", key="#permission.id"),
+            @CacheEvict(cacheNames = "permission", key="'code='.concat(#permission.code)")
+    })
     public void save(@NotNull Permission permission) {
         PermissionEntity entity = new PermissionEntity(
                 permission.getId(),

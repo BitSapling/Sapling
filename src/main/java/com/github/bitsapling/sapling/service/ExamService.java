@@ -19,7 +19,7 @@ public class ExamService {
     private ExamPlanService examPlanService;
 
     @Nullable
-    @Cacheable(cacheNames = "exam", key = "#id")
+    @Cacheable(cacheNames = "exam", key = "id-#id")
     public Exam getExam(long id) {
         return repository.findById(id).map(this::convert).orElse(null);
     }

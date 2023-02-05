@@ -6,6 +6,9 @@ import com.github.bitsapling.sapling.repository.UserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -20,29 +23,39 @@ public class UserService {
 
     // getUser
     @Nullable
+    @Cacheable(cacheNames = "user", key = "#id")
     public User getUser(long id) {
         Optional<UserEntity> userEntity = repository.findById(id);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Cacheable(cacheNames = "user", key = "'user_name='.concat(#username)")
     public User getUserByUsername(String username) {
         Optional<UserEntity> userEntity = repository.findByUsername(username);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Cacheable(cacheNames = "user", key = "'email='.concat(#email)")
     public User getUserByEmail(String email) {
         Optional<UserEntity> userEntity = repository.findByEmail(email);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Cacheable(cacheNames = "user", key = "'passkey='.concat(#passkey)")
     public User getUserByPasskey(String passkey) {
         Optional<UserEntity> userEntity = repository.findByPasskey(passkey);
         return userEntity.map(this::convert).orElse(null);
     }
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "user", key = "#user.id"),
+            @CacheEvict(cacheNames = "user", key = "'user_name='.concat(#user.username)"),
+            @CacheEvict(cacheNames = "user", key = "'email='.concat(#user.email)"),
+            @CacheEvict(cacheNames = "user", key = "'passkey='.concat(#user.passkey)"),
+    })
     public void save(User user) {
         UserEntity entity = convert(user);
         repository.save(entity);

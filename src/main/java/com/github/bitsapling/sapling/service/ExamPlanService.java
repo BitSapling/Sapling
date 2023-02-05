@@ -21,7 +21,7 @@ public class ExamPlanService {
     }
 
     @Nullable
-    @Cacheable(cacheNames = "exam_plan", key = "#code")
+    @Cacheable(cacheNames = "exam_plan", key = "'code='.concat(#code)")
     public ExamPlan getExamPlan(@NotNull String code) {
         return repository.findByCode(code).map(this::convert).orElse(null);
     }

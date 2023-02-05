@@ -6,7 +6,7 @@ sa-token:
   activity-timeout: -1
   is-concurrent: true
   is-share: false
-  token-style: uuid
+  token-style: random-128
   is-log: true
 logging:
   level:
@@ -14,7 +14,7 @@ logging:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/sapling?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/sapling?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
     username: sapling
     password: sapling
   jpa:
@@ -24,3 +24,47 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  cache:
+    redis:
+      cache-null-values: true
+      key-prefix: sapling
+      time-to-live: 86400
+      enable-statistics: true
+      use-key-prefix: true
+  quartz:
+    job-store-type: jdbc
+    wait-for-jobs-to-complete-on-shutdown: true
+    overwrite-existing-jobs: true
+    jdbc:
+      initialize-schema: always
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: sapling_scheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: qrtz_
+            useProperties: false
+            clusterCheckinInterval: 10000
+            isClustered: true
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+  data:
+    redis:
+      database: 3
+      timeout: 3000
+      password: 123456
+      port: 6379
+      host: localhost
+      jedis:
+        pool:
+          max-idle: 8
+          min-idle: 2
+          max-active: 8
+          max-wait: -1
