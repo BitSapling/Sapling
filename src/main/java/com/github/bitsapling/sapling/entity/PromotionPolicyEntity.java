@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(columnNames = {"id"})
         }
 )
-@Transactional
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -3,12 +3,14 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.UserEntity;
 import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -20,29 +22,33 @@ public class UserService {
 
     // getUser
     @Nullable
+    @Transactional
     public User getUser(long id) {
         Optional<UserEntity> userEntity = repository.findById(id);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Transactional
     public User getUserByUsername(String username) {
         Optional<UserEntity> userEntity = repository.findByUsername(username);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Transactional
     public User getUserByEmail(String email) {
         Optional<UserEntity> userEntity = repository.findByEmail(email);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
+    @Transactional
     public User getUserByPasskey(String passkey) {
         Optional<UserEntity> userEntity = repository.findByPasskey(passkey);
         return userEntity.map(this::convert).orElse(null);
     }
-
+    @Transactional
     public void save(User user) {
         UserEntity entity = convert(user);
         repository.save(entity);
@@ -71,7 +77,7 @@ public class UserService {
                 user.getIsp(),
                 user.getKarma(),
                 user.getInviteSlot(),
-                user.getSeedingTime());
+                user.getSeedingTime().toMillis());
     }
 
     @NotNull
@@ -97,6 +103,6 @@ public class UserService {
                 entity.getIsp(),
                 entity.getKarma(),
                 entity.getInviteSlot(),
-                entity.getSeedingTime());
+                Duration.ofMillis(entity.getSeedingTime()));
     }
 }

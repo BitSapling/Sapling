@@ -4,6 +4,7 @@ import com.github.bitsapling.sapling.entity.PermissionEntity;
 import com.github.bitsapling.sapling.entity.UserGroupEntity;
 import com.github.bitsapling.sapling.objects.UserGroup;
 import com.github.bitsapling.sapling.repository.UserGroupRepository;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class UserGroupService {
     private PromotionService promotionService;
 
     @Nullable
+    @Transactional
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroupEntity -> new UserGroup(
                 userGroupEntity.getId(),
@@ -30,6 +32,7 @@ public class UserGroupService {
                // , userGroupEntity.getInherited().stream().map(this::convert).toList()
         )).orElse(null);
     }
+    @Transactional
     public void save(@NotNull UserGroup userGroup) {
         repository.save(convert(userGroup));
     }

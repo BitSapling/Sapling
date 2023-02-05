@@ -19,7 +19,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Transactional
+
 public class ExamEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

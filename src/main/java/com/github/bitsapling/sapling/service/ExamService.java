@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.ExamEntity;
 import com.github.bitsapling.sapling.objects.Exam;
 import com.github.bitsapling.sapling.repository.ExamRepository;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ public class ExamService {
     private ExamPlanService examPlanService;
 
     @Nullable
+    @Transactional
     public Exam getExam(long id) {
         return repository.findById(id).map(this::convert).orElse(null);
     }

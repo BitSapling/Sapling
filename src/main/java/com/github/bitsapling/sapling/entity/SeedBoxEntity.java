@@ -12,7 +12,7 @@ import org.hibernate.annotations.CascadeType;
                 @UniqueConstraint(columnNames = {"address"})
         }
 )
-@Transactional
+
 @Data
 public class SeedBoxEntity {
     @Id

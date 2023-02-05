@@ -16,7 +16,7 @@ import java.sql.Timestamp;
                 @UniqueConstraint(columnNames = {"info_hash"})
         }
 )
-@Transactional
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

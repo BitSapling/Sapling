@@ -18,7 +18,7 @@ import java.util.List;
         }
 )
 @Data
-@Transactional
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserGroupEntity {

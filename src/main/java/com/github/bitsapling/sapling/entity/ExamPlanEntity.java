@@ -17,7 +17,7 @@ import java.time.Duration;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Transactional
+
 public class ExamPlanEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

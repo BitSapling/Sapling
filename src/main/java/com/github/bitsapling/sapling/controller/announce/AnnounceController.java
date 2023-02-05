@@ -1,8 +1,6 @@
 package com.github.bitsapling.sapling.controller.announce;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.dampcake.bencode.Bencode;
-import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
@@ -16,7 +14,6 @@ import com.github.bitsapling.sapling.util.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.EndianUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.jetbrains.annotations.NotNull;
@@ -24,17 +21,12 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -65,38 +57,23 @@ public class AnnounceController {
     @Autowired
     private AnnouncePerformanceMonitorService performanceMonitorService;
 
-    @SneakyThrows
-    @GetMapping("/test")
-    public String test() {
-        File file = new File("response.txt");
-        Bencode bencode = new Bencode(StandardCharsets.ISO_8859_1);
-        Map<String, Object> map = bencode.decode(Files.readAllBytes(file.toPath()), Type.DICTIONARY);
-        map.forEach((key, value) -> {
-            log.debug("Key: {}", key, value);
-            if (key.equals("peers")) {
-                ByteArrayInputStream stream = new ByteArrayInputStream(((String) value).getBytes(StandardCharsets.ISO_8859_1));
-                byte[] ip = new byte[4];
-                byte[] port = new byte[2];
-                try {
-                    while (stream.available() != 0) {
-                        stream.read(ip);
-                        stream.read(port);
-                        log.debug("IP: {}; Port: {}", InetAddress.getByAddress(ip), EndianUtils.readSwappedUnsignedShort(new ByteArrayInputStream(port)));
-                    }
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        });
-        return "test";
-    }
 
     @GetMapping("/scrape")
-    public String scrape(@PathVariable String passkey, @RequestParam List<String> infoHashes) {
-        return "scrape still todo!";
+    public String scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
+        log.debug("Scrape Query String: {}", request.getQueryString());
+        log.debug("Gets: " + gets);
+        String passkey = gets.get("passkey");
+        if (StringUtils.isEmpty(passkey)) {
+            throw new InvalidAnnounceException("You must re-download the torrent from tracker for seeding.");
+        }
+        if (!SafeUUID.isUUID(passkey)) {
+            throw new InvalidAnnounceException("Invalid passkey.");
+        }
+        checkClient();
+        checkScrapeFields(gets);
+        return "scrape!";
     }
+
 
     @GetMapping("/announce")
     public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, RetryableAnnounceException, IOException {
@@ -228,6 +205,10 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Bad client: User-Agent cannot be empty");
         }
     }
+    private void checkScrapeFields(Map<String, String> gets) throws InvalidAnnounceException {
+        if (StringUtils.isEmpty(gets.get("info_hash"))) throw new InvalidAnnounceException("Missing param: info_hash");
+    }
+
 
     private void checkAnnounceFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
         if (StringUtils.isEmpty(gets.get("info_hash"))) throw new InvalidAnnounceException("Missing param: info_hash");

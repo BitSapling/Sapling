@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
                 @UniqueConstraint(columnNames = {"code"})
         }
 )
-@Transactional
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

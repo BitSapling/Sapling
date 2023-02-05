@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.PromotionPolicyEntity;
 import com.github.bitsapling.sapling.objects.PromotionPolicy;
 import com.github.bitsapling.sapling.repository.PromotionPolicyRepository;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class PromotionService {
     private PromotionPolicyRepository repository;
 
     @Nullable
+    @Transactional
     public PromotionPolicy getPromotionPolicy(long id) {
         Optional<PromotionPolicyEntity> entity = repository.findById(id);
         return entity.map(this::convert).orElse(null);
@@ -40,7 +42,7 @@ public class PromotionService {
                 object.getDownloadRatio()
         );
     }
-
+    @Transactional
     public void save(@NotNull PromotionPolicy promotionPolicy) {
         PromotionPolicyEntity entity = new PromotionPolicyEntity(
                 promotionPolicy.getId(),

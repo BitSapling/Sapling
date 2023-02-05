@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.TorrentEntity;
 import com.github.bitsapling.sapling.objects.Torrent;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,19 @@ public class TorrentService {
     private PromotionService promotionService;
 
     @Nullable
+    @Transactional
     public Torrent getTorrent(long id) {
         TorrentEntity entity = torrentRepository.findById(id).orElse(null);
         if (entity == null) return null;
         return convert(entity);
     }
     @Nullable
+    @Transactional
     public Torrent getTorrent(@NotNull String infoHash){
         Optional<TorrentEntity> entity = torrentRepository.findByInfoHash(infoHash);
         return entity.map(this::convert).orElse(null);
     }
-
+    @Transactional
     public void save(@NotNull Torrent torrent) {
         torrentRepository.save(convert(torrent));
     }

@@ -18,7 +18,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Transactional
+
 public class PeerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
