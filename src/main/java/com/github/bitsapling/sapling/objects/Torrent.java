@@ -3,10 +3,14 @@ package com.github.bitsapling.sapling.objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 @AllArgsConstructor
 @Data
-public class Torrent {
+public class Torrent  implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final long id;
     private final String infoHash;
     private User user;

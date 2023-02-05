@@ -3,12 +3,16 @@ package com.github.bitsapling.sapling.objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 @AllArgsConstructor
 @Data
-public class User {
+public class User  implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final long id;
     private String email;
     private String passwordHash;

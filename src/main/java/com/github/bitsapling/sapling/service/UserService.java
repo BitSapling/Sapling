@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -23,28 +24,25 @@ public class UserService {
 
     // getUser
     @Nullable
-
     public User getUser(long id) {
         Optional<UserEntity> userEntity = repository.findById(id);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-
     public User getUserByUsername(String username) {
         Optional<UserEntity> userEntity = repository.findByUsername(username);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-
     public User getUserByEmail(String email) {
         Optional<UserEntity> userEntity = repository.findByEmail(email);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-
+    @Cacheable(cacheNames = {"user_passkey"}, key = "#passkey")
     public User getUserByPasskey(String passkey) {
         Optional<UserEntity> userEntity = repository.findByPasskey(passkey);
         return userEntity.map(this::convert).orElse(null);

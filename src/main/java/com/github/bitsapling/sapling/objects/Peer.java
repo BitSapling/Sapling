@@ -3,11 +3,15 @@ package com.github.bitsapling.sapling.objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 @AllArgsConstructor
 @Data
-public class Peer {
+public class Peer implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final long id;
     private final String ip;
     private final int port;

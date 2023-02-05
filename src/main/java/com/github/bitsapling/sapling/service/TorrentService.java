@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -23,7 +24,6 @@ public class TorrentService {
     private PromotionService promotionService;
 
     @Nullable
-
     public Torrent getTorrent(long id) {
         TorrentEntity entity = torrentRepository.findById(id).orElse(null);
         if (entity == null) return null;
@@ -31,7 +31,7 @@ public class TorrentService {
     }
 
     @Nullable
-
+    @Cacheable(cacheNames ={"torrent"}, key = "#infoHash")
     public Torrent getTorrent(@NotNull String infoHash) {
         Optional<TorrentEntity> entity = torrentRepository.findByInfoHash(infoHash);
         return entity.map(this::convert).orElse(null);
