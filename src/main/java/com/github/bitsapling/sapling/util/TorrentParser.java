@@ -3,7 +3,9 @@ package com.github.bitsapling.sapling.util;
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.exception.*;
+import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,4 +145,10 @@ public class TorrentParser {
         return dict;
     }
 
+    @NotNull
+    public String getInfoHash() {
+        Map<String, Object> infoHashDat = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
+        //noinspection deprecation
+        return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString();
+    }
 }

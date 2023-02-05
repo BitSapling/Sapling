@@ -8,9 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -36,21 +33,15 @@ public class PeerService {
     }
 
     @NotNull
-    @Cacheable(cacheNames = "peers", key = "#infoHash")
     public List<Peer> getPeers(@NotNull String infoHash) {
         List<PeerEntity> entities = repository.findPeersByInfoHash(infoHash);
         return entities.stream().map(this::convert).toList();
     }
 
-    @CacheEvict(cacheNames = "peers", key = "#peer.infoHash")
     public void save(@NotNull Peer peer) {
         repository.save(convert(peer));
     }
 
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "peers", key="#peer.id"),
-            @CacheEvict(cacheNames = "peers", key="#peer.infoHash")
-    })
     public void delete(@NotNull Peer peer) {
         //repository.delete(convert(peer));
         repository.deleteById(peer.getId());

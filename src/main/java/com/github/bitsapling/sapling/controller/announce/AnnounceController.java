@@ -187,8 +187,6 @@ public class AnnounceController {
                 Instant.now(),
                 false,
                 false,
-                false,
-                false,
                 0,
                 promotionService.getPromotionPolicy(1),
                 0,

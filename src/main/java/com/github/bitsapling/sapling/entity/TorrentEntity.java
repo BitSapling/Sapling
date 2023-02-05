@@ -43,12 +43,8 @@ public class TorrentEntity {
     private Timestamp createdAt;
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
-    @Column(name = "draft", nullable = false)
-    private boolean draft;
     @Column(name = "under_review", nullable = false)
     private boolean underReview;
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted;
     @Column(name = "anonymous", nullable = false)
     private boolean anonymous;
     @Column(name = "type", nullable = false)

@@ -29,9 +29,8 @@ public class RedisConfig {
         redisCacheConfiguration = redisCacheConfiguration
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer.UTF_8))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer()))
-                .disableCachingNullValues()
                 .prefixCacheNameWith("sapling:")
-                .entryTtl(Duration.ofMinutes(60L));
+                .entryTtl(Duration.ofMinutes(3L));
 //        //专门指定某些缓存空间的配置，如果过期时间【主要这里的key为缓存空间名称】
 //        Map<String, RedisCacheConfiguration> map = new HashMap<>();
 //        Set<Map.Entry<String, Long>> entries = ttlParams.entrySet();

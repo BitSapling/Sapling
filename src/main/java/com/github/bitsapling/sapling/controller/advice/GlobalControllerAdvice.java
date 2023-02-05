@@ -6,6 +6,7 @@ import com.github.bitsapling.sapling.exception.LoginException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.util.BencodeUtil;
 import com.github.bitsapling.sapling.util.ClassUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalControllerAdvice {
     @Autowired
     private ClassUtil classUtil;
@@ -43,6 +45,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> apiExceptionHandler(Exception exception) {
+        log.error("Catch an API exception",exception);
         return ResponseEntity.internalServerError()
                 .body(
                         Map.of("status", "error",
@@ -54,6 +57,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
+        log.error("Catch an argument exception",exception);
         return ResponseEntity.internalServerError()
                 .body(
                         Map.of("status", "error",

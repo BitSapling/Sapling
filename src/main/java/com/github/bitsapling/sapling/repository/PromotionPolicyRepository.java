@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PromotionPolicyRepository extends CrudRepository<PromotionPolicyEntity, Long> {
+
 }

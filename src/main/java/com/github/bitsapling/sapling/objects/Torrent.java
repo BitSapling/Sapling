@@ -16,9 +16,7 @@ public class Torrent {
     private long finishes;
     private final Instant createdAt;
     private Instant updatedAt;
-    private boolean draft;
     private boolean underReview;
-    private boolean deleted;
     private boolean anonymous;
     private int type;
     private PromotionPolicy promotionPolicy;

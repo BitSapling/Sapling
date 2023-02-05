@@ -1,17 +1,16 @@
 package com.github.bitsapling.sapling.objects;
 
-import lombok.Data;
 import lombok.Getter;
 
 @Getter
 public abstract class ResponsePojo {
-    private final long errorCode;
+    private final long code;
 
-    protected ResponsePojo(long errorCode) {
-        this.errorCode = errorCode;
+    protected ResponsePojo(long code) {
+        this.code = code;
     }
 
-    public long getErrorCode() {
-        return errorCode;
+    public long getCode() {
+        return code;
     }
 }

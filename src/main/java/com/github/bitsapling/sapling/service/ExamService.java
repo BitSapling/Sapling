@@ -6,7 +6,6 @@ import com.github.bitsapling.sapling.repository.ExamRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +18,6 @@ public class ExamService {
     private ExamPlanService examPlanService;
 
     @Nullable
-    @Cacheable(cacheNames = "exam", key = "id-#id")
     public Exam getExam(long id) {
         return repository.findById(id).map(this::convert).orElse(null);
     }

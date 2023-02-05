@@ -7,9 +7,6 @@ import com.github.bitsapling.sapling.repository.UserGroupRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +19,6 @@ public class UserGroupService {
     private PromotionService promotionService;
 
     @Nullable
-    @Cacheable(cacheNames = "user_group", key = "#id")
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroupEntity -> new UserGroup(
                 userGroupEntity.getId(),
@@ -34,9 +30,6 @@ public class UserGroupService {
                // , userGroupEntity.getInherited().stream().map(this::convert).toList()
         )).orElse(null);
     }
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "user_group", key="#userGroup.id")
-    })
     public void save(@NotNull UserGroup userGroup) {
         repository.save(convert(userGroup));
     }

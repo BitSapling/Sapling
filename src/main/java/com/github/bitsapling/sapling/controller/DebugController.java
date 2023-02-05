@@ -106,18 +106,18 @@ public class DebugController {
         joiner.add("File Size: " + parser.getTorrentFilesSize());
         joiner.add("Pieces Length: " + parser.getTorrentFilesSize());
         Map<String, Long> fileList = parser.getFileList();
-        fileList.forEach((key, value) -> joiner.add("File -> "+key + ", Size -> " + value));
+        fileList.forEach((key, value) -> joiner.add("File -> " + key + ", Size -> " + value));
         return joiner.toString();
     }
 
     @GetMapping("/debug/initTables")
     public String initTables() {
-        Permission permission = new Permission(0, "torrent:announce", true);
-        permissionService.save(permission);
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(new Permission(0, "torrent:announce", true));
+        permissions.add(new Permission(0, "torrent:upload", true));
         PromotionPolicy promotionPolicy = new PromotionPolicy(0, "系统默认", 1.0d, 1.0d);
         promotionService.save(promotionPolicy);
-        List<Permission> permissions = new ArrayList<>();
-        permissions.add(permission);
+        permissions.forEach(p -> permissionService.save(p));
         UserGroup userGroup = new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy);
         userGroupService.save(userGroup);
         User user = new User(0,

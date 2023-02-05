@@ -6,9 +6,6 @@ import com.github.bitsapling.sapling.repository.TorrentRepository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -24,22 +21,17 @@ public class TorrentService {
     private PromotionService promotionService;
 
     @Nullable
-    @Cacheable(cacheNames = "torrent", key = "#id")
     public Torrent getTorrent(long id) {
         TorrentEntity entity = torrentRepository.findById(id).orElse(null);
         if (entity == null) return null;
         return convert(entity);
     }
     @Nullable
-    @Cacheable(cacheNames = "torrent", key = "'info_hash='.concat(#infoHash)")
     public Torrent getTorrent(@NotNull String infoHash){
         Optional<TorrentEntity> entity = torrentRepository.findByInfoHash(infoHash);
         return entity.map(this::convert).orElse(null);
     }
-   @Caching(evict = {
-           @CacheEvict(cacheNames = "torrent", key = "#torrent.id"),
-           @CacheEvict(cacheNames = "torrent", key = "'info_hash='.concat(#torrent.infoHash)")
-   })
+
     public void save(@NotNull Torrent torrent) {
         torrentRepository.save(convert(torrent));
     }
@@ -56,9 +48,7 @@ public class TorrentService {
                 entity.getFinishes(),
                 entity.getCreatedAt().toInstant(),
                 entity.getUpdatedAt().toInstant(),
-                entity.isDraft(),
                 entity.isUnderReview(),
-                entity.isDeleted(),
                 entity.isAnonymous(),
                 entity.getType(),
                 promotionService.convert(entity.getPromotionPolicy()),
@@ -79,9 +69,7 @@ public class TorrentService {
                 torrent.getFinishes(),
                 Timestamp.from(torrent.getCreatedAt()),
                 Timestamp.from(torrent.getUpdatedAt()),
-                torrent.isDraft(),
                 torrent.isUnderReview(),
-                torrent.isDeleted(),
                 torrent.isAnonymous(),
                 torrent.getType(),
                 promotionService.convert(torrent.getPromotionPolicy()),
