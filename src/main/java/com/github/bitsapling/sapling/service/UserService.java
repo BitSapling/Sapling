@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
     @Autowired
     private UserRepository repository;
@@ -22,33 +23,33 @@ public class UserService {
 
     // getUser
     @Nullable
-    @Transactional
+
     public User getUser(long id) {
         Optional<UserEntity> userEntity = repository.findById(id);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-    @Transactional
+
     public User getUserByUsername(String username) {
         Optional<UserEntity> userEntity = repository.findByUsername(username);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-    @Transactional
+
     public User getUserByEmail(String email) {
         Optional<UserEntity> userEntity = repository.findByEmail(email);
         return userEntity.map(this::convert).orElse(null);
     }
 
     @Nullable
-    @Transactional
+
     public User getUserByPasskey(String passkey) {
         Optional<UserEntity> userEntity = repository.findByPasskey(passkey);
         return userEntity.map(this::convert).orElse(null);
     }
-    @Transactional
+
     public void save(User user) {
         UserEntity entity = convert(user);
         repository.save(entity);

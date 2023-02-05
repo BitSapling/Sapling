@@ -5,6 +5,7 @@ import com.github.bitsapling.sapling.objects.Torrent;
 import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 @Service
 @Slf4j
+@Transactional
 public class AnnounceService {
     private final BlockingDeque<AnnounceTask> taskQueue = new LinkedBlockingDeque<>(4096);
     @Autowired

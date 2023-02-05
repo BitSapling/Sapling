@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class TorrentService {
     @Autowired
     private TorrentRepository torrentRepository;
@@ -22,19 +23,20 @@ public class TorrentService {
     private PromotionService promotionService;
 
     @Nullable
-    @Transactional
+
     public Torrent getTorrent(long id) {
         TorrentEntity entity = torrentRepository.findById(id).orElse(null);
         if (entity == null) return null;
         return convert(entity);
     }
+
     @Nullable
-    @Transactional
-    public Torrent getTorrent(@NotNull String infoHash){
+
+    public Torrent getTorrent(@NotNull String infoHash) {
         Optional<TorrentEntity> entity = torrentRepository.findByInfoHash(infoHash);
         return entity.map(this::convert).orElse(null);
     }
-    @Transactional
+
     public void save(@NotNull Torrent torrent) {
         torrentRepository.save(convert(torrent));
     }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class ExamService {
     @Autowired
     private ExamRepository repository;
@@ -19,7 +20,7 @@ public class ExamService {
     private ExamPlanService examPlanService;
 
     @Nullable
-    @Transactional
+
     public Exam getExam(long id) {
         return repository.findById(id).map(this::convert).orElse(null);
     }

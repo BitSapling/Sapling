@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class UserGroupService {
     @Autowired
     private UserGroupRepository repository;
@@ -20,7 +21,7 @@ public class UserGroupService {
     private PromotionService promotionService;
 
     @Nullable
-    @Transactional
+
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroupEntity -> new UserGroup(
                 userGroupEntity.getId(),
@@ -29,10 +30,10 @@ public class UserGroupService {
                 userGroupEntity.getPermissionEntities().stream()
                         .map(perm -> permissionService.getPermission(perm.getId())).toList(),
                 promotionService.convert(userGroupEntity.getPromotionPolicy())
-               // , userGroupEntity.getInherited().stream().map(this::convert).toList()
+                // , userGroupEntity.getInherited().stream().map(this::convert).toList()
         )).orElse(null);
     }
-    @Transactional
+
     public void save(@NotNull UserGroup userGroup) {
         repository.save(convert(userGroup));
     }
@@ -46,7 +47,7 @@ public class UserGroupService {
                 group.getPermissionEntities().stream()
                         .map(perm -> permissionService.getPermission(perm.getId())).toList(),
                 promotionService.convert(group.getPromotionPolicy())
-               //, group.getInherited().stream().map(this::convert).toList()
+                //, group.getInherited().stream().map(this::convert).toList()
         );
     }
 

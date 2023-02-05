@@ -10,18 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class ExamPlanService {
     @Autowired
     private ExamPlanRepository repository;
 
     @Nullable
-    @Transactional
+
     public ExamPlan getExamPlan(long id) {
         return repository.findById(id).map(this::convert).orElse(null);
     }
 
     @Nullable
-    @Transactional
+
     public ExamPlan getExamPlan(@NotNull String code) {
         return repository.findByCode(code).map(this::convert).orElse(null);
     }

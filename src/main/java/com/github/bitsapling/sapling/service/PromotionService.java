@@ -12,12 +12,13 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class PromotionService {
     @Autowired
     private PromotionPolicyRepository repository;
 
     @Nullable
-    @Transactional
+
     public PromotionPolicy getPromotionPolicy(long id) {
         Optional<PromotionPolicyEntity> entity = repository.findById(id);
         return entity.map(this::convert).orElse(null);
@@ -42,7 +43,7 @@ public class PromotionService {
                 object.getDownloadRatio()
         );
     }
-    @Transactional
+
     public void save(@NotNull PromotionPolicy promotionPolicy) {
         PromotionPolicyEntity entity = new PromotionPolicyEntity(
                 promotionPolicy.getId(),

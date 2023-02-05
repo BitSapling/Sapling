@@ -14,12 +14,13 @@ import java.util.Optional;
 
 @Service
 @Repository
+@Transactional
 public class PermissionService {
     @Autowired
     private PermissionRepository repository;
 
     @NotNull
-    @Transactional
+
     public Permission registerPermission(@NotNull String code, boolean def) {
         Optional<PermissionEntity> permission = repository.findByCode(code);
         if (permission.isPresent()) {
@@ -32,7 +33,7 @@ public class PermissionService {
     }
 
     @Nullable
-    @Transactional
+
     public Permission getPermission(long id) {
         Optional<PermissionEntity> permission = repository.findById(id);
         if (permission.isPresent()) {
@@ -43,12 +44,12 @@ public class PermissionService {
     }
 
     @NotNull
-    public Permission convert(@NotNull PermissionEntity entity){
+    public Permission convert(@NotNull PermissionEntity entity) {
         return new Permission(entity.getId(), entity.getCode(), entity.isDef());
     }
 
     @Nullable
-    @Transactional
+
     public Permission getPermission(@NotNull String code) {
         Optional<PermissionEntity> permission = repository.findByCode(code);
         if (permission.isPresent()) {
@@ -57,7 +58,7 @@ public class PermissionService {
         }
         return null;
     }
-    @Transactional
+
     public void save(@NotNull Permission permission) {
         PermissionEntity entity = new PermissionEntity(
                 permission.getId(),

@@ -17,14 +17,14 @@ import java.util.List;
 
 @Service
 @Repository
-@Transactional
 @Slf4j
+@Transactional
 public class PeerService {
     @Autowired
     private PeersRepository repository;
 
     @Nullable
-    @Transactional
+
     public Peer getPeer(@NotNull String ip, int port, @NotNull String infoHash) {
         PeerEntity entity = repository.findByIpAndPortAndInfoHash(ip, port, infoHash).orElse(null);
         if (entity == null) {
@@ -34,18 +34,18 @@ public class PeerService {
     }
 
     @NotNull
-    @Transactional
+
     public List<Peer> getPeers(@NotNull String infoHash) {
         List<PeerEntity> entities = repository.findPeersByInfoHash(infoHash);
         return entities.stream().map(this::convert).toList();
     }
 
-    @Transactional
+
     public void save(@NotNull Peer peer) {
         repository.save(convert(peer));
     }
 
-    @Transactional
+
     public void delete(@NotNull Peer peer) {
         //repository.delete(convert(peer));
         repository.deleteById(peer.getId());
