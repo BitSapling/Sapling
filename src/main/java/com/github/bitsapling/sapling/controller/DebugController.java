@@ -2,10 +2,12 @@ package com.github.bitsapling.sapling.controller;
 
 import com.github.bitsapling.sapling.entity.PeerEntity;
 import com.github.bitsapling.sapling.entity.TorrentEntity;
+import com.github.bitsapling.sapling.exception.TorrentException;
 import com.github.bitsapling.sapling.objects.*;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import com.github.bitsapling.sapling.service.*;
+import com.github.bitsapling.sapling.util.TorrentParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +19,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -45,7 +44,7 @@ public class DebugController {
     private AnnouncePerformanceMonitorService announcePerformanceMonitorService;
     @Autowired
     private AnnounceService announceService;
-    
+
     private String page;
 
     {
@@ -74,7 +73,7 @@ public class DebugController {
         log.debug("Accepting peers");
         for (PeerEntity entity : peersRepository.findAll()) {
             Peer peer = peerService.convert(entity);
-            Peer copiedPeer = new Peer(peer.getId(),peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
+            Peer copiedPeer = new Peer(peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
                     peer.getUserAgent(), "<passkey-removed>", peer.getUploaded(),
                     peer.getDownloaded(), peer.getLeft(), peer.isSeeder(), peer.getUpdateAt(),
                     peer.getSeedingTime());
@@ -98,6 +97,17 @@ public class DebugController {
 
         log.debug("Done!");
         return resp;
+    }
+
+    @GetMapping("/debug/parseTorrents")
+    public String parseTorrent() throws IOException, TorrentException {
+        StringJoiner joiner = new StringJoiner("\n");
+        TorrentParser parser = new TorrentParser(new File("1.torrent"));
+        joiner.add("File Size: " + parser.getTorrentFilesSize());
+        joiner.add("Pieces Length: " + parser.getTorrentFilesSize());
+        Map<String, Long> fileList = parser.getFileList();
+        fileList.forEach((key, value) -> joiner.add("File -> "+key + ", Size -> " + value));
+        return joiner.toString();
     }
 
     @GetMapping("/debug/initTables")

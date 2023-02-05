@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.util;
 
-import com.dampcake.bencode.Bencode;
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
 import com.github.bitsapling.sapling.exception.*;
@@ -9,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,12 +19,11 @@ import java.util.StringJoiner;
  */
 public class TorrentUtilLegacy {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
-    private final Bencode bencode = new Bencode(StandardCharsets.UTF_8);
-    private final Bencode bencodeInfoHash = new Bencode(StandardCharsets.ISO_8859_1);
     private final byte[] data;
     private final Map<String, Long> fileList = new LinkedHashMap<>();
     private Map<String, Object> dict;
     private long totalSize;
+    private long piecesLength = -1;
 
     public TorrentUtilLegacy(File file) throws IOException, BencodeException, TorrentException {
         this.data = Files.readAllBytes(file.toPath());
@@ -51,7 +48,7 @@ public class TorrentUtilLegacy {
     }
 
     private void init() throws BencodeException, TorrentException {
-        this.dict = bencode.decode(this.data, Type.DICTIONARY);
+        this.dict = BencodeUtil.utf8().decode(this.data, Type.DICTIONARY);
         validate();
     }
 
@@ -87,6 +84,7 @@ public class TorrentUtilLegacy {
             this.fileList.put(pathBuilder.toString(), size);
         }
         totalSize = this.fileList.values().stream().mapToLong(v -> v).sum();
+        piecesLength = (Long) info.get("pieces length");
     }
 
     public long getTorrentFilesSize() {
@@ -126,6 +124,10 @@ public class TorrentUtilLegacy {
         return false;
     }
 
+    public long getPiecesLength() {
+        return piecesLength;
+    }
+
     /**
      * Rewrite the torrent.
      * This operation will remove all sensitive information, make torrent private and replace the tracker
@@ -145,13 +147,13 @@ public class TorrentUtilLegacy {
 
     @NotNull
     public String getInfoHash() {
-        Map<String, Object> infoHashDat = bencodeInfoHash.decode(this.data, Type.DICTIONARY);
+        Map<String, Object> infoHashDat = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
         //noinspection deprecation
-        return Hashing.sha1().hashBytes(bencodeInfoHash.encode((Map<?, ?>) infoHashDat.get("info"))).toString();
+        return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString();
     }
 
     public byte[] save() {
-        return bencode.encode(this.dict);
+        return BencodeUtil.bittorrent().encode(this.dict);
     }
 
     public void save(@NotNull File file) throws IOException {
