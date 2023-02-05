@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.objects.Peer;
 import com.github.bitsapling.sapling.objects.Torrent;
 import com.github.bitsapling.sapling.objects.User;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -31,8 +29,6 @@ public class AnnounceService {
     @Autowired
     private AnnouncePerformanceMonitorService monitorService;
 
-    private Instant lastCleanup = Instant.now().minus(11, ChronoUnit.MINUTES);
-
     public AnnounceService() {
         Thread thread = new Thread(() -> {
             try {
@@ -45,11 +41,11 @@ public class AnnounceService {
         thread.start();
     }
 
-    public void schedule(@NotNull AnnounceTask announceTask) throws AnnounceBusyException {
+    public void schedule(@NotNull AnnounceTask announceTask) {
         try {
             taskQueue.add(announceTask);
         } catch (IllegalStateException exception) {
-            throw new AnnounceBusyException();
+            log.error("Announce service is busy! Check your server database!", exception);
         }
     }
 
@@ -61,7 +57,6 @@ public class AnnounceService {
                     long start = System.nanoTime();
                     handleTask(task);
                     monitorService.recordJobStats(System.nanoTime() - start);
-
                 } catch (Exception e) {
                     log.error("Error handling task: {}", task, e);
                 }
@@ -77,7 +72,6 @@ public class AnnounceService {
         if (peer == null) {
             peer = createNewPeer(task);
         }
-
         Torrent torrent = task.torrent();
         long lastUploaded = peer.getUploaded();
         long lastDownload = peer.getDownloaded();
@@ -100,7 +94,6 @@ public class AnnounceService {
         user.setRealUploaded(user.getRealUploaded() + lastUploaded);
         // Apply user promotion policy
 
-
         long promotionUploadOffset = user.getGroup().getPromotionPolicy().applyUploadRatio(lastDownload);
         long promotionDownloadOffset = user.getGroup().getPromotionPolicy().applyDownloadRatio(lastUploaded);
         // Apply torrent promotion policy
@@ -117,6 +110,7 @@ public class AnnounceService {
             }
         }
     }
+
 
     @NotNull
     private Peer createNewPeer(AnnounceTask task) {

@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Instant;
@@ -106,15 +107,12 @@ public class AnnounceController {
         String[] ipv4 = request.getParameterValues("ipv4");
         String[] ipv6 = request.getParameterValues("ipv6");
         String passkey = gets.get("passkey");
-
         if (StringUtils.isEmpty(passkey)) {
             throw new InvalidAnnounceException("You must re-download the torrent from tracker for seeding.");
         }
-
         if (!SafeUUID.isUUID(passkey)) {
             throw new InvalidAnnounceException("Invalid passkey.");
         }
-
         checkClient();
         checkAnnounceFields(gets);
         String peerId = gets.get("peer_id");
@@ -128,12 +126,9 @@ public class AnnounceController {
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
         String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(IPUtil.getRequestIp(request));
         String infoHash = InfoHashUtil.parseInfoHash(readInfoHash(request.getQueryString()));
-        log.debug("Decoded info_hash: {}", infoHash);
-        log.debug("Info Hash Length: {}", infoHash.getBytes(StandardCharsets.UTF_8).length);
         long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
         long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
         int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
-
         // User permission checks
         log.debug("Passkey: " + passkey);
         User user = userService.getUserByPasskey(passkey);
@@ -153,21 +148,26 @@ public class AnnounceController {
         }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
+        Set<String> peerIps = new HashSet<>();
+        peerIps.add(peerIp);
         if (ipv4 != null) {
-            for (String v4 : ipv4) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v4, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent));
-            }
+            peerIps.addAll(List.of(ipv4));
         }
         if (ipv6 != null) {
-            for (String v6 : ipv6) {
-                announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(v6, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent));
-            }
+            peerIps.addAll(List.of(ipv6));
         }
-        announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(peerIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent));
-        log.debug("Sending peers to " + peerId);
+        List<String> filteredIps = peerIps.stream().filter(this::checkIsBadIp).toList();
+        if (filteredIps.isEmpty()) {
+            log.info("Client {} announced invalid ips.", user.getUsername());
+            throw new InvalidAnnounceException("Invalid IP address");
+        }
+        for (String filteredIp : filteredIps) {
+            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent));
+        }
+        log.debug("Sending {}'s peers to {}", infoHash, peerId);
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
         log.debug("Peers Bencoded: {}", peers);
-        performanceMonitorService.recordStats(System.nanoTime()- ns);
+        performanceMonitorService.recordStats(System.nanoTime() - ns);
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=utf-8")
                 .body(peers);
@@ -213,6 +213,12 @@ public class AnnounceController {
             }
         }
         return null;
+    }
+
+    @SneakyThrows(UnknownHostException.class)
+    private boolean checkIsBadIp(String ip) {
+        InetAddress address = InetAddress.getByName(ip);
+        return !address.isAnyLocalAddress() && !address.isLinkLocalAddress() && !address.isLoopbackAddress();
     }
 
     private void checkClient() throws FixedAnnounceException {
