@@ -110,16 +110,11 @@ public class AnnounceService {
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime().plus(Duration.between(lastUpdateAt, Instant.now())));
         userService.save(user);
-//        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadOffset, downloadOffset);
+        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset);
         if (task.event() == AnnounceEventType.STOPPED) {
             if (peer.getId() != 0) {
                 peerService.delete(peer);
             }
-        }
-        if(lastCleanup.until(Instant.now(), ChronoUnit.MINUTES) >= 10){
-            log.debug("Cleaning up...");
-            lastCleanup = Instant.now();
-            peerService.cleanup();
         }
     }
 

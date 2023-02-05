@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,6 @@ public interface PeersRepository extends CrudRepository<PeerEntity, Long> {
     Optional<PeerEntity> findByPeerIdAndInfoHash(@NotNull String peerId, @NotNull String infoHash);
     List<PeerEntity> findPeersByInfoHash(@NotNull String infoHash);
     //List<PeerEntity> findPeersByUserId(long userId);
+    List<PeerEntity> findAllByUpdateAtLessThan(@NotNull Instant instant);
     void deletePeerByInfoHashAndPeerId(String infoHash, String peerId);
 }

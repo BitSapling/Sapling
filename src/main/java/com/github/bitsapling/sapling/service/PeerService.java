@@ -90,12 +90,10 @@ public class PeerService {
         );
     }
 
-    public void cleanup() {
-        repository.findAll().forEach(peer->{
-            if(peer.getUpdateAt().until(Instant.now(), ChronoUnit.MINUTES) > 80){
-                log.debug("Deleting peer due inactivate: {}", peer);
-                repository.delete(peer);
-            }
-        });
+    public int cleanup() {
+        List<PeerEntity> entities = repository.findAllByUpdateAtLessThan(Instant.now().minus(90, ChronoUnit.MINUTES));
+        int count = entities.size();
+        repository.deleteAll(entities);
+        return count;
     }
 }
