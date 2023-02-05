@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface TorrentRepository extends CrudRepository<TorrentEntity, Long> {
-    @Cacheable(cacheNames = "torrent", key = "'info_hash='.concat(#infoHash)")
     Optional<TorrentEntity> findByInfoHash(@NotNull String infoHash);
 
     @NotNull
@@ -20,18 +19,14 @@ public interface TorrentRepository extends CrudRepository<TorrentEntity, Long> {
     List<TorrentEntity> findAllByUserId(long userId);
 
     @NotNull
-    @Cacheable(cacheNames = "torrent", key = "'title='.concat(#title)")
     List<TorrentEntity> findAllByTitle(@NotNull String title);
 
     @NotNull
-    @Cacheable(cacheNames = "torrent", key = "'under_review='.concat(#is)")
     List<TorrentEntity> findAllByUnderReviewIs(boolean is);
 
     @NotNull
-    @Cacheable(cacheNames = "torrent", key = "'anonymous='.concat(#is)")
     List<TorrentEntity> findAllByAnonymousIs(boolean is);
 
     @NotNull
-    @Cacheable(cacheNames = "torrent", key = "'user='.concat(#user.id)")
     List<TorrentEntity> findAllByUser(@NotNull UserEntity user);
 }
