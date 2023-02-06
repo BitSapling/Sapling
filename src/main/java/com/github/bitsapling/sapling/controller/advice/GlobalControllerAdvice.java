@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.advice;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.LoginException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
@@ -58,7 +59,7 @@ public class GlobalControllerAdvice {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
         log.error("Catch an argument exception",exception);
-        return ResponseEntity.internalServerError()
+        return ResponseEntity.badRequest()
                 .body(
                         Map.of("status", "error",
                                 "type", classUtil.getClassSimpleName(exception.getClass()),
@@ -75,7 +76,15 @@ public class GlobalControllerAdvice {
                         "message", exception.getMessage())
                 );
     }
-
+    @ExceptionHandler(value = NotPermissionException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotPermissionException exception) {
+        return ResponseEntity.status(403)
+                .body(Map.of("status", "error",
+                        "type", classUtil.getClassSimpleName(exception.getClass()),
+                        "message", exception.getMessage())
+                );
+    }
     @ExceptionHandler(value = LoginException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> loginExceptionHandler(LoginException exception) {

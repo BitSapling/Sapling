@@ -6,6 +6,7 @@ import com.github.bitsapling.sapling.exception.*;
 import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +18,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+
 @Slf4j
 public class TorrentParser {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
     private final byte[] data;
     private final Map<String, Long> fileList = new LinkedHashMap<>();
-    private Map<String, Object> dict;
+    private Map<String, Object> utf8Dict;
     private long totalSize;
 
     public TorrentParser(File file) throws IOException, BencodeException, TorrentException, ClassCastException {
@@ -48,18 +50,18 @@ public class TorrentParser {
     }
 
     private void init() throws InvalidTorrentVerifyException, InvalidTorrentVersionException, InvalidTorrentFileException, ClassCastException, EmptyTorrentFileException {
-        this.dict = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
+        this.utf8Dict = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
         validate();
         verifyAndCalcFiles();
     }
 
     private void validate() throws InvalidTorrentFileException, InvalidTorrentVersionException, InvalidTorrentVerifyException, ClassCastException {
-        if (!this.dict.containsKey("info"))
+        if (!this.utf8Dict.containsKey("info"))
             throw new InvalidTorrentFileException("Missing info key");
         if (isV2Torrent())
             throw new InvalidTorrentVersionException("version 2");
         @SuppressWarnings("unchecked")
-        Map<String, Object> info = (Map<String, Object>) this.dict.get("info");
+        Map<String, Object> info = (Map<String, Object>) this.utf8Dict.get("info");
         if (!info.containsKey("piece length") || !(info.get("piece length") instanceof Number))
             throw new InvalidTorrentVerifyException("piece length", Number.class, info.get("piece length"));
         if (!info.containsKey("name") || !(info.get("name") instanceof String))
@@ -72,7 +74,7 @@ public class TorrentParser {
     private void verifyAndCalcFiles() throws InvalidTorrentVerifyException, EmptyTorrentFileException {
         this.fileList.clear();
         @SuppressWarnings("unchecked")
-        Map<String, Object> info = (Map<String, Object>) this.dict.get("info");
+        Map<String, Object> info = (Map<String, Object>) this.utf8Dict.get("info");
         if (info.containsKey("length")) {
             // Single File Torrent
             String badEncodingFileName = (String) info.get("name");
@@ -112,8 +114,8 @@ public class TorrentParser {
             }
             String finalPath = pathBuilder.toString();
             // BitComet stuff
-            if(finalPath.contains("_____padding_file_")){
-                log.debug("Skipped {} because it's a BitComet padding file.",finalPath);
+            if (finalPath.contains("_____padding_file_")) {
+                log.debug("Skipped {} because it's a BitComet padding file.", finalPath);
                 continue;
             }
             this.fileList.put(finalPath, size);
@@ -127,7 +129,7 @@ public class TorrentParser {
 
     private boolean isV2Torrent() throws ClassCastException {
         @SuppressWarnings("unchecked")
-        Map<String, Object> info = (Map<String, Object>) this.dict.get("info");
+        Map<String, Object> info = (Map<String, Object>) this.utf8Dict.get("info");
         for (String v2Key : V2_KEYS) {
             if (info.containsKey(v2Key))
                 return true;
@@ -142,7 +144,7 @@ public class TorrentParser {
     }
 
     public Map<String, Object> getDict() {
-        return dict;
+        return utf8Dict;
     }
 
     @NotNull
@@ -150,5 +152,28 @@ public class TorrentParser {
         Map<String, Object> infoHashDat = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
         //noinspection deprecation
         return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString();
+    }
+
+    public byte @NotNull [] rewrite(@NotNull List<String> trackers, @NotNull String siteName, @NotNull String passkey, @Nullable String publisher,
+                                    @Nullable String publisherUrl) {
+        Map<String, Object> editDict = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> info = (Map<String, Object>) editDict.get("info");
+        info.put("private", 1);
+        info.put("created by", "BitSapling-TorrentParser/1.0; " + info.getOrDefault("created by", "N/A"));
+        info.put("source", "[" + siteName + "] " + info.getOrDefault("source", "N/A"));
+        editDict.put("info", info);
+        for (int i = 0; i < trackers.size(); i++) {
+            if (i == 0) {
+                editDict.put("announce", trackers.get(0)+"?passkey="+passkey);
+            }
+            editDict.put("announce-list", trackers.get(i)+"?passkey="+passkey);
+        }
+        if (publisher != null)
+            editDict.put("publisher", publisher);
+        if (publisherUrl != null)
+            editDict.put("publisher-url", publisherUrl);
+        editDict.remove("nodes");
+        return BencodeUtil.bittorrent().encode(editDict);
     }
 }
