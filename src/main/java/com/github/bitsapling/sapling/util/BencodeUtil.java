@@ -15,11 +15,7 @@ public class BencodeUtil {
     private static final Bencode UTF8_STANDARD = new Bencode(StandardCharsets.UTF_8);
 
     public static String convertToString(byte[] bytes) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (byte b : bytes) {
-            stringBuilder.append((char) b);
-        }
-        return stringBuilder.toString();
+        return new String(bytes, BITTORRENT_STANDARD.getCharset());
     }
 
     public static Bencode bittorrent() {
@@ -45,6 +41,6 @@ public class BencodeUtil {
                 throw new RetryableAnnounceException("incorrect ip format encountered when compact peer ip", 0);
             }
         }
-        return new String(buffer.array(), StandardCharsets.ISO_8859_1);
+        return convertToString(buffer.array());
     }
 }

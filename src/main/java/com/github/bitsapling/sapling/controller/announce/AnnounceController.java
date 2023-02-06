@@ -173,7 +173,7 @@ public class AnnounceController {
         log.debug("Peers Bencoded: {}", peers);
         performanceMonitorService.recordStats(System.nanoTime() - ns);
         return ResponseEntity.ok()
-                .header("Content-Type", "text/plain; charset=utf-8")
+                .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(peers);
     }
 
