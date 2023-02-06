@@ -21,7 +21,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 @Slf4j
 @Transactional
 public class AnnounceService {
-    private final BlockingDeque<AnnounceTask> taskQueue = new LinkedBlockingDeque<>(4096);
+    private final BlockingDeque<AnnounceTask> taskQueue = new LinkedBlockingDeque<>(40960);
     @Autowired
     private ExecutorUtil executor;
     @Autowired
