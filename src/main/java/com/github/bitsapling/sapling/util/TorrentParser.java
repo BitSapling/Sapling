@@ -14,10 +14,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 @Slf4j
 public class TorrentParser {
@@ -151,7 +148,7 @@ public class TorrentParser {
     public String getInfoHash() {
         Map<String, Object> infoHashDat = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
         //noinspection deprecation
-        return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString();
+        return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString().toLowerCase(Locale.ROOT);
     }
 
     public byte @NotNull [] rewrite(@NotNull List<String> trackers, @NotNull String siteName, @NotNull String passkey, @Nullable String publisher,

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Repository
@@ -24,18 +25,21 @@ public class PeerService {
 
     @Nullable
     public Peer getPeer(@NotNull String ip, int port, @NotNull String infoHash) {
-        return repository.findByIpAndPortAndInfoHash(ip, port, infoHash).orElse(null);
+        infoHash = infoHash.toLowerCase(Locale.ROOT);
+        return repository.findByIpAndPortAndInfoHashIgnoreCase(ip, port, infoHash).orElse(null);
     }
 
     @NotNull
 
     public List<Peer> getPeers(@NotNull String infoHash) {
-        List<Peer> entities = repository.findPeersByInfoHash(infoHash);
+        infoHash = infoHash.toLowerCase(Locale.ROOT);
+        List<Peer> entities = repository.findPeersByInfoHashIgnoreCase(infoHash);
         return entities.stream().toList();
     }
 
 
     public Peer save(@NotNull Peer peer) {
+        peer.setInfoHash(peer.getInfoHash().toLowerCase(Locale.ROOT));
         return repository.save(peer);
     }
 

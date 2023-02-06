@@ -16,20 +16,23 @@ import java.util.Optional;
 public class TorrentService {
     @Autowired
     private TorrentRepository torrentRepository;
+
     @Nullable
     public Torrent getTorrent(long id) {
         return torrentRepository.findById(id).orElse(null);
     }
 
     @Nullable
-    @Cacheable(cacheNames ={"torrent"}, key = "#infoHash")
+    @Cacheable(cacheNames = {"torrent"}, key = "#infoHash")
     public Torrent getTorrent(@NotNull String infoHash) {
-        Optional<Torrent> entity = torrentRepository.findByInfoHash(infoHash);
+        infoHash = infoHash.toLowerCase();
+        Optional<Torrent> entity = torrentRepository.findByInfoHashIgnoreCase(infoHash);
         return entity.orElse(null);
     }
 
     public Torrent save(@NotNull Torrent torrent) {
-       return torrentRepository.save(torrent);
+        torrent.setInfoHash(torrent.getInfoHash());
+        return torrentRepository.save(torrent);
     }
 
 }

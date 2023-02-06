@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface TorrentRepository extends CrudRepository<Torrent, Long> {
-    Optional<Torrent> findByInfoHash(@NotNull String infoHash);
+    Optional<Torrent> findByInfoHashIgnoreCase(@NotNull String infoHash);
 
     @NotNull
     @Cacheable(cacheNames = "torrent", key = "#userId")

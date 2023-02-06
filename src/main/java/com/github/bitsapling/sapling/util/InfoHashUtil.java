@@ -2,6 +2,8 @@ package com.github.bitsapling.sapling.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 public class InfoHashUtil {
     public static @NotNull String parseInfoHash(String encoded) throws IllegalArgumentException {
         try {
@@ -16,7 +18,7 @@ public class InfoHashUtil {
                     r.append(String.format("%02x", (int) c));
                 }
             }
-            return r.toString();
+            return r.toString().toLowerCase(Locale.ROOT);
         } catch (Exception e) {
             throw new IllegalArgumentException("Failed to decode info_hash: " + encoded);
         }

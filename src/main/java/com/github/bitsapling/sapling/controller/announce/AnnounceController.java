@@ -196,8 +196,7 @@ public class AnnounceController {
                 0,
                 "测试描述" + UUID.randomUUID()
         );
-        torrentService.save(torrent);
-        return torrentService.getTorrent(infoHash);
+        return torrentService.save(torrent);
     }
 
 
