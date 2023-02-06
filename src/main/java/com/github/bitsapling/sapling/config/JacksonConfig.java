@@ -25,7 +25,11 @@ public class JacksonConfig {
     @Bean
     @Primary
     public ObjectMapper primaryObjectMapper() {
-        return JsonMapper.builder().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .addModule(new JavaTimeModule()).build();
+
+        return JsonMapper.builder()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .findAndAddModules()
+                .addModule(new JavaTimeModule())
+                .build();
     }
 }

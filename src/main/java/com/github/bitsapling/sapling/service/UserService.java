@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -62,7 +60,7 @@ public class UserService {
                 user.getUsername(),
                 userGroupService.convert(user.getGroup()),
                 user.getPasskey(),
-                Timestamp.from(user.getCreatedAt()),
+                user.getCreatedAt(),
                 user.getAvatar(),
                 user.getCustomTitle(),
                 user.getSignature(),
@@ -76,7 +74,7 @@ public class UserService {
                 user.getIsp(),
                 user.getKarma(),
                 user.getInviteSlot(),
-                user.getSeedingTime().toMillis());
+                user.getSeedingTime());
     }
 
     @NotNull
@@ -88,7 +86,7 @@ public class UserService {
                 entity.getUsername(),
                 userGroupService.convert(entity.getGroup()),
                 entity.getPasskey(),
-                entity.getCreatedAt().toInstant(),
+                entity.getCreatedAt(),
                 entity.getAvatar(),
                 entity.getCustomTitle(),
                 entity.getSignature(),
@@ -102,6 +100,6 @@ public class UserService {
                 entity.getIsp(),
                 entity.getKarma(),
                 entity.getInviteSlot(),
-                Duration.ofMillis(entity.getSeedingTime()));
+                entity.getSeedingTime());
     }
 }

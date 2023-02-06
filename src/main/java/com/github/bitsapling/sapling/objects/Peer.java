@@ -5,8 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
+import java.sql.Timestamp;
 @AllArgsConstructor
 @Data
 public class Peer implements Serializable {
@@ -23,6 +22,6 @@ public class Peer implements Serializable {
     private long downloaded;
     private long left;
     private boolean seeder;
-    private Instant updateAt;
-    private Duration seedingTime;
+    private Timestamp updateAt;
+    private long seedingTime;
 }

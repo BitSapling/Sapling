@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Duration;
 @AllArgsConstructor
 @Data
 public class ExamPlan implements Serializable {
@@ -20,5 +19,5 @@ public class ExamPlan implements Serializable {
     private long seeds;
     private long seedingTime;
     private double shareRatio;
-    private Duration duration;
+    private long duration;
 }

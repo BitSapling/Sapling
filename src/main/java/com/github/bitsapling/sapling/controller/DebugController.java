@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.time.Duration;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 
@@ -126,7 +126,7 @@ public class DebugController {
                 "TestUser1",
                 userGroup,
                 new UUID(0, 0).toString(),
-                Instant.now(),
+                Timestamp.from(Instant.now()),
                 "https://www.baidu.com/favicon.ico",
                 "这是自定义头衔",
                 "这是测试签名",
@@ -140,7 +140,7 @@ public class DebugController {
                 "中国移不动",
                 BigDecimal.ZERO,
                 0,
-                Duration.ZERO);
+                0);
         userService.save(user);
         log.info("创建测试用户 1 成功");
         User user2 = new User(0,
@@ -149,7 +149,7 @@ public class DebugController {
                 "TestUser2",
                 userGroup,
                 new UUID(0, 0).toString(),
-                Instant.now(),
+                Timestamp.from(Instant.now()),
                 "https://weibo.com/favicon.ico",
                 "这是自定义头衔2",
                 "这是测试签名2",
@@ -163,7 +163,7 @@ public class DebugController {
                 "中国联不通",
                 BigDecimal.ZERO,
                 5,
-                Duration.ZERO);
+                0);
         userService.save(user2);
         log.info("创建测试用户 2 成功");
         return "初始化基本数据库测试内容成功";

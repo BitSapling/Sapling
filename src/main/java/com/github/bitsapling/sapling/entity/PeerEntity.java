@@ -1,13 +1,11 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "peers",
@@ -45,7 +43,7 @@ public class PeerEntity {
     @Column(name = "passkey", nullable = false)
     private String passKey;
     @Column(name = "update_at", nullable = false)
-    private Instant updateAt;
+    private Timestamp updateAt;
     @Column(name = "seeding_time", nullable = false)
-    private Duration seedingTime;
+    private long seedingTime;
 }

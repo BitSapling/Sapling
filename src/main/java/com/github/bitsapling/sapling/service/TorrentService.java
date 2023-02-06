@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -51,8 +50,8 @@ public class TorrentService {
                 entity.getSubTitle(),
                 entity.getSize(),
                 entity.getFinishes(),
-                entity.getCreatedAt().toInstant(),
-                entity.getUpdatedAt().toInstant(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
                 entity.isUnderReview(),
                 entity.isAnonymous(),
                 entity.getType(),
@@ -72,8 +71,8 @@ public class TorrentService {
                 torrent.getSubTitle(),
                 torrent.getSize(),
                 torrent.getFinishes(),
-                Timestamp.from(torrent.getCreatedAt()),
-                Timestamp.from(torrent.getUpdatedAt()),
+                torrent.getCreatedAt(),
+                torrent.getUpdatedAt(),
                 torrent.isUnderReview(),
                 torrent.isAnonymous(),
                 torrent.getType(),

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -160,8 +161,8 @@ public class AnnounceController {
                 "测试 torrent 标题" + UUID.randomUUID(),
                 "测试 torrent 副标题" + UUID.randomUUID(),
                 0, 0,
-                Instant.now(),
-                Instant.now(),
+                 Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()),
                 false,
                 false,
                 0,

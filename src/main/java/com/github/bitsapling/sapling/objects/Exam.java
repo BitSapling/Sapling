@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @AllArgsConstructor
 @Data
@@ -15,5 +15,6 @@ public class Exam implements Serializable {
     private long id;
     private User user;
     private ExamPlan examPlan;
-    private Instant endAt;
+
+    private Timestamp endAt;
 }

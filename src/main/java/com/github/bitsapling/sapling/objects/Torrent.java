@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.sql.Timestamp;
 @AllArgsConstructor
 @Data
 public class Torrent  implements Serializable {
@@ -18,8 +18,8 @@ public class Torrent  implements Serializable {
     private String subTitle;
     private final long size;
     private long finishes;
-    private final Instant createdAt;
-    private Instant updatedAt;
+    private final Timestamp createdAt;
+    private Timestamp updatedAt;
     private boolean underReview;
     private boolean anonymous;
     private int type;

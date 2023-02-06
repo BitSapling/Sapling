@@ -6,8 +6,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Instant;
+import java.sql.Timestamp;
 @AllArgsConstructor
 @Data
 public class User  implements Serializable {
@@ -19,7 +18,7 @@ public class User  implements Serializable {
     private String username;
     private UserGroup group;
     private String passkey;
-    private final Instant createdAt;
+    private final Timestamp createdAt;
     private String avatar;
     private String customTitle;
     private String signature;
@@ -33,5 +32,5 @@ public class User  implements Serializable {
     private String isp;
     private BigDecimal karma;
     private int inviteSlot;
-    private Duration seedingTime;
+    private long seedingTime;
 }

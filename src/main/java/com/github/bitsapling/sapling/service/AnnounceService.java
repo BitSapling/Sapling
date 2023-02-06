@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingDeque;
@@ -79,7 +79,7 @@ public class AnnounceService {
         long lastDownload = peer.getDownloaded();
         long uploadedOffset = task.uploaded() - lastUploaded;
         long downloadedOffset = task.downloaded() - lastDownload;
-        Instant lastUpdateAt = task.torrent().getUpdatedAt();
+        Timestamp lastUpdateAt = task.torrent().getUpdatedAt();
         if (uploadedOffset < 0) uploadedOffset = task.uploaded();
         if (downloadedOffset < 0) downloadedOffset = task.downloaded();
 
@@ -87,8 +87,8 @@ public class AnnounceService {
         peer.setDownloaded(task.downloaded() + downloadedOffset);
         peer.setLeft(task.left());
         peer.setSeeder(task.left() == 0);
-        peer.setUpdateAt(Instant.now());
-        peer.setSeedingTime(peer.getSeedingTime().plus(Duration.between(lastUpdateAt, Instant.now())));
+        peer.setUpdateAt(Timestamp.from(Instant.now()));
+        peer.setSeedingTime(peer.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         peerService.save(peer);
 
         // Update real user data
@@ -103,7 +103,7 @@ public class AnnounceService {
         promotionDownloadOffset = torrent.getPromotionPolicy().applyDownloadRatio(promotionDownloadOffset);
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
-        user.setSeedingTime(user.getSeedingTime().plus(Duration.between(lastUpdateAt, Instant.now())));
+        user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         userService.save(user);
         log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset);
         if (task.event() == AnnounceEventType.STOPPED) {
@@ -130,8 +130,8 @@ public class AnnounceService {
                 task.downloaded(),
                 task.left(),
                 task.left() == 0,
-                Instant.now(),
-                Duration.ZERO
+                Timestamp.from(Instant.now()),
+                0
         );
     }
 

@@ -1,13 +1,12 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "exam",
@@ -34,5 +33,5 @@ public class ExamEntity {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private UserEntity user;
     @Column(name = "end_at", nullable = false)
-    private Instant endAt;
+    private Timestamp endAt;
 }
