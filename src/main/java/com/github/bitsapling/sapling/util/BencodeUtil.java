@@ -45,6 +45,6 @@ public class BencodeUtil {
                 throw new RetryableAnnounceException("incorrect ip format encountered when compact peer ip", 0);
             }
         }
-        return convertToString(buffer.array());
+        return new String(buffer.array(), StandardCharsets.ISO_8859_1);
     }
 }
