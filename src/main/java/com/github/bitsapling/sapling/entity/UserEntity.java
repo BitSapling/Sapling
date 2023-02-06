@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +33,7 @@ public class UserEntity {
     @Column(name = "username", nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group",referencedColumnName = "id")
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
     private UserGroupEntity group;
     @Column(name = "passkey", nullable = false)

@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class TorrentEntity {
     @Column(name = "info_hash", nullable = false)
     private String infoHash;
     @PrimaryKeyJoinColumn
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
     private UserEntity user;
     @Column(name = "title", nullable = false)
@@ -49,7 +48,7 @@ public class TorrentEntity {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private PromotionPolicyEntity promotionPolicy;

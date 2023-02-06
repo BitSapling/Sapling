@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.Data;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -23,9 +22,9 @@ public class SeedBoxEntity {
     private String address;
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     private PromotionPolicyEntity downloadMultiplier;
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private PromotionPolicyEntity uploadMultiplier;

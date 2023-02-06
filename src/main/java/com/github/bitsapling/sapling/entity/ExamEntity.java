@@ -25,7 +25,7 @@ public class ExamEntity {
     @Column(name = "id", nullable = false)
     private long id;
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private ExamPlanEntity examPlan;
     @PrimaryKeyJoinColumn

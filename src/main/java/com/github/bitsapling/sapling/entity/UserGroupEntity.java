@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,12 +30,12 @@ public class UserGroupEntity {
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany(fetch = FetchType.EAGER)
-    @Cascade(CascadeType.SAVE_UPDATE)
+    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @PrimaryKeyJoinColumn
     private List<PermissionEntity> permissionEntities;
 
     @PrimaryKeyJoinColumn
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
 
