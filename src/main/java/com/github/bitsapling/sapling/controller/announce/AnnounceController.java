@@ -166,7 +166,7 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Invalid IP address");
         }
         for (String filteredIp : filteredIps) {
-            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user, compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent));
+            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
         log.debug("Sending {}'s peers to {}", infoHash, peerId);
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
@@ -192,7 +192,7 @@ public class AnnounceController {
                 false,
                 false,
                 0,
-                promotionService.getPromotionPolicy(1),
+                promotionService.getDefaultPromotionPolicy(),
                 0,
                 "测试描述" + UUID.randomUUID()
         );

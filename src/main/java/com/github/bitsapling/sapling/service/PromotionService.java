@@ -23,6 +23,11 @@ public class PromotionService {
         return entity.orElse(null);
     }
 
+    @Nullable
+    public PromotionPolicy getDefaultPromotionPolicy() {
+       return repository.findAll().iterator().next();
+    }
+
     public PromotionPolicy save(@NotNull PromotionPolicy promotionPolicy) {
        return repository.save(promotionPolicy);
     }

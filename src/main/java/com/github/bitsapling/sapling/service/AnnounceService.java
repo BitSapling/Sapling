@@ -29,6 +29,9 @@ public class AnnounceService {
     @Autowired
     private PeerService peerService;
     @Autowired
+    private TorrentService torrentService;
+
+    @Autowired
     private AnnouncePerformanceMonitorService monitorService;
 
     public AnnounceService() {
@@ -66,20 +69,22 @@ public class AnnounceService {
         }
     }
 
-    private void handleTask(AnnounceTask task) throws NoSuchElementException {
+    public void handleTask(AnnounceTask task) throws NoSuchElementException {
         // Multi-threaded
-        User user = task.user();
+        User user = userService.getUser(task.userId());
+        if (user == null) throw new IllegalStateException("User not exists anymore");
+        Torrent torrent = torrentService.getTorrent(task.torrentId());
+        if (torrent == null) throw new IllegalStateException("Torrent not exists anymore");
         // Register torrent into peers
         Peer peer = peerService.getPeer(task.ip(), task.port(), task.infoHash());
         if (peer == null) {
             peer = createNewPeer(task);
         }
-        Torrent torrent = task.torrent();
         long lastUploaded = peer.getUploaded();
         long lastDownload = peer.getDownloaded();
         long uploadedOffset = task.uploaded() - lastUploaded;
         long downloadedOffset = task.downloaded() - lastDownload;
-        Timestamp lastUpdateAt = task.torrent().getUpdatedAt();
+        Timestamp lastUpdateAt = torrent.getUpdatedAt();
         if (uploadedOffset < 0) uploadedOffset = task.uploaded();
         if (downloadedOffset < 0) downloadedOffset = task.downloaded();
 
@@ -144,8 +149,8 @@ public class AnnounceService {
     public record AnnounceTask(
             @NotNull String ip, int port, @NotNull String infoHash, @NotNull String peerId,
             long uploaded, long downloaded, long left, @NotNull AnnounceEventType event,
-            int numWant, User user, boolean compact, boolean noPeerId,
-            boolean supportCrypto, int redundant, String userAgent, String passKey, Torrent torrent
+            int numWant, long userId, boolean compact, boolean noPeerId,
+            boolean supportCrypto, int redundant, String userAgent, String passKey, long torrentId
     ) {
 
     }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Proxy;
+
 @Entity
 @Table(name = "exam_plan",
         uniqueConstraints = {
@@ -14,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
+@Proxy(lazy = false)
 public class ExamPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

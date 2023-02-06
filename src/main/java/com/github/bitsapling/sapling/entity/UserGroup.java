@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Proxy;
 
 import java.util.List;
 
@@ -16,9 +17,9 @@ import java.util.List;
         }
 )
 @Data
-
 @AllArgsConstructor
 @NoArgsConstructor
+@Proxy(lazy = false)
 public class UserGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

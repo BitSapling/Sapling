@@ -16,11 +16,6 @@ import java.util.Optional;
 public class TorrentService {
     @Autowired
     private TorrentRepository torrentRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private PromotionService promotionService;
-
     @Nullable
     public Torrent getTorrent(long id) {
         return torrentRepository.findById(id).orElse(null);

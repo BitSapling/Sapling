@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Proxy;
 
 @Entity
 @Table(name = "seedbox",
@@ -12,6 +13,7 @@ import org.hibernate.annotations.Cascade;
 )
 
 @Data
+@Proxy(lazy = false)
 public class SeedBox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
