@@ -2,10 +2,12 @@ package com.github.bitsapling.sapling.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class ExamPlan implements Serializable {
     @Serial

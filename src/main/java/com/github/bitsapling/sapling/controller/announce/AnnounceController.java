@@ -72,7 +72,10 @@ public class AnnounceController {
         }
         checkClient();
         checkScrapeFields(gets);
-        return "scrape!";
+        List<Peer> peers = peerService.getPeers(gets.get("info_hash"));
+
+        // TODO https://wiki.vuze.com/w/Scrape
+        return "TODO";
     }
 
 
@@ -134,7 +137,7 @@ public class AnnounceController {
         if (ipv6 != null) {
             peerIps.addAll(List.of(ipv6));
         }
-        List<String> filteredIps = peerIps.stream().filter(this::checkIsBadIp).toList();
+        List<String> filteredIps = peerIps.stream().filter(this::checkValidIp).toList();
         if (filteredIps.isEmpty()) {
             log.info("Client {} announced invalid ips.", user.getUsername());
             throw new InvalidAnnounceException("Invalid IP address");
@@ -161,7 +164,7 @@ public class AnnounceController {
                 "测试 torrent 标题" + UUID.randomUUID(),
                 "测试 torrent 副标题" + UUID.randomUUID(),
                 0, 0,
-                 Timestamp.from(Instant.now()),
+                Timestamp.from(Instant.now()),
                 Timestamp.from(Instant.now()),
                 false,
                 false,
@@ -192,7 +195,7 @@ public class AnnounceController {
     }
 
     @SneakyThrows(UnknownHostException.class)
-    private boolean checkIsBadIp(String ip) {
+    private boolean checkValidIp(String ip) {
         InetAddress address = InetAddress.getByName(ip);
         return !address.isAnyLocalAddress() && !address.isLinkLocalAddress() && !address.isLoopbackAddress();
     }
@@ -206,6 +209,7 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Bad client: User-Agent cannot be empty");
         }
     }
+
     private void checkScrapeFields(Map<String, String> gets) throws InvalidAnnounceException {
         if (StringUtils.isEmpty(gets.get("info_hash"))) throw new InvalidAnnounceException("Missing param: info_hash");
     }
@@ -250,7 +254,6 @@ public class AnnounceController {
         PeerResult peers = gatherPeers(infoHash, numWant);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
-        dict.put("min interval", randomInterval());
         dict.put("complete", peers.complete());
         dict.put("incomplete", peers.incomplete());
         dict.put("peers", BencodeUtil.compactPeers(peers.peers(), false));

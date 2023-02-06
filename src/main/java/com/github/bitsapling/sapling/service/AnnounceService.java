@@ -105,7 +105,9 @@ public class AnnounceService {
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         userService.save(user);
-        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {}", user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset);
+        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {} for ip address {} and port {}",
+                user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset,
+                task.ip(), task.port());
         if (task.event() == AnnounceEventType.STOPPED) {
             if (peer.getId() != 0) {
                 peerService.delete(peer);
