@@ -34,8 +34,8 @@ public class UserGroupService {
         )).orElse(null);
     }
 
-    public void save(@NotNull UserGroup userGroup) {
-        repository.save(convert(userGroup));
+    public UserGroup save(@NotNull UserGroup userGroup) {
+        return convert(repository.save(convert(userGroup)));
     }
 
     @NotNull

@@ -89,7 +89,7 @@ public class AnnounceService {
         peer.setSeeder(task.left() == 0);
         peer.setUpdateAt(Timestamp.from(Instant.now()));
         peer.setSeedingTime(peer.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
-        peerService.save(peer);
+        peer = peerService.save(peer);
 
         // Update real user data
         user.setRealDownloaded(user.getRealDownloaded() + lastDownload);
@@ -104,7 +104,7 @@ public class AnnounceService {
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
-        userService.save(user);
+        user = userService.save(user);
         log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {} for ip address {} and port {}",
                 user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset,
                 task.ip(), task.port());

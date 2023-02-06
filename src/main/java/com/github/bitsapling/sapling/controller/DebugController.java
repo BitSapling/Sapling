@@ -119,11 +119,11 @@ public class DebugController {
             permissions.add(new Permission(0, "torrent:announce", true));
             permissions.add(new Permission(0, "torrent:upload", true));
             permissions.add(new Permission(0, "torrent:scrape", true));
-            permissions.forEach(p -> permissionService.save(p));
+            permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
             PromotionPolicy promotionPolicy = new PromotionPolicy(0, "系统默认", 1.0d, 1.0d);
-            promotionService.save(promotionPolicy);
+            promotionPolicy = promotionService.save(promotionPolicy);
             UserGroup userGroup = new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy);
-            userGroupService.save(userGroup);
+            userGroup = userGroupService.save(userGroup);
             User user = new User(0,
                     "test@test.com",
                     "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6",
@@ -145,7 +145,7 @@ public class DebugController {
                     BigDecimal.ZERO,
                     0,
                     0);
-            userService.save(user);
+            user = userService.save(user);
             log.info("创建测试用户 1 成功");
             User user2 = new User(0,
                     "test2@test.com",
@@ -168,7 +168,7 @@ public class DebugController {
                     BigDecimal.ZERO,
                     5,
                     0);
-            userService.save(user2);
+            user2 = userService.save(user2);
             log.info("创建测试用户 2 成功");
             return "初始化基本数据库测试内容成功";
         } catch (Exception e) {

@@ -44,13 +44,13 @@ public class PromotionService {
         );
     }
 
-    public void save(@NotNull PromotionPolicy promotionPolicy) {
+    public PromotionPolicy save(@NotNull PromotionPolicy promotionPolicy) {
         PromotionPolicyEntity entity = new PromotionPolicyEntity(
                 promotionPolicy.getId(),
                 promotionPolicy.getDisplayName(),
                 promotionPolicy.getUploadRatio(),
                 promotionPolicy.getDownloadRatio()
         );
-        repository.save(entity);
+       return convert(repository.save(entity));
     }
 }

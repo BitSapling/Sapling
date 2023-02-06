@@ -46,9 +46,9 @@ public class UserService {
         return userEntity.map(this::convert).orElse(null);
     }
 
-    public void save(User user) {
+    public User save(User user) {
         UserEntity entity = convert(user);
-        repository.save(entity);
+        return convert(repository.save(entity));
     }
 
     @NotNull

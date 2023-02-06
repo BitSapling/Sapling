@@ -59,12 +59,12 @@ public class PermissionService {
         return null;
     }
 
-    public void save(@NotNull Permission permission) {
+    public Permission save(@NotNull Permission permission) {
         PermissionEntity entity = new PermissionEntity(
                 permission.getId(),
                 permission.getCode(),
                 permission.isDef()
         );
-        repository.save(entity);
+        return convert( repository.save(entity));
     }
 }

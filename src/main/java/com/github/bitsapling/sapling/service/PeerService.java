@@ -41,8 +41,8 @@ public class PeerService {
     }
 
 
-    public void save(@NotNull Peer peer) {
-        repository.save(convert(peer));
+    public Peer save(@NotNull Peer peer) {
+        return convert(repository.save(convert(peer)));
     }
 
 

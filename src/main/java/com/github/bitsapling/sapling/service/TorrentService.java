@@ -36,8 +36,8 @@ public class TorrentService {
         return entity.map(this::convert).orElse(null);
     }
 
-    public void save(@NotNull Torrent torrent) {
-        torrentRepository.save(convert(torrent));
+    public Torrent save(@NotNull Torrent torrent) {
+       return convert(torrentRepository.save(convert(torrent)));
     }
 
     @NotNull
