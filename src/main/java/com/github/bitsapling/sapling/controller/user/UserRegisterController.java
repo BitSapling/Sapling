@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.account;
+package com.github.bitsapling.sapling.controller.user;
 
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("/account")
-public class AccountRegisterController {
+public class UserRegisterController {
 
     @Autowired
 
