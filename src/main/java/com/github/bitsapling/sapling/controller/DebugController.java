@@ -150,7 +150,7 @@ public class DebugController {
                     "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6",
                     "TestUser2",
                     userGroup,
-                    new UUID(0, 0).toString(),
+                    new UUID(0, 1).toString(),
                     Timestamp.from(Instant.now()),
                     "https://weibo.com/favicon.ico",
                     "这是自定义头衔2",

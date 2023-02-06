@@ -13,7 +13,8 @@ import java.sql.Timestamp;
 @Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"username"}),
-                @UniqueConstraint(columnNames = {"email"})
+                @UniqueConstraint(columnNames = {"email"}),
+                @UniqueConstraint(columnNames = {"passkey"}),
         }
 )
 @Data
@@ -31,7 +32,7 @@ public class User {
     private String passwordHash;
     @Column(name = "username", nullable = false)
     private String username;
-    @PrimaryKeyJoinColumn(name = "group",referencedColumnName = "id")
+    @PrimaryKeyJoinColumn(name = "group", referencedColumnName = "id")
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     private UserGroup group;
@@ -67,6 +68,7 @@ public class User {
     private int inviteSlot;
     @Column(name = "seeding_time", nullable = false)
     private long seedingTime;
+
     public UserGroup getGroup() {
         return group;
     }
