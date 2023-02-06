@@ -13,8 +13,8 @@ import java.io.Serializable;
 public class Permission implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private  long id;
-    private  String code;
+    private long id;
+    private String code;
     //private String displayName;
     private boolean def;
 }

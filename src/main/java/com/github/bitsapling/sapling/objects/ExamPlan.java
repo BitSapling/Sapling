@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

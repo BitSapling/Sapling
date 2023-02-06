@@ -8,10 +8,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class User  implements Serializable {
+public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private long id;

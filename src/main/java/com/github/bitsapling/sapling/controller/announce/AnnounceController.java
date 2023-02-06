@@ -61,6 +61,7 @@ public class AnnounceController {
 
     @GetMapping("/scrape")
     public String scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
+        // https://wiki.vuze.com/w/Scrape
         log.debug("Scrape Query String: {}", request.getQueryString());
         log.debug("Gets: " + gets);
         String passkey = gets.get("passkey");
@@ -72,10 +73,32 @@ public class AnnounceController {
         }
         checkClient();
         checkScrapeFields(gets);
-        List<Peer> peers = peerService.getPeers(gets.get("info_hash"));
-
-        // TODO https://wiki.vuze.com/w/Scrape
-        return "TODO";
+        User user = userService.getUserByPasskey(passkey);
+        if (user == null) {
+            throw new InvalidAnnounceException("Unauthorized");
+        }
+        if (!StpUtil.hasPermission(user.getId(), "torrent:scrape")) {
+            throw new InvalidAnnounceException("Permission Denied");
+        }
+        Map<String, Object> dict = new LinkedHashMap<>();
+        Map<String, Integer> flags = new LinkedHashMap<>();
+        flags.put("min_request_interval", randomInterval());
+        dict.put("flags", flags);
+        Map<String, Map<String, Object>> files = new LinkedHashMap<>();
+        for (String infoHash : readAllInfoHash(request.getQueryString())) {
+            Torrent torrent = torrentService.getTorrent(infoHash);
+            if (torrent == null) {
+                continue;
+            }
+            Map<String, Object> meta = new LinkedHashMap<>();
+            PeerStatus peerStatus = getPeerStatus(infoHash);
+            meta.put("downloaded", peerStatus.downloaded());
+            meta.put("complete", peerStatus.complete());
+            meta.put("incomplete", peerStatus.incomplete());
+            files.put(infoHash, meta);
+        }
+        dict.put("files", files);
+        return BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict));
     }
 
 
@@ -177,6 +200,7 @@ public class AnnounceController {
         return torrentService.getTorrent(infoHash);
     }
 
+
     @Nullable
     private String readInfoHash(String queryString) {
         // This is a workaround for binary encoded info_hash data.
@@ -192,6 +216,23 @@ public class AnnounceController {
             }
         }
         return null;
+    }
+
+    private @NotNull List<String> readAllInfoHash(String queryString) {
+        // This is a workaround for binary encoded info_hash data.
+        List<String> infoHash = new ArrayList<>();
+        String[] queryStrings = queryString.split("&");
+        for (String string : queryStrings) {
+            String[] args = string.split("=");
+            if (args.length != 2) {
+                continue;
+            }
+            String key = args[0];
+            if (key.equals("info_hash")) {
+                infoHash.add(args[1]);
+            }
+        }
+        return infoHash;
     }
 
     @SneakyThrows(UnknownHostException.class)
@@ -301,6 +342,24 @@ public class AnnounceController {
         return random.nextInt(MIN_INTERVAL, MAX_INTERVAL);
     }
 
+    public PeerStatus getPeerStatus(@NotNull String infoHash) {
+        List<Peer> peers = peerService.getPeers(infoHash);
+        int complete = (int) peers.stream().filter(Peer::isSeeder).count();
+        int incomplete = (int) peers.stream().filter(peer -> !peer.isSeeder()).count();
+        Torrent torrent = torrentService.getTorrent(infoHash);
+        int downloaded;
+        if (torrent != null) {
+            downloaded = (int) torrent.getFinishes();
+        } else {
+            downloaded = 0;
+        }
+        return new PeerStatus(complete, incomplete, downloaded);
+    }
+
     record PeerResult(@NotNull List<Peer> peers, List<Peer> peers6, long complete, long incomplete) {
+    }
+
+    record PeerStatus(int complete, int incomplete, int downloaded) {
+
     }
 }

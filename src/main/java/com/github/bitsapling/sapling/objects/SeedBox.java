@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class SeedBox implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private  long id;
+    private long id;
     private String address;
     private PromotionPolicyEntity downloadMultiplier;
     private PromotionPolicyEntity uploadMultiplier;

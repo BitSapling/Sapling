@@ -115,6 +115,7 @@ public class DebugController {
         List<Permission> permissions = new ArrayList<>();
         permissions.add(new Permission(0, "torrent:announce", true));
         permissions.add(new Permission(0, "torrent:upload", true));
+        permissions.add(new Permission(0, "torrent:scrape", true));
         PromotionPolicy promotionPolicy = new PromotionPolicy(0, "系统默认", 1.0d, 1.0d);
         promotionService.save(promotionPolicy);
         permissions.forEach(p -> permissionService.save(p));
