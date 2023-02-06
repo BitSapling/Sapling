@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -33,7 +32,7 @@ public class UserEntity {
     @Column(name = "username", nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group",referencedColumnName = "id")
-    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     private UserGroupEntity group;
     @Column(name = "passkey", nullable = false)

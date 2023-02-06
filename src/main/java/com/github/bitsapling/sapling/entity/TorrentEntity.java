@@ -48,7 +48,7 @@ public class TorrentEntity {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private PromotionPolicyEntity promotionPolicy;

@@ -25,11 +25,11 @@ public class ExamEntity {
     @Column(name = "id", nullable = false)
     private long id;
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private ExamPlanEntity examPlan;
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     private UserEntity user;
     @Column(name = "end_at", nullable = false)

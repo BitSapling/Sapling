@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.util.List;
 
@@ -30,12 +29,12 @@ public class UserGroupEntity {
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany(fetch = FetchType.EAGER)
-    @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @PrimaryKeyJoinColumn
     private List<PermissionEntity> permissionEntities;
 
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
+    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     private PromotionPolicyEntity promotionPolicy;
 
