@@ -1,8 +1,8 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.objects.Peer;
-import com.github.bitsapling.sapling.objects.Torrent;
-import com.github.bitsapling.sapling.objects.User;
+import com.github.bitsapling.sapling.entity.Peer;
+import com.github.bitsapling.sapling.entity.Torrent;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
 import jakarta.transaction.Transactional;
@@ -96,11 +96,11 @@ public class AnnounceService {
         user.setRealUploaded(user.getRealUploaded() + lastUploaded);
         // Apply user promotion policy
 
-        long promotionUploadOffset = user.getGroup().getPromotionPolicy().applyUploadRatio(lastDownload);
-        long promotionDownloadOffset = user.getGroup().getPromotionPolicy().applyDownloadRatio(lastUploaded);
+        long promotionUploadOffset = (long) user.getGroup().getPromotionPolicy().applyUploadRatio(lastDownload);
+        long promotionDownloadOffset = (long) user.getGroup().getPromotionPolicy().applyDownloadRatio(lastUploaded);
         // Apply torrent promotion policy
-        promotionUploadOffset = torrent.getPromotionPolicy().applyUploadRatio(promotionUploadOffset);
-        promotionDownloadOffset = torrent.getPromotionPolicy().applyDownloadRatio(promotionDownloadOffset);
+        promotionUploadOffset = (long) torrent.getPromotionPolicy().applyUploadRatio(promotionUploadOffset);
+        promotionDownloadOffset = (long) torrent.getPromotionPolicy().applyDownloadRatio(promotionDownloadOffset);
         user.setUploaded(user.getUploaded() + promotionUploadOffset);
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
@@ -127,11 +127,11 @@ public class AnnounceService {
                 task.infoHash(),
                 task.peerId(),
                 task.userAgent(),
-                task.passKey(),
                 task.uploaded(),
                 task.downloaded(),
                 task.left(),
                 task.left() == 0,
+                task.passKey(),
                 Timestamp.from(Instant.now()),
                 0
         );

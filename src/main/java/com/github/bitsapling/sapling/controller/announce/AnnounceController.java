@@ -1,13 +1,13 @@
 package com.github.bitsapling.sapling.controller.announce;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.github.bitsapling.sapling.entity.Peer;
+import com.github.bitsapling.sapling.entity.Torrent;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
-import com.github.bitsapling.sapling.objects.Peer;
-import com.github.bitsapling.sapling.objects.Torrent;
-import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.service.*;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.*;

@@ -1,8 +1,8 @@
 package com.github.bitsapling.sapling.controller.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.LoginException;
-import com.github.bitsapling.sapling.objects.User;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.PasswordHash;

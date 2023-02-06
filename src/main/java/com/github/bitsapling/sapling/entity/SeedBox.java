@@ -12,7 +12,7 @@ import org.hibernate.annotations.Cascade;
 )
 
 @Data
-public class SeedBoxEntity {
+public class SeedBox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -22,9 +22,9 @@ public class SeedBoxEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
-    private PromotionPolicyEntity downloadMultiplier;
+    private PromotionPolicy downloadMultiplier;
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
-    private PromotionPolicyEntity uploadMultiplier;
+    private PromotionPolicy uploadMultiplier;
 }

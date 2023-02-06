@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TorrentEntity {
+public class Torrent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -29,7 +29,7 @@ public class TorrentEntity {
     @PrimaryKeyJoinColumn
     @Cascade({CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @ManyToOne(fetch = FetchType.EAGER)
-    private UserEntity user;
+    private User user;
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "sub_title", nullable = false)
@@ -51,7 +51,7 @@ public class TorrentEntity {
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
-    private PromotionPolicyEntity promotionPolicy;
+    private PromotionPolicy promotionPolicy;
     @Column(name = "description_type", nullable = false)
     private int descriptionType;
     @Column(name = "description", nullable = false)

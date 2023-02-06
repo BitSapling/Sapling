@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.entity.TorrentEntity;
-import com.github.bitsapling.sapling.objects.Torrent;
+import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
@@ -24,61 +23,18 @@ public class TorrentService {
 
     @Nullable
     public Torrent getTorrent(long id) {
-        TorrentEntity entity = torrentRepository.findById(id).orElse(null);
-        if (entity == null) return null;
-        return convert(entity);
+        return torrentRepository.findById(id).orElse(null);
     }
 
     @Nullable
     @Cacheable(cacheNames ={"torrent"}, key = "#infoHash")
     public Torrent getTorrent(@NotNull String infoHash) {
-        Optional<TorrentEntity> entity = torrentRepository.findByInfoHash(infoHash);
-        return entity.map(this::convert).orElse(null);
+        Optional<Torrent> entity = torrentRepository.findByInfoHash(infoHash);
+        return entity.orElse(null);
     }
 
     public Torrent save(@NotNull Torrent torrent) {
-       return convert(torrentRepository.save(convert(torrent)));
+       return torrentRepository.save(torrent);
     }
 
-    @NotNull
-    public Torrent convert(@NotNull TorrentEntity entity) {
-        return new Torrent(
-                entity.getId(),
-                entity.getInfoHash(),
-                userService.convert(entity.getUser()),
-                entity.getTitle(),
-                entity.getSubTitle(),
-                entity.getSize(),
-                entity.getFinishes(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt(),
-                entity.isUnderReview(),
-                entity.isAnonymous(),
-                entity.getType(),
-                promotionService.convert(entity.getPromotionPolicy()),
-                entity.getDescriptionType(),
-                entity.getDescription()
-        );
-    }
-
-    @NotNull
-    public TorrentEntity convert(@NotNull Torrent torrent) {
-        return new TorrentEntity(
-                torrent.getId(),
-                torrent.getInfoHash(),
-                userService.convert(torrent.getUser()),
-                torrent.getTitle(),
-                torrent.getSubTitle(),
-                torrent.getSize(),
-                torrent.getFinishes(),
-                torrent.getCreatedAt(),
-                torrent.getUpdatedAt(),
-                torrent.isUnderReview(),
-                torrent.isAnonymous(),
-                torrent.getType(),
-                promotionService.convert(torrent.getPromotionPolicy()),
-                torrent.getDescriptionType(),
-                torrent.getDescription()
-        );
-    }
 }

@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ExamEntity {
+public class Exam {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -27,11 +27,11 @@ public class ExamEntity {
     @PrimaryKeyJoinColumn
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    private ExamPlanEntity examPlan;
+    private ExamPlan examPlan;
     @PrimaryKeyJoinColumn
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    private UserEntity user;
+    private User user;
     @Column(name = "end_at", nullable = false)
     private Timestamp endAt;
 }

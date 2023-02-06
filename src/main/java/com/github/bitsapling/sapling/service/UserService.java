@@ -1,10 +1,8 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.entity.UserEntity;
-import com.github.bitsapling.sapling.objects.User;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,89 +15,35 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository repository;
-    @Autowired
-    private UserGroupService userGroupService;
 
     // getUser
     @Nullable
     public User getUser(long id) {
-        Optional<UserEntity> userEntity = repository.findById(id);
-        return userEntity.map(this::convert).orElse(null);
+        Optional<User> userEntity = repository.findById(id);
+        return userEntity.orElse(null);
     }
 
     @Nullable
     public User getUserByUsername(String username) {
-        Optional<UserEntity> userEntity = repository.findByUsername(username);
-        return userEntity.map(this::convert).orElse(null);
+        Optional<User> userEntity = repository.findByUsername(username);
+        return userEntity.orElse(null);
     }
 
     @Nullable
     public User getUserByEmail(String email) {
-        Optional<UserEntity> userEntity = repository.findByEmail(email);
-        return userEntity.map(this::convert).orElse(null);
+        Optional<User> userEntity = repository.findByEmail(email);
+        return userEntity.orElse(null);
     }
 
     @Nullable
     @Cacheable(cacheNames = {"user_passkey"}, key = "#passkey")
     public User getUserByPasskey(String passkey) {
-        Optional<UserEntity> userEntity = repository.findByPasskey(passkey);
-        return userEntity.map(this::convert).orElse(null);
+        Optional<User> userEntity = repository.findByPasskey(passkey);
+        return userEntity.orElse(null);
     }
 
     public User save(User user) {
-        UserEntity entity = convert(user);
-        return convert(repository.save(entity));
+        return repository.save(user);
     }
-
-    @NotNull
-    public UserEntity convert(User user) {
-        return new UserEntity(
-                user.getId(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getUsername(),
-                userGroupService.convert(user.getGroup()),
-                user.getPasskey(),
-                user.getCreatedAt(),
-                user.getAvatar(),
-                user.getCustomTitle(),
-                user.getSignature(),
-                user.getLanguage(),
-                user.getDownloadBandwidth(),
-                user.getUploadBandwidth(),
-                user.getDownloaded(),
-                user.getUploaded(),
-                user.getRealDownloaded(),
-                user.getRealUploaded(),
-                user.getIsp(),
-                user.getKarma(),
-                user.getInviteSlot(),
-                user.getSeedingTime());
-    }
-
-    @NotNull
-    public User convert(@NotNull UserEntity entity) {
-        return new User(
-                entity.getId(),
-                entity.getEmail(),
-                entity.getPasswordHash(),
-                entity.getUsername(),
-                userGroupService.convert(entity.getGroup()),
-                entity.getPasskey(),
-                entity.getCreatedAt(),
-                entity.getAvatar(),
-                entity.getCustomTitle(),
-                entity.getSignature(),
-                entity.getLanguage(),
-                entity.getDownloadBandwidth(),
-                entity.getUploadBandwidth(),
-                entity.getDownloaded(),
-                entity.getUploaded(),
-                entity.getRealDownloaded(),
-                entity.getRealUploaded(),
-                entity.getIsp(),
-                entity.getKarma(),
-                entity.getInviteSlot(),
-                entity.getSeedingTime());
-    }
+    
 }

@@ -19,7 +19,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGroupEntity {
+public class UserGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -31,12 +31,12 @@ public class UserGroupEntity {
     @OneToMany(fetch = FetchType.EAGER)
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @PrimaryKeyJoinColumn
-    private List<PermissionEntity> permissionEntities;
+    private List<Permission> permissionEntities;
 
     @PrimaryKeyJoinColumn
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
-    private PromotionPolicyEntity promotionPolicy;
+    private PromotionPolicy promotionPolicy;
 
 //    @PrimaryKeyJoinColumn
 //    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
@@ -44,7 +44,7 @@ public class UserGroupEntity {
 //    private List<UserGroupEntity> inherited;
 
     public boolean hasPermission(String permission) {
-        for (PermissionEntity perm : permissionEntities) {
+        for (Permission perm : permissionEntities) {
             if (perm.getCode().equals(permission)) {
                 return true;
             }

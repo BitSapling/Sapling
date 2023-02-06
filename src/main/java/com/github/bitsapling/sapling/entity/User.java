@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class UserEntity {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -34,7 +34,7 @@ public class UserEntity {
     @PrimaryKeyJoinColumn(name = "group",referencedColumnName = "id")
     @Cascade({org.hibernate.annotations.CascadeType.ALL})
     @ManyToOne(fetch = FetchType.EAGER)
-    private UserGroupEntity group;
+    private UserGroup group;
     @Column(name = "passkey", nullable = false)
     private String passkey;
     @Column(name = "create_at", nullable = false)
@@ -67,7 +67,7 @@ public class UserEntity {
     private int inviteSlot;
     @Column(name = "seeding_time", nullable = false)
     private long seedingTime;
-    public UserGroupEntity getGroup() {
+    public UserGroup getGroup() {
         return group;
     }
 }

@@ -1,7 +1,7 @@
 package com.github.bitsapling.sapling.repository;
 
-import com.github.bitsapling.sapling.entity.UserEntity;
-import com.github.bitsapling.sapling.entity.UserGroupEntity;
+import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.entity.UserGroup;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends CrudRepository<UserEntity, Long> {
-    Optional<UserEntity> findByUsername(@NotNull String username);
+public interface UserRepository extends CrudRepository<User, Long> {
+    Optional<User> findByUsername(@NotNull String username);
 
-    Optional<UserEntity> findByEmail(@NotNull String email);
+    Optional<User> findByEmail(@NotNull String email);
 
-    Optional<UserEntity> findByPasskey(@NotNull String passkey);
+    Optional<User> findByPasskey(@NotNull String passkey);
 
-    List<UserEntity> findByEmailContains(@NotNull String emailPart);
+    List<User> findByEmailContains(@NotNull String emailPart);
 
-    List<UserEntity> findByUsernameContains(@NotNull String usernamePart);
+    List<User> findByUsernameContains(@NotNull String usernamePart);
 
-    List<UserEntity> findByGroup(@NotNull UserGroupEntity group);
+    List<User> findByGroup(@NotNull UserGroup group);
 }

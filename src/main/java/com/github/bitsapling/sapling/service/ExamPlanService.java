@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.service;
 
-import com.github.bitsapling.sapling.entity.ExamPlanEntity;
-import com.github.bitsapling.sapling.objects.ExamPlan;
+import com.github.bitsapling.sapling.entity.ExamPlan;
 import com.github.bitsapling.sapling.repository.ExamPlanRepository;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
@@ -18,44 +17,12 @@ public class ExamPlanService {
     @Nullable
 
     public ExamPlan getExamPlan(long id) {
-        return repository.findById(id).map(this::convert).orElse(null);
+        return repository.findById(id).orElse(null);
     }
 
     @Nullable
-
     public ExamPlan getExamPlan(@NotNull String code) {
-        return repository.findByCode(code).map(this::convert).orElse(null);
+        return repository.findByCode(code).orElse(null);
     }
 
-    @NotNull
-    public ExamPlan convert(@NotNull ExamPlanEntity entity) {
-        return new ExamPlan(
-                entity.getId(),
-                entity.getCode(),
-                entity.getDisplayName(),
-                entity.getUploaded(),
-                entity.getDownloaded(),
-                entity.getKarma(),
-                entity.getSeeds(),
-                entity.getSeedingTime(),
-                entity.getShareRatio(),
-                entity.getDuration()
-        );
-    }
-
-    @NotNull
-    public ExamPlanEntity convert(@NotNull ExamPlan examPlan) {
-        return new ExamPlanEntity(
-                examPlan.getId(),
-                examPlan.getCode(),
-                examPlan.getDisplayName(),
-                examPlan.getUploaded(),
-                examPlan.getDownloaded(),
-                examPlan.getKarma(),
-                examPlan.getSeeds(),
-                examPlan.getSeedingTime(),
-                examPlan.getShareRatio(),
-                examPlan.getDuration()
-        );
-    }
 }

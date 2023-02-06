@@ -1,8 +1,8 @@
 package com.github.bitsapling.sapling.util;
 
 import com.dampcake.bencode.Bencode;
+import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
-import com.github.bitsapling.sapling.objects.Peer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

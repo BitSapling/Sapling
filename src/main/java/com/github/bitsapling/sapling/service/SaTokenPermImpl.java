@@ -1,10 +1,9 @@
-package com.github.bitsapling.sapling.service.permission;
+package com.github.bitsapling.sapling.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpInterface;
-import com.github.bitsapling.sapling.objects.Permission;
-import com.github.bitsapling.sapling.objects.User;
-import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.entity.Permission;
+import com.github.bitsapling.sapling.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

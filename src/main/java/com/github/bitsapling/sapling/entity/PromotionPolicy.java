@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.entity;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PromotionPolicyEntity {
+public class PromotionPolicy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -29,4 +28,11 @@ public class PromotionPolicyEntity {
     private double uploadRatio;
     @Column(name = "download_ratio")
     private double downloadRatio;
+
+    public double applyUploadRatio(double upload) {
+        return upload * uploadRatio;
+    }
+    public double applyDownloadRatio(double download) {
+        return download * downloadRatio;
+    }
 }

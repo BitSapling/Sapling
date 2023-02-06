@@ -1,9 +1,7 @@
 package com.github.bitsapling.sapling.controller;
 
-import com.github.bitsapling.sapling.entity.PeerEntity;
-import com.github.bitsapling.sapling.entity.TorrentEntity;
+import com.github.bitsapling.sapling.entity.*;
 import com.github.bitsapling.sapling.exception.TorrentException;
-import com.github.bitsapling.sapling.objects.*;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import com.github.bitsapling.sapling.service.*;
@@ -66,17 +64,17 @@ public class DebugController {
         List<Peer> peers = new ArrayList<>();
         log.debug("Accepting torrents");
         long dbTimeStart = System.currentTimeMillis();
-        for (TorrentEntity entity : torrentRepository.findAll()) {
-            Torrent torrent = torrentService.convert(entity);
-            torrents.add(torrent);
-            torrentsJoiner.add(torrent.toString());
+        for (Torrent entity : torrentRepository.findAll()) {
+            torrents.add(entity);
+            torrentsJoiner.add(entity.toString());
         }
         log.debug("Accepting peers");
-        for (PeerEntity entity : peersRepository.findAll()) {
-            Peer peer = peerService.convert(entity);
-            Peer copiedPeer = new Peer(peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
-                    peer.getUserAgent(), "<passkey-removed>", peer.getUploaded(),
-                    peer.getDownloaded(), peer.getLeft(), peer.isSeeder(), peer.getUpdateAt(),
+        for (Peer peer : peersRepository.findAll()) {
+            Peer copiedPeer = new Peer(
+                    peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
+                    peer.getUserAgent(), peer.getUploaded(),
+                    peer.getDownloaded(),  peer.getLeft(), peer.isSeeder(),"<passkey-removed>",
+                    peer.getUpdateAt(),
                     peer.getSeedingTime());
             peersJoiner.add(copiedPeer.toString());
             peers.add(peer);
