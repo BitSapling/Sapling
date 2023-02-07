@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+/public/torrents
+/config
+/src/main/resources/application-test.yml
+/src/main/resources/application-caching.yml

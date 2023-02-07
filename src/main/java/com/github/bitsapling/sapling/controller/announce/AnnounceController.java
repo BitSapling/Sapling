@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -60,10 +61,9 @@ public class AnnounceController {
 
 
     @GetMapping("/scrape")
-    public String scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
+    public ResponseEntity<String> scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
         // https://wiki.vuze.com/w/Scrape
         log.debug("Scrape Query String: {}", request.getQueryString());
-        log.debug("Gets: " + gets);
         String passkey = gets.get("passkey");
         if (StringUtils.isEmpty(passkey)) {
             throw new InvalidAnnounceException("You must re-download the torrent from tracker for seeding.");
@@ -98,16 +98,18 @@ public class AnnounceController {
             files.put(infoHash, meta);
         }
         dict.put("files", files);
-        return BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict));
+        String resp =BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict));
+        log.debug("Base64 Response: {}",Base64.getEncoder().encodeToString(resp.getBytes(StandardCharsets.ISO_8859_1)));
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/plain; charset=iso-8859-1")
+                .body(resp);
     }
 
 
     @GetMapping("/announce")
     public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, RetryableAnnounceException, IOException {
         long ns = System.nanoTime();
-
         log.debug("Query String: {}", request.getQueryString());
-        log.debug("Gets: " + gets);
         String[] ipv4 = request.getParameterValues("ipv4");
         String[] ipv6 = request.getParameterValues("ipv6");
         String passkey = gets.get("passkey");
@@ -168,9 +170,8 @@ public class AnnounceController {
         for (String filteredIp : filteredIps) {
             announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
-        log.debug("Sending {}'s peers to {}", infoHash, peerId);
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
-        log.debug("Peers Bencoded: {}", peers);
+        log.debug("Base64 Response: {}", Base64.getEncoder().encodeToString(peers.getBytes(StandardCharsets.ISO_8859_1)));
         performanceMonitorService.recordStats(System.nanoTime() - ns);
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
@@ -283,7 +284,6 @@ public class AnnounceController {
         } else {
             resp = generatePeersResponseNonCompat(peerIdHash, infoHash, numWant, compact);
         }
-        log.info("Resp: {}", resp);
         return resp;
     }
 

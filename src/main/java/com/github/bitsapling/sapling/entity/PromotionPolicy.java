@@ -1,10 +1,15 @@
 package com.github.bitsapling.sapling.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Proxy;
 
 @Entity
 @Table(name = "promotion_policies",
@@ -16,11 +21,10 @@ import org.hibernate.annotations.Proxy;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Proxy(lazy = false)
 public class PromotionPolicy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
     @Column(name = "display_name", nullable = false)
