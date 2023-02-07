@@ -5,6 +5,7 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -30,44 +31,52 @@ public class AnnounceService {
     private PeerService peerService;
     @Autowired
     private TorrentService torrentService;
-
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
     @Autowired
     private AnnouncePerformanceMonitorService monitorService;
 
     public AnnounceService() {
-        Thread thread = new Thread(() -> {
-            try {
-                handleTasks();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        thread.setDaemon(true);
-        thread.start();
     }
 
-    public void schedule(@NotNull AnnounceTask announceTask) {
-        try {
-            taskQueue.add(announceTask);
-        } catch (IllegalStateException exception) {
-            log.error("Announce service is busy! Check your server database!", exception);
-        }
-    }
-
-    public void handleTasks() throws InterruptedException {
-        while (true) {
-            AnnounceTask task = taskQueue.take();
-            executor.getAnnounceExecutor().submit(() -> {
-                try {
-                    long start = System.nanoTime();
-                    handleTask(task);
-                    monitorService.recordJobStats(System.nanoTime() - start);
-                } catch (Exception e) {
-                    log.error("Error handling task: {}", task, e);
-                }
-            });
-        }
-    }
+//    public void schedule(@NotNull AnnounceTask announceTask) {
+//        try {
+//            executor.getAnnounceExecutor().submit(() -> {
+//                SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
+//                boolean participate = bindHibernateSessionToThread(sessionFactory);
+//                try {
+//                    long start = System.nanoTime();
+//                    handleTask(announceTask);
+//                    monitorService.recordJobStats(System.nanoTime() - start);
+//                } catch (Exception e) {
+//                    log.error("Error handling task: {}", announceTask, e);
+//                } finally {
+//                    closeHibernateSessionFromThread(participate, sessionFactory);
+//                }
+//            });
+//        }catch (RejectedExecutionException)
+//    }
+//
+//    public void closeHibernateSessionFromThread(boolean participate, Object sessionFactory) {
+//        if (!participate) {
+//            SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager
+//                    .unbindResource(sessionFactory);
+//            SessionFactoryUtils.closeSession(sessionHolder.getSession());
+//        }
+//    }
+//
+//    public boolean bindHibernateSessionToThread(SessionFactory sessionFactory) {
+//        if (TransactionSynchronizationManager.hasResource(sessionFactory)) {
+//            // Do not modify the Session: just set the participate flag.
+//            return true;
+//        } else {
+//            Session session = sessionFactory.openSession();
+//            session.setFlushMode(FlushMode.MANUAL.toJpaFlushMode());
+//            SessionHolder sessionHolder = new SessionHolder(session);
+//            TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
+//        }
+//        return false;
+//    }
 
     public void handleTask(AnnounceTask task) throws NoSuchElementException {
         // Multi-threaded
@@ -140,10 +149,6 @@ public class AnnounceService {
                 Timestamp.from(Instant.now()),
                 0
         );
-    }
-
-    public BlockingDeque<AnnounceTask> getTaskQueue() {
-        return taskQueue;
     }
 
     public record AnnounceTask(

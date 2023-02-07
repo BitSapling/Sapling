@@ -190,7 +190,7 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Invalid IP address");
         }
         for (String filteredIp : filteredIps) {
-            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
+            announceBackgroundJob.handleTask(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
         log.debug("Base64 Response: {}", Base64.getEncoder().encodeToString(peers.getBytes(StandardCharsets.ISO_8859_1)));
