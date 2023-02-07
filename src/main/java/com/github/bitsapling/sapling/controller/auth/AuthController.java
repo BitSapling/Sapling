@@ -53,7 +53,8 @@ public class AuthController {
         }
         StpUtil.login(user.getId());
         Map<String, Object> loginResponse = new LinkedHashMap<>();
-        loginResponse.put("status", "ok");
+        //loginResponse.put("status", "ok");
+        loginResponse.put("token", StpUtil.getTokenInfo());
         Map<String, Object> basicInformation = new LinkedHashMap<>();
         basicInformation.put("user_id", user.getId());
         basicInformation.put("user_role", user.getGroup().getCode());
@@ -82,7 +83,7 @@ public class AuthController {
     @PostMapping("/status")
     public Map<String, Object> status() {
         Map<String, Object> resp = new LinkedHashMap<>();
-        resp.put("status", "ok");
+        //resp.put("status", "ok");
         resp.put("isLogin", StpUtil.isLogin());
         resp.put("isSafe", StpUtil.isSafe());
         resp.put("isSwitch", StpUtil.isSwitch());

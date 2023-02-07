@@ -63,6 +63,7 @@ public class GlobalControllerAdvice {
                 .status(exception.getStatusCode())
                 .body(
                         Map.of("status", "error",
+                                "code", exception.getError(),
                                 "type", exception.getErrorText(),
                                 "message", exception.getMessage())
                 );

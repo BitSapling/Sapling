@@ -51,7 +51,7 @@ dependencies {
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
-
+    implementation 'cn.dev33:sa-token-spring-aop:1.34.0'
 
 
 }
