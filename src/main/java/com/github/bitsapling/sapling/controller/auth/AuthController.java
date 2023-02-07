@@ -56,11 +56,11 @@ public class AuthController {
         //loginResponse.put("status", "ok");
         loginResponse.put("token", StpUtil.getTokenInfo());
         Map<String, Object> basicInformation = new LinkedHashMap<>();
-        basicInformation.put("user_id", user.getId());
-        basicInformation.put("user_role", user.getGroup().getCode());
-        basicInformation.put("user_name", user.getUsername());
-        basicInformation.put("user_email", user.getEmail());
-        basicInformation.put("user_language", user.getLanguage());
+        basicInformation.put("id", user.getId());
+        basicInformation.put("role", user.getGroup().getCode());
+        basicInformation.put("name", user.getUsername());
+        basicInformation.put("email", user.getEmail());
+        basicInformation.put("language", user.getLanguage());
         Map<String, Object> endpoints = new LinkedHashMap<>();
         endpoints.put("user.info", "/user/info");
         loginResponse.put("user", basicInformation);
