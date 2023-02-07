@@ -3,9 +3,6 @@ sa-token:
 logging:
   level:
     com.github.bitsapling.sapling: debug
-spring:
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+#spring:
+#  jpa:
+#    show-sql: true

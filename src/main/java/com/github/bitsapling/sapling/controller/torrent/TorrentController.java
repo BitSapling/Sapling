@@ -3,17 +3,26 @@ package com.github.bitsapling.sapling.controller.torrent;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
+import com.github.bitsapling.sapling.entity.Category;
+import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.entity.Torrent;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIGenericException;
 import com.github.bitsapling.sapling.exception.EmptyTorrentFileException;
 import com.github.bitsapling.sapling.exception.InvalidTorrentVersionException;
 import com.github.bitsapling.sapling.exception.TorrentException;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
+import com.github.bitsapling.sapling.service.CategoryService;
+import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.TorrentService;
+import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import com.github.bitsapling.sapling.util.URLEncodeUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +57,12 @@ public class TorrentController {
     @Autowired
     private TorrentService torrentService;
     @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private PromotionService promotionService;
+    @Autowired
+    private UserService userService;
+    @Autowired
     @Qualifier("torrentsDirectory")
     private File torrentsDirectory;
     @Autowired
@@ -54,19 +71,39 @@ public class TorrentController {
     @PostMapping("/upload")
     @SaCheckLogin
     @SaCheckPermission("torrent:upload")
-    public ResponseEntity<ResponsePojo> upload(@RequestParam("file") MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            throw new APIGenericException(INVALID_TORRENT_FILE, "You must provide a file.");
+    public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
+        if (StringUtils.isEmpty(form.getTitle())) {
+            throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
+        }
+        if (StringUtils.isEmpty(form.getDescription())) {
+            throw new APIGenericException(MISSING_PARAMETERS, "You must provide a description.");
+        }
+        if (form.getFile() == null || form.getFile().isEmpty()) {
+            throw new APIGenericException(INVALID_TORRENT_FILE, "You must provide a valid torrent file.");
+        }
+        User user = userService.getUser(StpUtil.getLoginIdAsLong());
+        Category category = categoryService.getCategory(form.getCategory());
+        PromotionPolicy promotionPolicy = promotionService.getDefaultPromotionPolicy();
+        if (category == null) {
+            throw new APIGenericException(INVALID_CATEGORY, "Specified category not exists.");
         }
         try {
-            TorrentParser parser = new TorrentParser(file.getBytes());
+            TorrentParser parser = new TorrentParser(form.getFile().getBytes());
             String infoHash = parser.getInfoHash();
             if (torrentService.getTorrent(infoHash) != null) {
                 throw new APIGenericException(TORRENT_ALREADY_EXISTS, "The torrent's info_hash has been exists on this tracker.");
             }
-            FileCopyUtils.copy(file.getInputStream(), Files.newOutputStream(new File(torrentsDirectory, infoHash + ".torrent").toPath()));
+            FileCopyUtils.copy(form.getFile().getInputStream(), Files.newOutputStream(new File(torrentsDirectory, infoHash + ".torrent").toPath()));
+            Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(),
+                    form.getSubtitle(), parser.getTorrentFilesSize(),
+                    0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()),
+                    StpUtil.hasPermission("torrent:bypass_review"),
+                    StpUtil.hasPermission("torrent:publish_anonymous") && form.isAnonymous(),
+                    category,
+                    promotionPolicy, form.getDescription());
+            torrent = torrentService.save(torrent);
             return ResponseEntity.ok()
-                    .body(new TorrentUploadSuccess(parser.getInfoHash(), file));
+                    .body(new TorrentUploadSuccess(torrent.getId(), parser.getInfoHash(), form.getFile()));
         } catch (EmptyTorrentFileException e) {
             throw new APIGenericException(INVALID_TORRENT_FILE, "This torrent is empty.");
         } catch (InvalidTorrentVersionException e) {
@@ -110,6 +147,18 @@ public class TorrentController {
         return new HttpEntity<>(bytes, header);
     }
 
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    static class TorrentUploadForm {
+        private String title;
+        private String subtitle;
+        private String description;
+        private String category;
+        private List<String> tags;
+        private boolean anonymous;
+        private MultipartFile file;
+    }
 
     @Getter
     static class TorrentUploadSuccess extends ResponsePojo {
@@ -117,9 +166,11 @@ public class TorrentController {
         private final String name;
         private final long size;
         private final String infoHash;
+        private final long id;
 
-        protected TorrentUploadSuccess(@NotNull String infoHash, @Nullable MultipartFile multipartFile) {
+        protected TorrentUploadSuccess(long id, @NotNull String infoHash, @Nullable MultipartFile multipartFile) {
             super(0);
+            this.id = id;
             this.infoHash = infoHash;
             if (multipartFile != null) {
                 this.originalName = multipartFile.getOriginalFilename();
@@ -135,6 +186,10 @@ public class TorrentController {
         @NotNull
         public String getInfoHash() {
             return infoHash;
+        }
+
+        public long getId() {
+            return id;
         }
     }
 }

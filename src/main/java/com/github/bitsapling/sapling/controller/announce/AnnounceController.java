@@ -10,6 +10,7 @@ import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.service.AnnouncePerformanceMonitorService;
 import com.github.bitsapling.sapling.service.AnnounceService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
+import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.TorrentService;
@@ -78,6 +79,8 @@ public class AnnounceController {
     private PromotionService promotionService;
     @Autowired
     private AnnouncePerformanceMonitorService performanceMonitorService;
+    @Autowired
+    private CategoryService categoryService;
 
 
     @GetMapping("/scrape")
@@ -212,7 +215,7 @@ public class AnnounceController {
                 Timestamp.from(Instant.now()),
                 false,
                 false,
-                0,
+                categoryService.getCategory(1),
                 promotionService.getDefaultPromotionPolicy(),
                 "测试描述" + UUID.randomUUID()
         );

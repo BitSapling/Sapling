@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.controller;
 
+import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Permission;
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
@@ -7,9 +8,11 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.entity.UserGroup;
 import com.github.bitsapling.sapling.exception.TorrentException;
+import com.github.bitsapling.sapling.repository.CategoryRepository;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import com.github.bitsapling.sapling.service.AnnouncePerformanceMonitorService;
+import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PermissionService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.UserGroupService;
@@ -48,6 +51,10 @@ public class DebugController {
     private PeersRepository peersRepository;
     @Autowired
     private TorrentRepository torrentRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryService categoryService;
     @Autowired
     private AnnouncePerformanceMonitorService announcePerformanceMonitorService;
 
@@ -109,11 +116,9 @@ public class DebugController {
             permissions.add(new Permission(0, "torrent:upload", true));
             permissions.add(new Permission(0, "torrent:scrape", true));
             permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
-            PromotionPolicy promotionPolicy = new PromotionPolicy(0, "系统默认", 1.0d, 1.0d);
-            promotionPolicy = promotionService.save(promotionPolicy);
-            UserGroup userGroup = new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy);
-            userGroup = userGroupService.save(userGroup);
-            User user = new User(0,
+            PromotionPolicy promotionPolicy =promotionService.save( new PromotionPolicy(0, "系统默认", 1.0d, 1.0d));
+            UserGroup userGroup = userGroupService.save(new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy));
+            User user = userService.save(new User(0,
                     "test@test.com",
                     "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6",
                     "TestUser1",
@@ -133,10 +138,9 @@ public class DebugController {
                     "中国移不动",
                     BigDecimal.ZERO,
                     0,
-                    0);
-            user = userService.save(user);
+                    0));
             log.info("创建测试用户 1 成功");
-            User user2 = new User(0,
+            User user2 = userService.save(new User(0,
                     "test2@test.com",
                     "$2a$06$r6QixzXG/Y8mUtmCV7b70.Jp7qjOL2nONUJolzGmQPzVn2acoKLf6",
                     "TestUser2",
@@ -156,9 +160,9 @@ public class DebugController {
                     "中国联不通",
                     BigDecimal.ZERO,
                     5,
-                    0);
-            user2 = userService.save(user2);
+                    0));
             log.info("创建测试用户 2 成功");
+            Category category = categoryService.save(new Category(0,"test-category", "这是一个测试分类", "fa fa-book"));
             return "初始化基本数据库测试内容成功";
         } catch (Exception e) {
             log.error("Error: ", e);

@@ -56,8 +56,10 @@ public class Torrent {
     private boolean underReview;
     @Column(name = "anonymous", nullable = false)
     private boolean anonymous;
-    @Column(name = "type", nullable = false)
-    private int type;
+    @ManyToOne
+    @JsonBackReference
+    @PrimaryKeyJoinColumn
+    private Category category;
     @Cascade({CascadeType.ALL})
     @ManyToOne
     @PrimaryKeyJoinColumn

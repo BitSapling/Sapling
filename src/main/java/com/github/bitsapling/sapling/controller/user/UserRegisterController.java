@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.controller.user;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ public class UserRegisterController {
 
     @GetMapping("/register")
     public ResponsePojo register() {
-        return new EmailInUseErrorPojo();
+        throw new NotImplementedException();
     }
 
 }

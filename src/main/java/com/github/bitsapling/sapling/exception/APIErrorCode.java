@@ -11,7 +11,8 @@ public enum APIErrorCode {
     INVALID_TORRENT_FILE(5, HttpStatus.NOT_ACCEPTABLE),
     TORRENT_ALREADY_EXISTS(6, HttpStatus.CONFLICT),
     TORRENT_NOT_EXISTS(7, HttpStatus.NOT_FOUND),
-    TORRENT_FILE_MISSING(8, HttpStatus.INTERNAL_SERVER_ERROR);
+    TORRENT_FILE_MISSING(8, HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_CATEGORY(9, HttpStatus.NOT_FOUND);
 
     private final int code;
     private final HttpStatusCode statusCode;
