@@ -40,6 +40,11 @@ public class UserService {
         Optional<User> userEntity = repository.findByPasskey(passkey);
         return userEntity.orElse(null);
     }
+    @Nullable
+    public User getUserByPersonalAccessToken(@NotNull String personalAccessToken){
+        Optional<User> userEntity = repository.findByPersonalAccessTokenIgnoreCase(personalAccessToken);
+        return userEntity.orElse(null);
+    }
 
     @NotNull
     public User save(User user) {

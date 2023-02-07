@@ -17,6 +17,10 @@ public class SafeUUID {
             return null;
         }
     }
+    @NotNull
+    public static String randomNoDashesUUID(){
+        return UUID.randomUUID().toString().replace("_","");
+    }
 
     @NotNull
     public static UUID nilUniqueId() {

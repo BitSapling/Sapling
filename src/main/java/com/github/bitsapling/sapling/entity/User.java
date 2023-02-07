@@ -81,6 +81,9 @@ public class User {
     @Column(name = "seeding_time", nullable = false)
     private long seedingTime;
 
+    @Column(name = "personal_access_token", nullable = false)
+    private String personalAccessToken;
+
     public UserGroup getGroup() {
         return group;
     }

@@ -138,7 +138,8 @@ public class DebugController {
                     "中国移不动",
                     BigDecimal.ZERO,
                     0,
-                    0));
+                    0,
+                    new UUID(1,0).toString().replace("_","")));
             log.info("创建测试用户 1 成功");
             User user2 = userService.save(new User(0,
                     "test2@test.com",
@@ -160,7 +161,8 @@ public class DebugController {
                     "中国联不通",
                     BigDecimal.ZERO,
                     5,
-                    0));
+                    0,
+                    new UUID(2,0).toString().replace("_","")));
             log.info("创建测试用户 2 成功");
             Category category = categoryService.save(new Category(0,"test-category", "这是一个测试分类", "fa fa-book"));
             return "初始化基本数据库测试内容成功";
