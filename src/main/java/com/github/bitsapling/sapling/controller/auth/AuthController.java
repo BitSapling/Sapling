@@ -42,7 +42,7 @@ public class AuthController {
             throw new APIGenericException(MISSING_PARAMETERS, "Password parameter is required");
         }
         User user = userService.getUserByUsername(login.getUser());
-        if (user == null) userService.getUserByEmail(login.getUser());
+        if (user == null) user = userService.getUserByEmail(login.getUser());
         if (user == null) {
             log.warn("IP {} tried to login with not exists username {}", IPUtil.getRequestIp(request), login.getUser());
             throw new APIGenericException(AUTHENTICATION_FAILED);
