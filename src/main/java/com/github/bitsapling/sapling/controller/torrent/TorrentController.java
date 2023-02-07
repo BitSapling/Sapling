@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -113,6 +114,15 @@ public class TorrentController {
         }
     }
 
+    @GetMapping("/list")
+    @SaCheckLogin
+    @SaCheckPermission("torrent:list")
+    public List<TorrentSearchResult> list() throws IOException {
+       List<TorrentSearchResult> results = new ArrayList<>();
+       return torrentService.getAllTorrents().stream().map(TorrentSearchResult::new).toList();
+
+    }
+
     @GetMapping("/download")
     @SaCheckLogin
     @SaCheckPermission("torrent:download")
@@ -146,7 +156,51 @@ public class TorrentController {
         header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncodeUtil.urlEncode(fileName, false));
         return new HttpEntity<>(bytes, header);
     }
+    @Data
+    static class TorrentSearchResult{
+        private long id;
+        private String infoHash;
+        private ResultUserBean user;
+        private String title;
+        private String subTitle;
+        private long size;
+        private long finishes;
+        private String categorySlug;
+        private String promotionPolicy;
+        private String description;
 
+        public TorrentSearchResult(@NotNull Torrent torrent){
+            this.id = torrent.getId();
+            this.infoHash = torrent.getInfoHash();
+            if(torrent.isAnonymous()){
+                this.user = new ResultUserBean(null);
+            }else{
+                this.user = new ResultUserBean(torrent.getUser());
+            }
+            this.title = torrent.getTitle();
+            this.subTitle = torrent.getSubTitle();
+            this.size = torrent.getSize();
+            this.finishes = torrent.getFinishes();
+            this.categorySlug = torrent.getCategory().getSlug();
+            this.promotionPolicy = torrent.getPromotionPolicy().getDisplayName();
+            this.description = torrent.getDescription();
+        }
+        @AllArgsConstructor
+        @Data
+        public static class ResultUserBean {
+            private final long id;
+            private final String username;
+            protected ResultUserBean(@Nullable User user){
+                if(user != null) {
+                    this.id = user.getId();
+                    this.username = user.getUsername();
+                }else{
+                    this.id = -1;
+                    this.username = "Anonymous";
+                }
+            }
+        }
+    }
     @AllArgsConstructor
     @NoArgsConstructor
     @Data

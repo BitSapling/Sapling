@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.repository;
 
+import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import org.jetbrains.annotations.NotNull;
@@ -27,4 +28,7 @@ public interface TorrentRepository extends CrudRepository<Torrent, Long> {
 
     @NotNull
     List<Torrent> findAllByUser(@NotNull User user);
+
+    @NotNull
+    List<Torrent> findAllByCategory(@NotNull Category category);
 }
