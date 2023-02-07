@@ -38,5 +38,5 @@ out/
 
 /public/torrents
 /config
-/src/main/resources/application-test.yml
-/src/main/resources/application-caching.yml
+/src/main/resources/application-db-tencentcloud.yml
+/src/main/resources/application-db-vultr.yml
