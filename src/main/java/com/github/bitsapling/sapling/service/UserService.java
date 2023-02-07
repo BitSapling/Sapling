@@ -5,7 +5,6 @@ import com.github.bitsapling.sapling.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,7 +35,6 @@ public class UserService {
     }
 
     @Nullable
-    @Cacheable(cacheNames = {"user_passkey"}, key = "#passkey")
     public User getUserByPasskey(String passkey) {
         Optional<User> userEntity = repository.findByPasskey(passkey);
         return userEntity.orElse(null);

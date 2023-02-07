@@ -17,7 +17,6 @@ public class PromotionService {
     private PromotionPolicyRepository repository;
 
     @Nullable
-
     public PromotionPolicy getPromotionPolicy(long id) {
         Optional<PromotionPolicy> entity = repository.findById(id);
         return entity.orElse(null);

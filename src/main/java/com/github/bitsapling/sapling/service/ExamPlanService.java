@@ -15,7 +15,6 @@ public class ExamPlanService {
     private ExamPlanRepository repository;
 
     @Nullable
-
     public ExamPlan getExamPlan(long id) {
         return repository.findById(id).orElse(null);
     }

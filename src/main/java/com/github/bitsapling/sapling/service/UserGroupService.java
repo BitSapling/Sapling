@@ -19,7 +19,6 @@ public class UserGroupService {
     private PromotionService promotionService;
 
     @Nullable
-
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroup -> new UserGroup(
                 userGroup.getId(),

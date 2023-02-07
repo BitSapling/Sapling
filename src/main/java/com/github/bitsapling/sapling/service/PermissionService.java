@@ -19,7 +19,6 @@ public class PermissionService {
     private PermissionRepository repository;
 
     @NotNull
-
     public Permission registerPermission(@NotNull String code, boolean def) {
         Optional<Permission> permission = repository.findByCode(code);
         if (permission.isPresent()) {
@@ -32,7 +31,6 @@ public class PermissionService {
     }
 
     @Nullable
-
     public Permission getPermission(long id) {
         Optional<Permission> permission = repository.findById(id);
         return permission.orElse(null);

@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,7 +22,6 @@ public class TorrentService {
     }
 
     @Nullable
-    @Cacheable(cacheNames = {"torrent"}, key = "#infoHash")
     public Torrent getTorrent(@NotNull String infoHash) {
         infoHash = infoHash.toLowerCase();
         Optional<Torrent> entity = torrentRepository.findByInfoHashIgnoreCase(infoHash);

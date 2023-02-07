@@ -18,7 +18,6 @@ public class ExamService {
     private ExamPlanService examPlanService;
 
     @Nullable
-
     public Exam getExam(long id) {
         return repository.findById(id).orElse(null);
     }
