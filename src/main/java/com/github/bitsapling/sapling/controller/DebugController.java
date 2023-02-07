@@ -32,10 +32,6 @@ public class DebugController {
     @Autowired
     private UserService userService;
     @Autowired
-    private TorrentService torrentService;
-    @Autowired
-    private PeerService peerService;
-    @Autowired
     private PeersRepository peersRepository;
     @Autowired
     private TorrentRepository torrentRepository;
@@ -43,32 +39,19 @@ public class DebugController {
     private AnnouncePerformanceMonitorService announcePerformanceMonitorService;
     @Autowired
     private AnnounceService announceService;
-
-    private String page;
-
-    {
-        try {
-            page = Files.readString(new File("landing-debug.html").toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @GetMapping("/")
     public String torrents() throws IOException {
-        log.debug("Accepted");
+        String page = Files.readString(new File("landing-debug.html").toPath());
         long startTime = System.currentTimeMillis();
         StringJoiner peersJoiner = new StringJoiner("\n\n");
         StringJoiner torrentsJoiner = new StringJoiner("\n\n");
         List<Torrent> torrents = new ArrayList<>();
         List<Peer> peers = new ArrayList<>();
-        log.debug("Accepting torrents");
         long dbTimeStart = System.currentTimeMillis();
         for (Torrent entity : torrentRepository.findAll()) {
             torrents.add(entity);
             torrentsJoiner.add(entity.toString());
         }
-        log.debug("Accepting peers");
         for (Peer peer : peersRepository.findAll()) {
             Peer copiedPeer = new Peer(
                     peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
@@ -80,7 +63,6 @@ public class DebugController {
             peers.add(peer);
         }
         long dbTimeEnd = System.currentTimeMillis() - dbTimeStart;
-        log.debug("Replacing");
         String resp = page.replace("%%torrents_amount%%", String.valueOf(torrents.size()));
         resp = resp.replace("%%peers_amount%%", String.valueOf(peers.size()));
         resp = resp.replace("%%announce_reqs%%", String.valueOf(announcePerformanceMonitorService.getAnnounceTimes().size()));
@@ -93,8 +75,6 @@ public class DebugController {
         resp = resp.replace("%%debug_page_db_consumed%%", String.valueOf(dbTimeEnd));
         resp = resp.replace("%%debug_page_consumed%%", String.valueOf(System.currentTimeMillis() - startTime));
         resp = resp.replace("%%announce_job_avg%%", String.valueOf(announcePerformanceMonitorService.avgJobMs()));
-
-        log.debug("Done!");
         return resp;
     }
 
@@ -173,19 +153,5 @@ public class DebugController {
             log.error("Error: ", e);
             throw e;
         }
-    }
-
-    // A function that censor half of original string to *
-    public String censor(String original) {
-        StringBuilder result = new StringBuilder();
-        int length = original.length();
-        for (int i = 0; i < length; i++) {
-            if (i % 2 == 0) {
-                result.append(original.charAt(i));
-            } else {
-                result.append("*");
-            }
-        }
-        return result.toString();
     }
 }
