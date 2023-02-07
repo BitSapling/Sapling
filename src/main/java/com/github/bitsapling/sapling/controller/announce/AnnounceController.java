@@ -8,9 +8,21 @@ import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
-import com.github.bitsapling.sapling.service.*;
+import com.github.bitsapling.sapling.service.AnnouncePerformanceMonitorService;
+import com.github.bitsapling.sapling.service.AnnounceService;
+import com.github.bitsapling.sapling.service.BlacklistClientService;
+import com.github.bitsapling.sapling.service.PeerService;
+import com.github.bitsapling.sapling.service.PromotionService;
+import com.github.bitsapling.sapling.service.TorrentService;
+import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
-import com.github.bitsapling.sapling.util.*;
+import com.github.bitsapling.sapling.util.BencodeUtil;
+import com.github.bitsapling.sapling.util.BooleanUtil;
+import com.github.bitsapling.sapling.util.IPUtil;
+import com.github.bitsapling.sapling.util.InfoHashUtil;
+import com.github.bitsapling.sapling.util.MiscUtil;
+import com.github.bitsapling.sapling.util.RandomUtil;
+import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +42,17 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -98,8 +120,8 @@ public class AnnounceController {
             files.put(infoHash, meta);
         }
         dict.put("files", files);
-        String resp =BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict));
-        log.debug("Base64 Response: {}",Base64.getEncoder().encodeToString(resp.getBytes(StandardCharsets.ISO_8859_1)));
+        String resp = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(dict));
+        log.debug("Base64 Response: {}", Base64.getEncoder().encodeToString(resp.getBytes(StandardCharsets.ISO_8859_1)));
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(resp);
@@ -238,7 +260,10 @@ public class AnnounceController {
     @SneakyThrows(UnknownHostException.class)
     private boolean checkValidIp(String ip) {
         InetAddress address = InetAddress.getByName(ip);
-        return !address.isAnyLocalAddress() && !address.isLinkLocalAddress() && !address.isLoopbackAddress();
+        return !address.isAnyLocalAddress()
+                && !address.isLinkLocalAddress()
+                && !address.isLoopbackAddress()
+                && !address.isSiteLocalAddress();
     }
 
     private void checkClient() throws FixedAnnounceException {
