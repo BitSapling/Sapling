@@ -28,6 +28,7 @@ public class TorrentService {
         return entity.orElse(null);
     }
 
+    @NotNull
     public Torrent save(@NotNull Torrent torrent) {
         torrent.setInfoHash(torrent.getInfoHash());
         return torrentRepository.save(torrent);

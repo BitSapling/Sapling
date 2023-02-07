@@ -36,14 +36,13 @@ public class PermissionService {
         return permission.orElse(null);
     }
 
-
     @Nullable
-
     public Permission getPermission(@NotNull String code) {
         Optional<Permission> permission = repository.findByCode(code);
         return permission.orElse(null);
     }
 
+    @NotNull
     public Permission save(@NotNull Permission permission) {
         return repository.save(permission);
     }

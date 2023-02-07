@@ -11,7 +11,6 @@ import java.util.UUID;
 @Component
 @Transactional
 public class AnnouncePerformanceMonitorService {
-    private long handled = 0;
     private final Instant startTime = Instant.now();
     private final Cache<UUID, Long> announceTimes = CacheBuilder
             .newBuilder()
@@ -21,6 +20,7 @@ public class AnnouncePerformanceMonitorService {
             .newBuilder()
             .maximumSize(1000)
             .build();
+    private long handled = 0;
 
     public void recordStats(long ns) {
         announceTimes.put(UUID.randomUUID(), ns);

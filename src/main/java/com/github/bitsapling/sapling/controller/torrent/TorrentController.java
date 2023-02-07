@@ -13,7 +13,6 @@ import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import com.github.bitsapling.sapling.util.URLEncodeUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -49,10 +48,8 @@ public class TorrentController {
     @Autowired
     @Qualifier("torrentsDirectory")
     private File torrentsDirectory;
-
     @Autowired
     private HttpServletRequest request;
-
 
     @PostMapping("/upload")
     @SaCheckLogin
@@ -82,7 +79,7 @@ public class TorrentController {
     @GetMapping("/download")
     @SaCheckLogin
     @SaCheckPermission("torrent:download")
-    public HttpEntity<?> download(@RequestParam Map<String, String> gets, HttpServletResponse response) throws IOException, TorrentException {
+    public HttpEntity<?> download(@RequestParam Map<String, String> gets) throws IOException, TorrentException {
         String infoHash = gets.get("info_hash");
         if (StringUtils.isEmpty(infoHash)) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a info_hash.");

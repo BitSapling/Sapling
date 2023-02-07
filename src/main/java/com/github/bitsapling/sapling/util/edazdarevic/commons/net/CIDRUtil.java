@@ -39,11 +39,10 @@ import java.util.List;
 @SuppressWarnings("all")
 public class CIDRUtil {
     private final String cidr;
-
+    private final int prefixLength;
     private InetAddress inetAddress;
     private InetAddress startAddress;
     private InetAddress endAddress;
-    private final int prefixLength;
 
 
     public CIDRUtil(String cidr) throws UnknownHostException {

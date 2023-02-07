@@ -24,10 +24,11 @@ public class PromotionService {
 
     @Nullable
     public PromotionPolicy getDefaultPromotionPolicy() {
-       return repository.findAll().iterator().next();
+        return repository.findAll().iterator().next();
     }
 
+    @NotNull
     public PromotionPolicy save(@NotNull PromotionPolicy promotionPolicy) {
-       return repository.save(promotionPolicy);
+        return repository.save(promotionPolicy);
     }
 }

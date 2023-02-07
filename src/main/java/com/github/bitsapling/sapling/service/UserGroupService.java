@@ -31,6 +31,7 @@ public class UserGroupService {
         )).orElse(null);
     }
 
+    @NotNull
     public UserGroup save(@NotNull UserGroup userGroup) {
         return repository.save(userGroup);
     }

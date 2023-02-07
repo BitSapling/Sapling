@@ -15,17 +15,20 @@ public class APIGenericException extends RuntimeException implements Serializabl
         this.error = error;
         this.message = message;
     }
+
     public APIGenericException(@NotNull APIErrorCode error) {
         this.error = error;
         this.message = error.name();
     }
+
     public int getError() {
         return error.getCode();
     }
 
-    public String getErrorText(){
+    public String getErrorText() {
         return error.name();
     }
+
     @NotNull
     public String getMessage() {
         return message;

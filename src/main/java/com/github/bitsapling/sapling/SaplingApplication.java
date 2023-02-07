@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SaplingApplication {
 
     public static void main(String[] args) {
-        System.out.println("Hash: "+PasswordHash.hash("testtest"));
+        System.out.println("Hash: " + PasswordHash.hash("testtest"));
         SpringApplication.run(SaplingApplication.class, args);
         //SaManager.setSaTokenContext(new SaTokenContextForSpring());
         SaManager.getConfig();

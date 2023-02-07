@@ -2,7 +2,11 @@ package com.github.bitsapling.sapling.config;
 
 import com.github.bitsapling.sapling.crontask.PeersCleanup;
 import org.jetbrains.annotations.NotNull;
-import org.quartz.*;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -57,7 +61,6 @@ public class QuartzConfig {
     }
 
     public static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory implements ApplicationContextAware {
-
         private transient AutowireCapableBeanFactory beanFactory;
 
         @Override

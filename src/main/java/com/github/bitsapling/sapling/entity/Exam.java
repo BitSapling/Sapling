@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
 
@@ -33,12 +34,12 @@ public class Exam {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private ExamPlan examPlan;
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private User user;

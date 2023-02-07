@@ -1,11 +1,20 @@
 package com.github.bitsapling.sapling.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Proxy;
 
 import java.math.BigDecimal;
@@ -35,7 +44,7 @@ public class User {
     @Column(name = "username", nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group", referencedColumnName = "id")
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private UserGroup group;

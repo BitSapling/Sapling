@@ -40,15 +40,15 @@ public class SafeUUID {
         try {
             UUID.fromString(str);
             return true;
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            System.err.println("Failed to check "+str);
+            System.err.println("Failed to check " + str);
             return false;
         }
-       // return str.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+        // return str.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     }
 
-    public static boolean isDashesStrippedUUID(@NotNull String str){
+    public static boolean isDashesStrippedUUID(@NotNull String str) {
         return str.matches("[0-9a-fA-F]{32}");
     }
 }

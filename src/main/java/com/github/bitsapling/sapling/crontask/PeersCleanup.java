@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class PeersCleanup extends QuartzJobBean {
     @Autowired
     private PeerService peerService;
+
     @Override
     protected void executeInternal(@NotNull JobExecutionContext context) {
         log.info("Executing the peers cleanup...");

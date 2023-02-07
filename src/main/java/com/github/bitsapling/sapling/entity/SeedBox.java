@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "seedbox",
@@ -30,10 +31,10 @@ public class SeedBox {
     private String address;
     @ManyToOne
     @PrimaryKeyJoinColumn
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @JsonBackReference
     private PromotionPolicy downloadMultiplier;
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @ManyToOne
     @PrimaryKeyJoinColumn
     @JsonBackReference

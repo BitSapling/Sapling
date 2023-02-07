@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.controller.user;
 
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

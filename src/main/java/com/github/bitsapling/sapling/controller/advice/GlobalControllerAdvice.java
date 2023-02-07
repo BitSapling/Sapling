@@ -47,7 +47,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> apiExceptionHandler(Exception exception) {
-        log.error("Catch an API exception",exception);
+        log.error("Catch an API exception", exception);
         return ResponseEntity.internalServerError()
                 .body(
                         Map.of("status", "error",
@@ -71,7 +71,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
-        log.error("Catch an argument exception",exception);
+        log.error("Catch an argument exception", exception);
         return ResponseEntity.badRequest()
                 .body(
                         Map.of("status", "error",
@@ -89,6 +89,7 @@ public class GlobalControllerAdvice {
                         "message", exception.getMessage())
                 );
     }
+
     @ExceptionHandler(value = NotPermissionException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotPermissionException exception) {

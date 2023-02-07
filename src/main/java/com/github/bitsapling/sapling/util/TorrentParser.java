@@ -2,7 +2,11 @@ package com.github.bitsapling.sapling.util;
 
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
-import com.github.bitsapling.sapling.exception.*;
+import com.github.bitsapling.sapling.exception.EmptyTorrentFileException;
+import com.github.bitsapling.sapling.exception.InvalidTorrentFileException;
+import com.github.bitsapling.sapling.exception.InvalidTorrentVerifyException;
+import com.github.bitsapling.sapling.exception.InvalidTorrentVersionException;
+import com.github.bitsapling.sapling.exception.TorrentException;
 import com.google.common.hash.Hashing;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +18,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringJoiner;
 
 @Slf4j
 public class TorrentParser {
@@ -162,9 +170,9 @@ public class TorrentParser {
         editDict.put("info", info);
         for (int i = 0; i < trackers.size(); i++) {
             if (i == 0) {
-                editDict.put("announce", trackers.get(0)+"?passkey="+passkey);
+                editDict.put("announce", trackers.get(0) + "?passkey=" + passkey);
             }
-            editDict.put("announce-list", trackers.get(i)+"?passkey="+passkey);
+            editDict.put("announce-list", trackers.get(i) + "?passkey=" + passkey);
         }
         if (publisher != null)
             editDict.put("publisher", publisher);

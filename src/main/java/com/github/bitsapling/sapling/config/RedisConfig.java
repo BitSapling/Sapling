@@ -18,9 +18,6 @@ import java.time.Duration;
 @Configuration
 //@EnableCaching
 public class RedisConfig {
-    // ${cache} 获取配置文件的配置信息   #{}是spring表达式，获取Bean对象的属性
-//    @Value("#{${cache}}")
-//    private Map<String, Long> ttlParams;
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
@@ -30,13 +27,6 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer()))
                 .prefixCacheNameWith("sapling:")
                 .entryTtl(Duration.ofMinutes(3L));
-//        //专门指定某些缓存空间的配置，如果过期时间【主要这里的key为缓存空间名称】
-//        Map<String, RedisCacheConfiguration> map = new HashMap<>();
-//        Set<Map.Entry<String, Long>> entries = ttlParams.entrySet();
-//        for (Map.Entry<String, Long> entry : entries) {
-//            map.put("user", redisCacheConfiguration.entryTtl(Duration.ofSeconds(40)));
-//            map.put(entry.getKey(), redisCacheConfiguration.entryTtl(Duration.ofSeconds(entry.getValue())));
-//        }
         return RedisCacheManager
                 .builder(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)

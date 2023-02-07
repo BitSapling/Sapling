@@ -12,8 +12,9 @@ public class ClassUtil {
     private final Cache<Class<?>, String> simpleNameCache = CacheBuilder.newBuilder()
             .maximumSize(4096)
             .build();
+
     @SneakyThrows(ExecutionException.class)
-    public String getClassSimpleName(Class<?> clazz){
+    public String getClassSimpleName(Class<?> clazz) {
         return simpleNameCache.get(clazz, clazz::getSimpleName);
     }
 }

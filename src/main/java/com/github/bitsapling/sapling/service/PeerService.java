@@ -30,19 +30,17 @@ public class PeerService {
     }
 
     @NotNull
-
     public List<Peer> getPeers(@NotNull String infoHash) {
         infoHash = infoHash.toLowerCase(Locale.ROOT);
         List<Peer> entities = repository.findPeersByInfoHashIgnoreCase(infoHash);
         return entities.stream().toList();
     }
 
-
+    @NotNull
     public Peer save(@NotNull Peer peer) {
         peer.setInfoHash(peer.getInfoHash().toLowerCase(Locale.ROOT));
         return repository.save(peer);
     }
-
 
     public void delete(@NotNull Peer peer) {
         //repository.delete(convert(peer));
@@ -50,7 +48,9 @@ public class PeerService {
     }
 
     public int cleanup() {
-        List<Peer> entities = repository.findAllByUpdateAtLessThan(Instant.now().minus(90, ChronoUnit.MINUTES));
+        List<Peer> entities = repository.findAllByUpdateAtLessThan(
+                Instant.now().minus(90, ChronoUnit.MINUTES)
+        );
         int count = entities.size();
         repository.deleteAll(entities);
         return count;

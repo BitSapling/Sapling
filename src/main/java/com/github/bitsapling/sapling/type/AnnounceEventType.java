@@ -13,22 +13,24 @@ public enum AnnounceEventType {
 
     UNKNOWN("unknown");
     private final String key;
-    AnnounceEventType(String key){
+
+    AnnounceEventType(String key) {
         this.key = key;
+    }
+
+    public static @NotNull AnnounceEventType fromName(@Nullable String name) {
+        if (name == null) return UNKNOWN;
+        name = name.toLowerCase(Locale.ROOT);
+        for (AnnounceEventType type : values()) {
+            if (type.getKey().equals(name)) {
+                return type;
+            }
+        }
+        return UNKNOWN;
     }
 
     @NotNull
     public String getKey() {
         return key;
-    }
-    public static @NotNull AnnounceEventType fromName(@Nullable String name){
-        if(name == null) return UNKNOWN;
-        name = name.toLowerCase(Locale.ROOT);
-        for (AnnounceEventType type : values()){
-            if (type.getKey().equals(name)){
-                return type;
-            }
-        }
-        return UNKNOWN;
     }
 }

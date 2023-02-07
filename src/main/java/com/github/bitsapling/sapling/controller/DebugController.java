@@ -1,10 +1,19 @@
 package com.github.bitsapling.sapling.controller;
 
-import com.github.bitsapling.sapling.entity.*;
+import com.github.bitsapling.sapling.entity.Peer;
+import com.github.bitsapling.sapling.entity.Permission;
+import com.github.bitsapling.sapling.entity.PromotionPolicy;
+import com.github.bitsapling.sapling.entity.Torrent;
+import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.entity.UserGroup;
 import com.github.bitsapling.sapling.exception.TorrentException;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
-import com.github.bitsapling.sapling.service.*;
+import com.github.bitsapling.sapling.service.AnnouncePerformanceMonitorService;
+import com.github.bitsapling.sapling.service.PermissionService;
+import com.github.bitsapling.sapling.service.PromotionService;
+import com.github.bitsapling.sapling.service.UserGroupService;
+import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +27,11 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -37,8 +50,7 @@ public class DebugController {
     private TorrentRepository torrentRepository;
     @Autowired
     private AnnouncePerformanceMonitorService announcePerformanceMonitorService;
-    @Autowired
-    private AnnounceService announceService;
+
     @GetMapping("/")
     public String torrents() throws IOException {
         String page = Files.readString(new File("landing-debug.html").toPath());
@@ -56,7 +68,7 @@ public class DebugController {
             Peer copiedPeer = new Peer(
                     peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
                     peer.getUserAgent(), peer.getUploaded(),
-                    peer.getDownloaded(),  peer.getLeft(), peer.isSeeder(),"<passkey-removed>",
+                    peer.getDownloaded(), peer.getLeft(), peer.isSeeder(), "<passkey-removed>",
                     peer.getUpdateAt(),
                     peer.getSeedingTime());
             peersJoiner.add(copiedPeer.toString());
@@ -69,7 +81,6 @@ public class DebugController {
         resp = resp.replace("%%announce_ms%%", String.valueOf(announcePerformanceMonitorService.avgMs()));
         resp = resp.replace("%%startup_date%%", announcePerformanceMonitorService.getStartTime().toString());
         resp = resp.replace("%%announce_count%%", String.valueOf(announcePerformanceMonitorService.getHandled()));
-//        resp = resp.replace("%%announce_jobs%%", String.valueOf(announceService.getTaskQueue().size()));
         resp = resp.replace("%%peers_list%%", peersJoiner.toString());
         resp = resp.replace("%%torrents_list%%", torrentsJoiner.toString());
         resp = resp.replace("%%debug_page_db_consumed%%", String.valueOf(dbTimeEnd));

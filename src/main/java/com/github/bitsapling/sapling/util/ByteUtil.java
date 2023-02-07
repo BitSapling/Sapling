@@ -1,4 +1,5 @@
 package com.github.bitsapling.sapling.util;
+
 // https://blog.csdn.net/weixin_38820375/article/details/88556771
 public class ByteUtil {
     public static byte[] short2byte(short s) {

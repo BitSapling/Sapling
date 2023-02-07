@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.util;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+
 @Slf4j
 public class IPUtil {
     @NotNull

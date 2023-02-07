@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
-import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -129,7 +127,7 @@ public class AnnounceController {
 
 
     @GetMapping("/announce")
-    public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, BrowserReadableAnnounceException, RetryableAnnounceException, IOException {
+    public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, RetryableAnnounceException {
         long ns = System.nanoTime();
         log.debug("Query String: {}", request.getQueryString());
         String[] ipv4 = request.getParameterValues("ipv4");
@@ -192,7 +190,7 @@ public class AnnounceController {
         for (String filteredIp : filteredIps) {
             announceBackgroundJob.handleTask(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
-        String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(peerId, infoHash, numWant, compact)));
+        String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(infoHash, numWant, compact)));
         log.debug("Base64 Response: {}", Base64.getEncoder().encodeToString(peers.getBytes(StandardCharsets.ISO_8859_1)));
         performanceMonitorService.recordStats(System.nanoTime() - ns);
         return ResponseEntity.ok()
@@ -201,7 +199,7 @@ public class AnnounceController {
     }
 
     @Nullable
-    private Torrent testAddTorrent(String infoHash) {
+    private Torrent testAddTorrent(@NotNull String infoHash) {
         log.info("TEST ONLY: Creating torrent for info_hash: {}", infoHash);
         Torrent torrent = new Torrent(
                 0,
@@ -216,15 +214,13 @@ public class AnnounceController {
                 false,
                 0,
                 promotionService.getDefaultPromotionPolicy(),
-                0,
                 "测试描述" + UUID.randomUUID()
         );
         return torrentService.save(torrent);
     }
 
-
     @Nullable
-    private String readInfoHash(String queryString) {
+    private String readInfoHash(@NotNull String queryString) {
         // This is a workaround for binary encoded info_hash data.
         String[] queryStrings = queryString.split("&");
         for (String string : queryStrings) {
@@ -240,7 +236,7 @@ public class AnnounceController {
         return null;
     }
 
-    private @NotNull List<String> readAllInfoHash(String queryString) {
+    private @NotNull List<String> readAllInfoHash(@NotNull String queryString) {
         // This is a workaround for binary encoded info_hash data.
         List<String> infoHash = new ArrayList<>();
         String[] queryStrings = queryString.split("&");
@@ -258,7 +254,7 @@ public class AnnounceController {
     }
 
     @SneakyThrows(UnknownHostException.class)
-    private boolean checkValidIp(String ip) {
+    private boolean checkValidIp(@NotNull String ip) {
         InetAddress address = InetAddress.getByName(ip);
         return !address.isAnyLocalAddress()
                 && !address.isLinkLocalAddress()
@@ -276,7 +272,7 @@ public class AnnounceController {
         }
     }
 
-    private void checkScrapeFields(Map<String, String> gets) throws InvalidAnnounceException {
+    private void checkScrapeFields(@NotNull Map<String, String> gets) throws InvalidAnnounceException {
         if (StringUtils.isEmpty(gets.get("info_hash"))) throw new InvalidAnnounceException("Missing param: info_hash");
     }
 
@@ -302,20 +298,18 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponse(String peerIdHash, String infoHash, int numWant, boolean compact) throws IOException, RetryableAnnounceException {
+    private Map<String, Object> generatePeersResponse(String infoHash, int numWant, boolean compact) throws RetryableAnnounceException {
         Map<String, Object> resp;
         if (compact) {
-            resp = generatePeersResponseCompat(peerIdHash, infoHash, numWant);
+            resp = generatePeersResponseCompat(infoHash, numWant);
         } else {
-            resp = generatePeersResponseNonCompat(peerIdHash, infoHash, numWant, compact);
+            resp = generatePeersResponseNonCompat(infoHash, numWant, compact);
         }
         return resp;
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponseCompat(String peerId, String infoHash, int numWant) throws RetryableAnnounceException {
-        // TODO: What the fuck
-        // http://bittorrent.org/beps/bep_0023.html
+    private Map<String, Object> generatePeersResponseCompat(String infoHash, int numWant) throws RetryableAnnounceException {
         PeerResult peers = gatherPeers(infoHash, numWant);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
@@ -329,7 +323,7 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponseNonCompat(String peerId, String infoHash, int numWant, boolean noPeerId) {
+    private Map<String, Object> generatePeersResponseNonCompat(@NotNull String infoHash, int numWant, boolean noPeerId) {
         PeerResult peers = gatherPeers(infoHash, numWant);
         List<Map<String, Object>> peerList = new ArrayList<>();
         List<Peer> allPeers = new ArrayList<>(peers.peers());
@@ -366,6 +360,7 @@ public class AnnounceController {
         return random.nextInt(MIN_INTERVAL, MAX_INTERVAL);
     }
 
+    @NotNull
     public PeerStatus getPeerStatus(@NotNull String infoHash) {
         List<Peer> peers = peerService.getPeers(infoHash);
         int complete = (int) peers.stream().filter(Peer::isSeeder).count();

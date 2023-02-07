@@ -38,6 +38,7 @@ public class PromotionPolicy {
     public double applyUploadRatio(double upload) {
         return upload * uploadRatio;
     }
+
     public double applyDownloadRatio(double download) {
         return download * downloadRatio;
     }

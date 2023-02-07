@@ -58,13 +58,11 @@ public class Torrent {
     private boolean anonymous;
     @Column(name = "type", nullable = false)
     private int type;
-    @Cascade({org.hibernate.annotations.CascadeType.ALL})
+    @Cascade({CascadeType.ALL})
     @ManyToOne
     @PrimaryKeyJoinColumn
     @JsonBackReference
     private PromotionPolicy promotionPolicy;
-    @Column(name = "description_type", nullable = false)
-    private int descriptionType;
     @Column(name = "description", nullable = false)
     private String description;
 

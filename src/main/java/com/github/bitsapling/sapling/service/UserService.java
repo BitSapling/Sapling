@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,8 +41,9 @@ public class UserService {
         return userEntity.orElse(null);
     }
 
+    @NotNull
     public User save(User user) {
         return repository.save(user);
     }
-    
+
 }
