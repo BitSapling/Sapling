@@ -2,13 +2,14 @@ package com.github.bitsapling.sapling.controller.advice;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
+import com.github.bitsapling.sapling.exception.APIGenericException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
-import com.github.bitsapling.sapling.exception.LoginException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.util.BencodeUtil;
 import com.github.bitsapling.sapling.util.ClassUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,6 +56,18 @@ public class GlobalControllerAdvice {
                 );
     }
 
+    @ExceptionHandler(value = APIGenericException.class)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> apiExceptionHandler(APIGenericException exception) {
+        return ResponseEntity
+                .status(exception.getStatusCode())
+                .body(
+                        Map.of("status", "error",
+                                "type", exception.getErrorText(),
+                                "message", exception.getMessage())
+                );
+    }
+
     @ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> argumentExceptionHandler(IllegalArgumentException exception) {
@@ -70,7 +83,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = NotLoginException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotLoginException exception) {
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("status", "error",
                         "type", classUtil.getClassSimpleName(exception.getClass()),
                         "message", exception.getMessage())
@@ -79,16 +92,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = NotPermissionException.class)
     @ResponseBody
     public ResponseEntity<Map<String, Object>> loginExceptionHandler(NotPermissionException exception) {
-        return ResponseEntity.status(403)
-                .body(Map.of("status", "error",
-                        "type", classUtil.getClassSimpleName(exception.getClass()),
-                        "message", exception.getMessage())
-                );
-    }
-    @ExceptionHandler(value = LoginException.class)
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> loginExceptionHandler(LoginException exception) {
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("status", "error",
                         "type", classUtil.getClassSimpleName(exception.getClass()),
                         "message", exception.getMessage())

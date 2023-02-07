@@ -15,52 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserRegisterController {
 
     @Autowired
-
     private HttpServletRequest request;
 
     @GetMapping("/register")
     public ResponsePojo register() {
         return new EmailInUseErrorPojo();
     }
-    @Getter
-    static class RegistrationClosedErrorPojo extends ResponsePojo {
-        private final String message = "Sorry, this site is not accepting new registrations at this time";
 
-        RegistrationClosedErrorPojo() {
-            super(10005);
-        }
-    }
-    @Getter
-    static class AgeCheckErrorPojo extends ResponsePojo {
-        private final String message = "You are under the age allowed to register on this site";
-
-        AgeCheckErrorPojo() {
-            super(10004);
-        }
-    }
-    @Getter
-    static class CaptchaErrorPojo extends ResponsePojo {
-        private final String message = "Captcha Incorrect";
-
-        CaptchaErrorPojo() {
-            super(10003);
-        }
-    }
-    @Getter
-    static class EmailInUseErrorPojo extends ResponsePojo {
-        private final String message = "Email is already in use";
-
-        EmailInUseErrorPojo() {
-            super(10002);
-        }
-    }
-
-    @Getter
-    static class UsernameInUseErrorPojo extends ResponsePojo {
-        private final String message = "Username is already in use";
-
-        UsernameInUseErrorPojo() {
-            super(10001);
-        }
-    }
 }

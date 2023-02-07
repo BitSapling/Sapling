@@ -69,7 +69,7 @@ public class DebugController {
         resp = resp.replace("%%announce_ms%%", String.valueOf(announcePerformanceMonitorService.avgMs()));
         resp = resp.replace("%%startup_date%%", announcePerformanceMonitorService.getStartTime().toString());
         resp = resp.replace("%%announce_count%%", String.valueOf(announcePerformanceMonitorService.getHandled()));
-        resp = resp.replace("%%announce_jobs%%", String.valueOf(announceService.getTaskQueue().size()));
+//        resp = resp.replace("%%announce_jobs%%", String.valueOf(announceService.getTaskQueue().size()));
         resp = resp.replace("%%peers_list%%", peersJoiner.toString());
         resp = resp.replace("%%torrents_list%%", torrentsJoiner.toString());
         resp = resp.replace("%%debug_page_db_consumed%%", String.valueOf(dbTimeEnd));

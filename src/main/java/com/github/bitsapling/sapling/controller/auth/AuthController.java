@@ -2,7 +2,8 @@ package com.github.bitsapling.sapling.controller.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.entity.User;
-import com.github.bitsapling.sapling.exception.LoginException;
+import com.github.bitsapling.sapling.exception.APIErrorCode;
+import com.github.bitsapling.sapling.exception.APIGenericException;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.PasswordHash;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.github.bitsapling.sapling.exception.APIErrorCode.AUTHENTICATION_FAILED;
+import static com.github.bitsapling.sapling.exception.APIErrorCode.MISSING_PARAMETERS;
+
 @RestController
 @RequestMapping("/auth")
 @Slf4j
@@ -30,23 +34,22 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginDto login) throws LoginException {
-
+    public Map<String, Object> login(@RequestBody LoginDto login) {
         if (login.getUser() == null) {
-            throw new IllegalArgumentException("User parameter is required");
+            throw new APIGenericException(MISSING_PARAMETERS, "User parameter is required");
         }
         if (login.getPassword() == null) {
-            throw new IllegalArgumentException("Password parameter is required");
+            throw new APIGenericException(MISSING_PARAMETERS, "Password parameter is required");
         }
         User user = userService.getUserByUsername(login.getUser());
         if (user == null) userService.getUserByEmail(login.getUser());
         if (user == null) {
             log.warn("IP {} tried to login with not exists username {}", IPUtil.getRequestIp(request), login.getUser());
-            throw new LoginException("Username or Password incorrect");
+            throw new APIGenericException(AUTHENTICATION_FAILED);
         }
         if (!PasswordHash.verify(login.getPassword(), user.getPasswordHash())) {
             log.warn("IP {} tried to login with username {} and password {}", IPUtil.getRequestIp(request), login.getUser(), login.getPassword());
-            throw new LoginException("Username or Password incorrect");
+            throw new APIGenericException(AUTHENTICATION_FAILED, "Username or Password incorrect");
         }
         StpUtil.login(user.getId());
         Map<String, Object> loginResponse = new LinkedHashMap<>();
@@ -65,14 +68,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public Map<String, Object> logout() throws LoginException {
+    public Map<String, Object> logout() {
         if (StpUtil.isLogin()) {
             StpUtil.logout();
             Map<String, Object> logoutResponse = new LinkedHashMap<>();
             logoutResponse.put("status", "ok");
             return logoutResponse;
         } else {
-            throw new LoginException("You are not logged in yet");
+            throw new APIGenericException(APIErrorCode.REQUIRED_AUTHENTICATION);
         }
     }
 
