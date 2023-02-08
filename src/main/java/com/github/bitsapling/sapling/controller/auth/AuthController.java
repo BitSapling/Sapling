@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.auth;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.github.bitsapling.sapling.controller.bean.LoginStatusBean;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
@@ -76,13 +77,13 @@ public class AuthController {
     }
 
     @PostMapping("/status")
-    public Map<String, Object> status() {
-        Map<String, Object> resp = new LinkedHashMap<>();
-        //resp.put("status", "ok");
-        resp.put("isLogin", StpUtil.isLogin());
-        resp.put("isSafe", StpUtil.isSafe());
-        resp.put("isSwitch", StpUtil.isSwitch());
-        return resp;
+    public LoginStatusBean status() {
+        User user = userService.getUser(StpUtil.getLoginIdAsLong());
+        if (user == null) {
+            return new LoginStatusBean(false, false, false, null);
+        }else{
+            return new LoginStatusBean(true, true, false, getUserBasicInformation(user));
+        }
     }
 
     @PostMapping("/register")
