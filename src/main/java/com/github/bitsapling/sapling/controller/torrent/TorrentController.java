@@ -28,6 +28,7 @@ import com.github.bitsapling.sapling.util.URLEncodeUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -72,10 +73,12 @@ public class TorrentController {
     private TransferHistoryService transferHistoryService;
     @Autowired
     private SettingService settingService;
-
+    @Autowired
+    private PolicyFactory sanitizeFactory;
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
     public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
+
         if (StringUtils.isEmpty(form.getTitle())) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
         }
@@ -85,6 +88,7 @@ public class TorrentController {
         if (form.getFile() == null || form.getFile().isEmpty()) {
             throw new APIGenericException(INVALID_TORRENT_FILE, "You must provide a valid torrent file.");
         }
+        form.setDescription(sanitizeFactory.sanitize(form.getDescription()));
         User user = userService.getUser(StpUtil.getLoginIdAsLong());
         Category category = categoryService.getCategory(form.getCategory());
         PromotionPolicy promotionPolicy = promotionService.getDefaultPromotionPolicy();
