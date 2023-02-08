@@ -83,9 +83,10 @@ public class TorrentParser {
         if (info.containsKey("length")) {
             // Single File Torrent
             String badEncodingFileName = (String) info.get("name");
-            long size = (Long) info.get("length");
+            long size = Long.parseLong(String.valueOf(info.get("length")));
             String fileName = new String(badEncodingFileName.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
             this.fileList.put(fileName, size);
+            this.totalSize = size;
             return;
         }
         // Multiple files
@@ -125,7 +126,12 @@ public class TorrentParser {
             }
             this.fileList.put(finalPath, size);
         }
-        totalSize = this.fileList.values().stream().mapToLong(v -> v).sum();
+        if (info.containsKey("length")) {
+            // Single File Torrent
+            totalSize = Long.parseLong(String.valueOf(info.get("length")));
+        }else {
+            totalSize = this.fileList.values().stream().mapToLong(v -> v).sum();
+        }
     }
 
     public long getTorrentFilesSize() {

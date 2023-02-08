@@ -145,7 +145,7 @@ public class TorrentController {
     @GetMapping("/download")
     @SaCheckPermission("torrent:download")
     public HttpEntity<?> download(@RequestParam Map<String, String> gets) throws IOException, TorrentException {
-        SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
+       // SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
         TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
         String infoHash = gets.get("info_hash");
         if (StringUtils.isEmpty(infoHash)) {
