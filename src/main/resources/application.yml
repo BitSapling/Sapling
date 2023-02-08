@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test,db-tencentcloud
+    active: test.caching,db-tencentcloud
   jpa:
     properties:
       hibernate:
@@ -8,6 +8,19 @@ spring:
         generate-ddl: true
         hbm2ddl:
           auto: update
+  data:
+    redis:
+      database: 3
+      timeout: 3000
+      #password: 123456
+      port: 6379
+      host: localhost
+      jedis:
+        pool:
+          max-idle: 8
+          min-idle: 2
+          max-active: 8
+          max-wait: -1
   quartz:
     job-store-type: jdbc
     wait-for-jobs-to-complete-on-shutdown: true
