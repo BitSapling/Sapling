@@ -88,6 +88,9 @@ public class TorrentController {
         if (category == null) {
             throw new APIGenericException(INVALID_CATEGORY, "Specified category not exists.");
         }
+        if(form.isAnonymous()){
+            StpUtil.checkPermission("torrent:publish_anonymous");
+        }
         try {
             TorrentParser parser = new TorrentParser(form.getFile().getBytes());
             String infoHash = parser.getInfoHash();
@@ -99,7 +102,7 @@ public class TorrentController {
                     form.getSubtitle(), parser.getTorrentFilesSize(),
                     0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()),
                     StpUtil.hasPermission("torrent:bypass_review"),
-                    StpUtil.hasPermission("torrent:publish_anonymous") && form.isAnonymous(),
+                    form.isAnonymous(),
                     category,
                     promotionPolicy, form.getDescription());
             torrent = torrentService.save(torrent);
