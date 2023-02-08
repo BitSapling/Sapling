@@ -1,7 +1,9 @@
 package com.github.bitsapling.sapling.controller.auth;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.controller.bean.LoginStatusBean;
+import com.github.bitsapling.sapling.controller.bean.UserBean;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
@@ -16,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,13 +79,17 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/status")
+    @GetMapping("/status")
     public LoginStatusBean status() {
-        User user = userService.getUser(StpUtil.getLoginIdAsLong());
-        if (user == null) {
+        try {
+            User user = userService.getUser(StpUtil.getLoginIdAsLong());
+            if (user == null) {
+                return new LoginStatusBean(false, false, false, null);
+            } else {
+                return new LoginStatusBean(true, true, false, getUserBasicInformation(user));
+            }
+        }catch (NotLoginException e){
             return new LoginStatusBean(false, false, false, null);
-        }else{
-            return new LoginStatusBean(true, true, false, getUserBasicInformation(user));
         }
     }
 
@@ -133,15 +140,10 @@ public class AuthController {
         Map<String, Object> response = new LinkedHashMap<>();
         //loginResponse.put("status", "ok");
         response.put("token", StpUtil.getTokenInfo());
-        Map<String, Object> basicInformation = new LinkedHashMap<>();
-        basicInformation.put("id", user.getId());
-        basicInformation.put("role", user.getGroup().getCode());
-        basicInformation.put("name", user.getUsername());
-        basicInformation.put("email", user.getEmail());
-        basicInformation.put("language", user.getLanguage());
-        response.put("user", basicInformation);
+        response.put("user", new UserBean(user));
         return response;
     }
+
 
     @AllArgsConstructor
     @NoArgsConstructor

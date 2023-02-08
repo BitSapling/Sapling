@@ -14,7 +14,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 @Entity
-@Table(name = "category",
+@Table(name = "categories",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"})
                 , @UniqueConstraint(columnNames = {"slug"})

@@ -19,7 +19,7 @@ import org.hibernate.annotations.CascadeType;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "exam",
+@Table(name = "exams",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"})
                 , @UniqueConstraint(columnNames = {"user_id"})

@@ -8,35 +8,45 @@ import java.math.BigDecimal;
 
 @Data
 public class UserBean {
-    private final long id;
-    private final String username;
-    private final String avatar;
-    private final String customTitle;
-    private final String signature;
-    private final String language;
-    private final String uploadBandwidth;
-    private final String downloadBandwidth;
-    private final long downloaded;
-    private final long uploaded;
-    private final String isp;
-    private final long seedingTime;
-    private final long createdAt;
-    private final BigDecimal karma;
+    private long id;
+    private String email;
+    private String username;
+    private UserGroupBean group;
+    private long createdAt;
+    private String avatar;
+    private String customTitle;
+    private String signature;
+    private String language;
+    private String downloadBandwidth;
+    private String uploadBandwidth;
+    private long downloaded;
+    private long uploaded;
+    private long realDownloaded;
+    private long realUploaded;
+    private String isp;
+    private BigDecimal karma;
+    private int inviteSlot;
+    private long seedingTime;
 
     public UserBean(@NotNull User user) {
         this.id = user.getId();
+        this.email = user.getEmail();
         this.username = user.getUsername();
+        this.group = new UserGroupBean(user.getGroup());
+        this.createdAt = user.getCreatedAt().getTime();
         this.avatar = user.getAvatar();
         this.customTitle = user.getCustomTitle();
         this.signature = user.getSignature();
         this.language = user.getLanguage();
-        this.uploadBandwidth = user.getUploadBandwidth();
         this.downloadBandwidth = user.getDownloadBandwidth();
+        this.uploadBandwidth = user.getUploadBandwidth();
         this.downloaded = user.getDownloaded();
         this.uploaded = user.getUploaded();
+        this.realDownloaded = user.getRealDownloaded();
+        this.realUploaded = user.getRealUploaded();
         this.isp = user.getIsp();
-        this.seedingTime = user.getSeedingTime();
-        this.createdAt = user.getCreatedAt().getTime();
         this.karma = user.getKarma();
+        this.inviteSlot = user.getInviteSlot();
+        this.seedingTime = user.getSeedingTime();
     }
 }
