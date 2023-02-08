@@ -29,6 +29,6 @@ public class SettingEntity {
     private long id;
     @Column(name = "setting_key", nullable = false)
     private String key;
-    @Column(name = "setting_value", nullable = false)
+    @Column(name = "setting_value", nullable = false,columnDefinition="mediumtext")
     private String value;
 }

@@ -39,6 +39,7 @@ public class SettingService {
             if (entity == null) throw new BadConfigException();
             try {
                 set(configKey, entity);
+                log.info("Resolved missing configuration key via #spawnDefault static method.");
             } catch (JsonProcessingException e) {
                 log.error("Unable to serialize setting object: {} -> {}", configKey, entity, e);
                 throw new RuntimeException(e);
