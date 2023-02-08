@@ -19,6 +19,7 @@ import com.github.bitsapling.sapling.service.UserGroupService;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,26 +65,20 @@ public class DebugController {
         long startTime = System.currentTimeMillis();
         StringJoiner peersJoiner = new StringJoiner("\n\n");
         StringJoiner torrentsJoiner = new StringJoiner("\n\n");
-        List<Torrent> torrents = new ArrayList<>();
-        List<Peer> peers = new ArrayList<>();
+        int debugPeers = 0;
+        int debugTorrents = 0;
         long dbTimeStart = System.currentTimeMillis();
         for (Torrent entity : torrentRepository.findAll()) {
-            torrents.add(entity);
-            torrentsJoiner.add(entity.toString());
+            debugTorrents ++;
+            torrentsJoiner.add(new DebugTorrent(entity).toString());
         }
         for (Peer peer : peersRepository.findAll()) {
-            Peer copiedPeer = new Peer(
-                    peer.getId(), peer.getIp(), peer.getPort(), peer.getInfoHash(), "<peerid>",
-                    peer.getUserAgent(), peer.getUploaded(),
-                    peer.getDownloaded(), peer.getLeft(), peer.isSeeder(), "<passkey-removed>",
-                    peer.getUpdateAt(),
-                    peer.getSeedingTime());
-            peersJoiner.add(copiedPeer.toString());
-            peers.add(peer);
+            debugPeers ++;
+            peersJoiner.add(new DebugPeer(peer).toString());
         }
         long dbTimeEnd = System.currentTimeMillis() - dbTimeStart;
-        String resp = page.replace("%%torrents_amount%%", String.valueOf(torrents.size()));
-        resp = resp.replace("%%peers_amount%%", String.valueOf(peers.size()));
+        String resp = page.replace("%%torrents_amount%%", String.valueOf(debugTorrents));
+        resp = resp.replace("%%peers_amount%%", String.valueOf(debugPeers));
         resp = resp.replace("%%announce_reqs%%", String.valueOf(announcePerformanceMonitorService.getAnnounceTimes().size()));
         resp = resp.replace("%%announce_ms%%", String.valueOf(announcePerformanceMonitorService.avgMs()));
         resp = resp.replace("%%startup_date%%", announcePerformanceMonitorService.getStartTime().toString());
@@ -94,6 +89,66 @@ public class DebugController {
         resp = resp.replace("%%debug_page_consumed%%", String.valueOf(System.currentTimeMillis() - startTime));
         resp = resp.replace("%%announce_job_avg%%", String.valueOf(announcePerformanceMonitorService.avgJobMs()));
         return resp;
+    }
+    @Getter
+    static class DebugTorrent{
+        private final long id;
+        private final String infoHash;
+        private final String title;
+        private final String subTitle;
+        private final long size;
+        private final long finishes;
+        private final Timestamp createdAt;
+        private final Timestamp updatedAt;
+        private final boolean underReview;
+        private final boolean anonymous;
+        private final Category category;
+        private final PromotionPolicy promotionPolicy;
+        private final String description;
+        public DebugTorrent(Torrent torrent){
+            this.id = torrent.getId();
+            this.infoHash = torrent.getInfoHash();
+            this.title = torrent.getTitle();
+            this.subTitle = torrent.getSubTitle();
+            this.size = torrent.getSize();
+            this.finishes = torrent.getFinishes();
+            this.createdAt = torrent.getCreatedAt();
+            this.updatedAt = torrent.getUpdatedAt();
+            this.underReview = torrent.isUnderReview();
+            this.anonymous = torrent.isAnonymous();
+            this.category = torrent.getCategory();
+            this.promotionPolicy = torrent.getPromotionPolicy();
+            this.description = torrent.getDescription();
+
+        }
+    }
+    @Getter
+    static class DebugPeer{
+        private final long id;
+        private final String ip;
+        private final int port;
+        private final String infoHash;
+        private final String userAgent;
+        private final long uploaded;
+        private final long downloaded;
+        private final long left;
+        private final boolean seeder;
+        private final Timestamp updateAt;
+        private final long seedingTime;
+
+        public DebugPeer(Peer peer){
+            this.id = peer.getId();
+            this.ip = peer.getIp();
+            this.port = peer.getPort();
+            this.infoHash = peer.getInfoHash();
+            this.userAgent = peer.getUserAgent();
+            this.uploaded = peer.getUploaded();
+            this.downloaded = peer.getDownloaded();
+            this.left = peer.getLeft();
+            this.seeder = peer.isSeeder();
+            this.updateAt = peer.getUpdateAt();
+            this.seedingTime = peer.getSeedingTime();
+        }
     }
 
     @GetMapping("/debug/parseTorrents")

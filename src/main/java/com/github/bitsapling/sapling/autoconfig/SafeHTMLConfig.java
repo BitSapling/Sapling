@@ -13,6 +13,7 @@ public class SafeHTMLConfig {
                 .and(Sanitizers.TABLES)
                 .and(Sanitizers.IMAGES)
                 .and(Sanitizers.BLOCKS)
-                .and(Sanitizers.FORMATTING);
+                .and(Sanitizers.FORMATTING)
+                .and(Sanitizers.STYLES);
     }
 }
