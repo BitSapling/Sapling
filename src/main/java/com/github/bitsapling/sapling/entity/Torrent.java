@@ -65,7 +65,7 @@ public class Torrent {
     @PrimaryKeyJoinColumn
     @JsonBackReference
     private PromotionPolicy promotionPolicy;
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "mediumtext")
     private String description;
 
 
