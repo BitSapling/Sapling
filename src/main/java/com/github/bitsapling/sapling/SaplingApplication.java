@@ -5,10 +5,12 @@ import com.github.bitsapling.sapling.util.PasswordHash;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 import java.util.UUID;
 
 @SpringBootApplication
+@EnableCaching
 //@Import({SaBeanRegister.class, SaBeanInject.class})
 @Slf4j
 public class SaplingApplication {

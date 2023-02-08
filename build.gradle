@@ -52,6 +52,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
    // implementation 'cn.dev33:sa-token-spring-aop:1.34.0'
+    implementation 'org.redisson:redisson-hibernate-6:3.19.3'
 
 
 }
