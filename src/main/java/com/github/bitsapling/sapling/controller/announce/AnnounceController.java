@@ -169,10 +169,6 @@ public class AnnounceController {
         }
         Torrent torrent = torrentService.getTorrent(infoHash);
         if (torrent == null) {
-            torrent = testAddTorrent(infoHash);
-            //throw new InvalidAnnounceException("Torrent not registered on this tracker");
-        }
-        if (torrent == null) {
             throw new InvalidAnnounceException("Torrent not registered on this tracker");
         }
         // User had permission to announce torrents
