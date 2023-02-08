@@ -1,10 +1,16 @@
 spring:
   jpa:
     properties:
+      redisson-config: classpath:conf/redisson.yaml
       hibernate:
         cache:
-          use_query_cache: true
+          region:
+            factory_class: org.redisson.hibernate.RedissonRegionFactory
           use_second_level_cache: true
+          use_query_cache: true
+          region_prefix: sapling
+          use_structured_entries: true
+          provider_configuration_file_resource_path: classpath:conf/hibernate-redis.properties
   cache:
     redis:
       cache-null-values: true

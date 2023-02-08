@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -48,8 +49,8 @@ public class PeerService {
     }
 
     public int cleanup() {
-        List<Peer> entities = repository.findAllByUpdateAtLessThan(
-                Instant.now().minus(90, ChronoUnit.MINUTES)
+        List<Peer> entities = repository.findAllByUpdateAtIsLessThan(
+                Timestamp.from(Instant.now().minus(90, ChronoUnit.MINUTES))
         );
         int count = entities.size();
         repository.deleteAll(entities);

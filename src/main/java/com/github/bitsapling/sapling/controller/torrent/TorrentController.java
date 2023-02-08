@@ -165,9 +165,8 @@ public class TorrentController {
         private String subTitle;
         private long size;
         private long finishes;
-        private String categorySlug;
+        private ResultCategoryBean category;
         private String promotionPolicy;
-        private String description;
 
         public TorrentSearchResult(@NotNull Torrent torrent){
             this.id = torrent.getId();
@@ -181,9 +180,20 @@ public class TorrentController {
             this.subTitle = torrent.getSubTitle();
             this.size = torrent.getSize();
             this.finishes = torrent.getFinishes();
-            this.categorySlug = torrent.getCategory().getSlug();
+            this.category = new ResultCategoryBean(torrent.getCategory());
             this.promotionPolicy = torrent.getPromotionPolicy().getDisplayName();
-            this.description = torrent.getDescription();
+        }
+        @AllArgsConstructor
+        @Data
+        public static class ResultCategoryBean{
+            private final long id;
+            private final String slug;
+            private final String name;
+            protected ResultCategoryBean(Category category){
+                this.id = category.getId();
+                this.slug = category.getSlug();
+                this.name = category.getName();
+            }
         }
         @AllArgsConstructor
         @Data
