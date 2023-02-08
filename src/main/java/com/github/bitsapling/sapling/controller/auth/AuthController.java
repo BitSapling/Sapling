@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,10 +43,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody LoginDto login) {
-        if (login.getUser() == null) {
+        if (StringUtils.isEmpty(login.getUser())) {
             throw new APIGenericException(MISSING_PARAMETERS, "User parameter is required");
         }
-        if (login.getPassword() == null) {
+        if (StringUtils.isEmpty(login.getPassword())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Password parameter is required");
         }
         User user = userService.getUserByUsername(login.getUser());
@@ -86,21 +87,21 @@ public class AuthController {
 
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody RegisterDto register) {
-        if(register.getEmail() == null){
+        if (StringUtils.isEmpty(register.getEmail())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Email parameter is required");
         }
-        if(register.getUsername() == null){
+        if (StringUtils.isEmpty(register.getUsername())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Username parameter is required");
         }
-        if(register.getPassword() == null){
+        if (StringUtils.isEmpty(register.getPassword())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Password parameter is required");
         }
         User user = userService.getUserByUsername(register.getUsername());
-        if(user != null){
+        if (user != null) {
             throw new APIGenericException(APIErrorCode.USERNAME_ALREADY_IN_USAGE);
         }
         user = userService.getUserByEmail(register.getEmail());
-        if(user != null){
+        if (user != null) {
             throw new APIGenericException(APIErrorCode.EMAIL_ALREADY_IN_USAGE);
         }
         user = userService.save(new User(
@@ -117,7 +118,7 @@ public class AuthController {
                 "zh-CN",
                 "100mbps",
                 "100mbps",
-                0L,0L,0L,0L,
+                0L, 0L, 0L, 0L,
                 "未知",
                 BigDecimal.ZERO,
                 0,
@@ -127,7 +128,7 @@ public class AuthController {
         return getUserBasicInformation(user);
     }
 
-    private Map<String, Object> getUserBasicInformation(User user){
+    private Map<String, Object> getUserBasicInformation(User user) {
         Map<String, Object> response = new LinkedHashMap<>();
         //loginResponse.put("status", "ok");
         response.put("token", StpUtil.getTokenInfo());
@@ -148,6 +149,7 @@ public class AuthController {
         private String user;
         private String password;
     }
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
