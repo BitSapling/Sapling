@@ -35,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -124,6 +125,17 @@ public class TorrentController {
     @SaCheckPermission("torrent:list")
     public List<TorrentSearchResult> list() throws IOException {
        return torrentService.getAllTorrents().stream().map(TorrentSearchResult::new).toList();
+    }
+
+    @GetMapping("/view/{info_hash}")
+    @SaCheckLogin
+    @SaCheckPermission("torrent:view")
+    public TorrentInfo view(@PathVariable("info_hash") String infoHash) throws IOException {
+        Torrent torrent =  torrentService.getTorrent(infoHash);
+        if(torrent == null){
+            throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
+        }
+        return new TorrentInfo(torrent);
     }
 
     @GetMapping("/download")
@@ -257,6 +269,46 @@ public class TorrentController {
 
         public long getId() {
             return id;
+        }
+    }
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    private static class TorrentInfo {
+        private long id;
+        private String infoHash;
+        private TorrentSearchResult.ResultUserBean user;
+        private String title;
+        private String subTitle;
+        private long size;
+        private long finishes;
+        private Timestamp createdAt;
+        private Timestamp updatedAt;
+        private boolean underReview;
+        private boolean anonymous;
+        private TorrentSearchResult.ResultCategoryBean category;
+        private PromotionPolicy promotionPolicy;
+        private String description;
+
+        public TorrentInfo(Torrent torrent){
+            this.id = torrent.getId();
+            this.infoHash = torrent.getInfoHash();
+            if(torrent.isAnonymous()){
+                this.user = new TorrentSearchResult.ResultUserBean(null);
+            }else{
+                this.user = new TorrentSearchResult.ResultUserBean(torrent.getUser());
+            }
+            this.title = torrent.getTitle();
+            this.subTitle = torrent.getSubTitle();
+            this.size = torrent.getSize();
+            this.finishes = torrent.getFinishes();
+            this.createdAt = torrent.getCreatedAt();
+            this.updatedAt = torrent.getUpdatedAt();
+            this.underReview = torrent.isUnderReview();
+            this.anonymous = torrent.isAnonymous();
+            this.category = new TorrentSearchResult.ResultCategoryBean(torrent.getCategory());
+            this.promotionPolicy = torrent.getPromotionPolicy();
+            this.description = torrent.getDescription();
         }
     }
 }
