@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.announce;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.github.bitsapling.sapling.config.TrackerConfig;
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
@@ -13,6 +14,7 @@ import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.service.PromotionService;
+import com.github.bitsapling.sapling.service.SettingService;
 import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
@@ -39,8 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -81,6 +80,8 @@ public class AnnounceController {
     private AnnouncePerformanceMonitorService performanceMonitorService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SettingService settingService;
 
 
     @GetMapping("/scrape")
@@ -103,6 +104,7 @@ public class AnnounceController {
         if (!StpUtil.hasPermission(user.getId(), "torrent:scrape")) {
             throw new InvalidAnnounceException("Permission Denied");
         }
+
         Map<String, Object> dict = new LinkedHashMap<>();
         Map<String, Integer> flags = new LinkedHashMap<>();
         flags.put("min_request_interval", randomInterval());
@@ -195,27 +197,6 @@ public class AnnounceController {
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(peers);
-    }
-
-    @Nullable
-    private Torrent testAddTorrent(@NotNull String infoHash) {
-        log.info("TEST ONLY: Creating torrent for info_hash: {}", infoHash);
-        Torrent torrent = new Torrent(
-                0,
-                infoHash,
-                userService.getUser(1),
-                "测试 torrent 标题" + UUID.randomUUID(),
-                "测试 torrent 副标题" + UUID.randomUUID(),
-                0, 0,
-                Timestamp.from(Instant.now()),
-                Timestamp.from(Instant.now()),
-                false,
-                false,
-                categoryService.getCategory(1),
-                promotionService.getDefaultPromotionPolicy(),
-                "测试描述" + UUID.randomUUID()
-        );
-        return torrentService.save(torrent);
     }
 
     @Nullable
@@ -356,7 +337,8 @@ public class AnnounceController {
     }
 
     private int randomInterval() {
-        return random.nextInt(MIN_INTERVAL, MAX_INTERVAL);
+        TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
+        return random.nextInt(trackerConfig.getTorrentIntervalMin(), trackerConfig.getTorrentIntervalMax());
     }
 
     @NotNull

@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.config;
+package com.github.bitsapling.sapling.autoconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -118,10 +118,11 @@ public class DebugController {
             permissions.add(new Permission(0, "torrent:list", false));
             permissions.add(new Permission(0, "torrent:view", false));
             permissions.add(new Permission(0, "torrent:download", false));
+            permissions.add(new Permission(0, "torrent:download_review", false));
             permissions.add(new Permission(0,"torrent:publish_anonymous", false));
-            permissions.add(new Permission(0,"torrent:torrent:bypass_review", false));
+            permissions.add(new Permission(0,"torrent:bypass_review", false));
             permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
-            PromotionPolicy promotionPolicy =promotionService.save( new PromotionPolicy(0, "系统默认", 1.0d, 1.0d));
+            PromotionPolicy promotionPolicy = promotionService.save( new PromotionPolicy(0, "系统默认", 1.0d, 1.0d));
             UserGroup userGroup = userGroupService.save(new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy));
             User user = userService.save(new User(0,
                     "test@test.com",

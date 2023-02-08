@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "settings",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"}),
-                @UniqueConstraint(columnNames = {"key"})
+                @UniqueConstraint(columnNames = {"setting_key"})
         }
 )
 
@@ -27,8 +27,8 @@ public class SettingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
-    @Column(name = "key", nullable = false)
+    @Column(name = "setting_key", nullable = false)
     private String key;
-    @Column(name = "value", nullable = false)
+    @Column(name = "setting_value", nullable = false)
     private String value;
 }

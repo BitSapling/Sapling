@@ -11,8 +11,11 @@ public abstract class ResponsePojo implements Serializable {
     private static final long serialVersionUID = 1L;
     private final long code;
 
-    protected ResponsePojo(long code) {
+    public ResponsePojo(long code) {
         this.code = code;
+    }
+    public ResponsePojo() {
+        this.code = 0;
     }
 
     public long getCode() {

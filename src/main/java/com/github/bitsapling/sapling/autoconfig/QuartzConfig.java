@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.config;
+package com.github.bitsapling.sapling.autoconfig;
 
 import com.github.bitsapling.sapling.crontask.PeersCleanup;
 import org.jetbrains.annotations.NotNull;

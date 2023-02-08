@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.config;
+package com.github.bitsapling.sapling.autoconfig;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import org.springframework.context.annotation.Configuration;

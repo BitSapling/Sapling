@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.config;
+package com.github.bitsapling.sapling.autoconfig;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
