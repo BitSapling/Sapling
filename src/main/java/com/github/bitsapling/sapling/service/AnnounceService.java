@@ -2,6 +2,7 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Torrent;
+import com.github.bitsapling.sapling.entity.TransferHistory;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
@@ -35,6 +36,8 @@ public class AnnounceService {
     private EntityManagerFactory entityManagerFactory;
     @Autowired
     private AnnouncePerformanceMonitorService monitorService;
+    @Autowired
+    private TransferHistoryService transferHistoryService;
 
     public AnnounceService() {
     }
@@ -119,6 +122,27 @@ public class AnnounceService {
         user.setDownloaded(user.getDownloaded() + promotionDownloadOffset);
         user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         user = userService.save(user);
+        TransferHistory transferHistory = transferHistoryService.getTransferHistory(user, torrent);
+        if(transferHistory != null){
+            long torrentLeft = transferHistory.getLeft();
+            if(torrentLeft != 0 && task.left() == 0){
+                torrent.setFinishes(torrent.getFinishes()+1);
+            }
+            transferHistory.setUpdatedAt(Timestamp.from(Instant.now()));
+            transferHistory.setLeft(task.left());
+        }else{
+            transferHistory = new TransferHistory(0, user, torrent, task.left(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()));
+            if(task.left() == 0){
+                torrent.setFinishes(torrent.getFinishes()+1);
+            }
+        }
+        transferHistoryService.save(transferHistory);
+        torrentService.save(torrent);
+
+
+
+
+
         log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {} for ip address {} and port {}",
                 user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset,
                 task.ip(), task.port());
@@ -127,6 +151,7 @@ public class AnnounceService {
                 peerService.delete(peer);
             }
         }
+
     }
 
 

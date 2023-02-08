@@ -53,8 +53,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1'
    // implementation 'cn.dev33:sa-token-spring-aop:1.34.0'
     implementation 'org.redisson:redisson-hibernate-6:3.19.3'
-
-
+//    implementation 'cn.dev33:sa-token-dao-redis-jackson:1.34.0'
+//    implementation 'org.apache.commons:commons-pool2'
 }
 
 tasks.named('test') {

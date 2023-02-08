@@ -15,6 +15,7 @@ import com.github.bitsapling.sapling.objects.ResponsePojo;
 import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.TorrentService;
+import com.github.bitsapling.sapling.service.TransferHistoryService;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import com.github.bitsapling.sapling.util.URLEncodeUtil;
@@ -67,6 +68,8 @@ public class TorrentController {
     private File torrentsDirectory;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private TransferHistoryService transferHistoryService;
 
     @PostMapping("/upload")
     @SaCheckLogin
