@@ -12,7 +12,9 @@ public enum APIErrorCode {
     TORRENT_ALREADY_EXISTS(6, HttpStatus.CONFLICT),
     TORRENT_NOT_EXISTS(7, HttpStatus.NOT_FOUND),
     TORRENT_FILE_MISSING(8, HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_CATEGORY(9, HttpStatus.NOT_FOUND);
+    INVALID_CATEGORY(9, HttpStatus.NOT_FOUND),
+    EMAIL_ALREADY_IN_USAGE(10, HttpStatus.CONFLICT),
+    USERNAME_ALREADY_IN_USAGE(11, HttpStatus.CONFLICT);
 
     private final int code;
     private final HttpStatusCode statusCode;
