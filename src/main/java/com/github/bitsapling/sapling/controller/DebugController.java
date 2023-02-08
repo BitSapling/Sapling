@@ -20,6 +20,7 @@ import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,6 +92,7 @@ public class DebugController {
         return resp;
     }
     @Getter
+    @ToString
     static class DebugTorrent{
         private final long id;
         private final String infoHash;
@@ -123,6 +125,7 @@ public class DebugController {
         }
     }
     @Getter
+    @ToString
     static class DebugPeer{
         private final long id;
         private final String ip;

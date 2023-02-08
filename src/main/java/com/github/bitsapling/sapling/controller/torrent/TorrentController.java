@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,10 +74,10 @@ public class TorrentController {
     private SettingService settingService;
     @Autowired
     private PolicyFactory sanitizeFactory;
+
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
     public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
-
         if (StringUtils.isEmpty(form.getTitle())) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
         }
@@ -92,19 +91,28 @@ public class TorrentController {
         User user = userService.getUser(StpUtil.getLoginIdAsLong());
         Category category = categoryService.getCategory(form.getCategory());
         PromotionPolicy promotionPolicy = promotionService.getDefaultPromotionPolicy();
+        SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
         if (category == null) {
             throw new APIGenericException(INVALID_CATEGORY, "Specified category not exists.");
         }
+        if (user == null) {
+            throw new IllegalStateException("User cannot be null at this time");
+        }
+        String publisher = user.getUsername();
+        String publisherUrl = siteBasicConfig.getSiteBaseURL() + "/user/" + user.getId();
         if (form.isAnonymous()) {
             StpUtil.checkPermission("torrent:publish_anonymous");
+            publisher = "Anonymous";
+            publisherUrl = siteBasicConfig.getSiteBaseURL();
         }
         try {
-            TorrentParser parser = new TorrentParser(form.getFile().getBytes());
+            byte[] torrentContent = TorrentParser.rewriteForTracker(form.getFile().getBytes(), siteBasicConfig.getSiteName(), publisher, publisherUrl);
+            TorrentParser parser = new TorrentParser(torrentContent);
             String infoHash = parser.getInfoHash();
             if (torrentService.getTorrent(infoHash) != null) {
                 throw new APIGenericException(TORRENT_ALREADY_EXISTS, "The torrent's info_hash has been exists on this tracker.");
             }
-            FileCopyUtils.copy(form.getFile().getInputStream(), Files.newOutputStream(new File(torrentsDirectory, infoHash + ".torrent").toPath()));
+            Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
             Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(), form.getSubtitle(), parser.getTorrentFilesSize(), 0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), StpUtil.hasPermission("torrent:bypass_review"), form.isAnonymous(), category, promotionPolicy, form.getDescription());
             torrent = torrentService.save(torrent);
             return ResponseEntity.ok().body(new TorrentUploadSuccess(torrent.getId(), parser.getInfoHash(), form.getFile()));
@@ -154,14 +162,7 @@ public class TorrentController {
         if (!torrentFile.exists()) {
             throw new APIGenericException(TORRENT_FILE_MISSING, "This torrent's file are missing on this tracker, please contact with system administrator.");
         }
-        String publisher = torrent.getUser().getUsername();
-        String publisherUrl = siteBasicConfig.getSiteBaseURL() + "/user/" + publisher;
-        if (torrent.isAnonymous()) {
-            publisher = null;
-            publisherUrl = null;
-        }
-        TorrentParser parser = new TorrentParser(torrentFile);
-        byte[] bytes = parser.rewrite(trackerConfig.getTrackerURL(), trackerConfig.getTorrentPrefix(), torrent.getUser().getPasskey(), publisher, publisherUrl);
+        byte[] bytes = TorrentParser.rewriteForUser(Files.readAllBytes(torrentFile.toPath()), trackerConfig.getTrackerURL(), torrent.getUser().getPasskey());
         String fileName = "[" + trackerConfig.getTorrentPrefix() + "] " + torrent.getTitle() + ".torrent";
         HttpHeaders header = new HttpHeaders();
         header.set(HttpHeaders.CONTENT_TYPE, "application/x-bittorrent");

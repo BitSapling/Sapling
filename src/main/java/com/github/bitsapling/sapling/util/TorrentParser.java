@@ -159,26 +159,27 @@ public class TorrentParser {
         return Hashing.sha1().hashBytes(BencodeUtil.bittorrent().encode((Map<?, ?>) infoHashDat.get("info"))).toString().toLowerCase(Locale.ROOT);
     }
 
-    public byte @NotNull [] rewrite(@NotNull List<String> trackers, @NotNull String siteName, @NotNull String passkey, @Nullable String publisher,
-                                    @Nullable String publisherUrl) {
-        Map<String, Object> editDict = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
+    public static byte @NotNull [] rewriteForTracker(byte[] data,  @NotNull String siteName,  @Nullable String publisher, @Nullable String publisherUrl) {
+        Map<String, Object> editDict = BencodeUtil.bittorrent().decode(data, Type.DICTIONARY);
         @SuppressWarnings("unchecked")
         Map<String, Object> info = (Map<String, Object>) editDict.get("info");
         info.put("private", 1);
-        info.put("created by", "BitSapling-TorrentParser/1.0; " + info.getOrDefault("created by", "N/A"));
-        info.put("source", "[" + siteName + "] " + info.getOrDefault("source", "N/A"));
         editDict.put("info", info);
+        if (publisher != null)
+            editDict.put("publisher", publisher);
+        if (publisherUrl != null)
+            editDict.put("publisher-url", publisherUrl);
+        editDict.remove("nodes");
+        return BencodeUtil.bittorrent().encode(editDict);
+    }
+    public static byte @NotNull [] rewriteForUser(byte[] data, @NotNull List<String> trackers ,@NotNull String passkey) {
+        Map<String, Object> editDict = BencodeUtil.bittorrent().decode(data, Type.DICTIONARY);
         for (int i = 0; i < trackers.size(); i++) {
             if (i == 0) {
                 editDict.put("announce", trackers.get(0) + "?passkey=" + passkey);
             }
             editDict.put("announce-list", trackers.get(i) + "?passkey=" + passkey);
         }
-        if (publisher != null)
-            editDict.put("publisher", publisher);
-        if (publisherUrl != null)
-            editDict.put("publisher-url", publisherUrl);
-        editDict.remove("nodes");
         return BencodeUtil.bittorrent().encode(editDict);
     }
 }

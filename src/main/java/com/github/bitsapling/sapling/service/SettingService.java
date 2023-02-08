@@ -22,7 +22,7 @@ public class SettingService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Nullable
+    @NotNull
     public <T> T get(@NotNull String configKey, @NotNull Class<T> clazz) throws BadConfigException {
         Optional<SettingEntity> configData = repository.findByKey(configKey);
         if (configData.isPresent()) {
@@ -31,7 +31,7 @@ public class SettingService {
                 return objectMapper.readValue(data, clazz);
             } catch (JsonProcessingException e) {
                 log.error("Unable to deserialize setting object: {} -> {}", configKey, data, e);
-                return null;
+                throw new RuntimeException(e);
             }
         } else {
             log.error("The configuration key {} doesn't exists in database!", configKey);
