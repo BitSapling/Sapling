@@ -25,6 +25,12 @@ public class PromotionService {
     }
 
     @Nullable
+    public PromotionPolicy getPromotionPolicy(@NotNull String name) {
+        Optional<PromotionPolicy> entity = repository.findPromotionPolicyBySlug(name);
+        return entity.orElse(null);
+    }
+
+    @Nullable
     public PromotionPolicy getDefaultPromotionPolicy() {
         return repository.findAll().iterator().next();
     }

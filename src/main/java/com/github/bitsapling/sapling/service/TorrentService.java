@@ -2,6 +2,8 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
 import com.github.bitsapling.sapling.entity.Category;
+import com.github.bitsapling.sapling.entity.PromotionPolicy;
+import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import jakarta.persistence.EntityManager;
@@ -25,6 +27,10 @@ public class TorrentService {
     private TorrentRepository torrentRepository;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private PromotionService promotionService;
+    @Autowired
+    private TagService tagService;
     @Autowired
     private EntityManager entityManager;
 
@@ -92,25 +98,25 @@ public class TorrentService {
 
     @NotNull
     public Page<Torrent> search(@NotNull String keyword, @NotNull List<String> categoriesRequired, @NotNull List<String> promotionRequired, @NotNull List<String> tagRequired, @NotNull Pageable pageable) {
-        List<Long> categoriesRequiredId = new ArrayList<>();
-        List<Long> promotionRequiredId = new ArrayList<>();
-        List<Long> tagRequiredId = new ArrayList<>();
+        List<Category> categoriesRequiredId = new ArrayList<>();
+        List<PromotionPolicy> promotionRequiredId = new ArrayList<>();
+        List<Tag> tagRequiredId = new ArrayList<>();
         for (String categorySlug : categoriesRequired) {
             Category category = categoryService.getCategory(categorySlug);
             if (category != null) {
-                categoriesRequiredId.add(category.getId());
+                categoriesRequiredId.add(category);
             }
         }
         for (String promotionSlug : promotionRequired) {
-            Category promotion = categoryService.getCategory(promotionSlug);
+            PromotionPolicy promotion = promotionService.getPromotionPolicy(promotionSlug);
             if (promotion != null) {
-                promotionRequiredId.add(promotion.getId());
+                promotionRequiredId.add(promotion);
             }
         }
         for (String tagSlug : tagRequired) {
-            Category tag = categoryService.getCategory(tagSlug);
+            Tag tag = tagService.getTag(tagSlug);
             if (tag != null) {
-                tagRequiredId.add(tag.getId());
+                tagRequiredId.add(tag);
             }
         }
         return torrentRepository.findAll((root, query, criteriaBuilder) -> {
