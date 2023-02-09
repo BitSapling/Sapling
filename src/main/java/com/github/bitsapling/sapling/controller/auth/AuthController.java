@@ -11,6 +11,7 @@ import com.github.bitsapling.sapling.controller.dto.response.UserResponseDTO;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
+import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.UserGroupService;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.IPUtil;
@@ -46,9 +47,12 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private UserGroupService userGroupService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping("/login")
     public UserSessionResponseDTO login(@RequestBody LoginRequestDTO login) {
+        String ip = IPUtil.getRequestIp(request);
         if (StringUtils.isEmpty(login.getUser())) {
             throw new APIGenericException(MISSING_PARAMETERS, "User parameter is required");
         }
@@ -58,13 +62,15 @@ public class AuthController {
         User user = userService.getUserByUsername(login.getUser());
         if (user == null) user = userService.getUserByEmail(login.getUser());
         if (user == null) {
-            log.warn("IP {} tried to login with not exists username {}", IPUtil.getRequestIp(request), login.getUser());
+            log.info("IP {} tried to login with not exists username {}.",ip, login.getUser());
+            authenticationService.markUserLoginFail(ip); // Mark fail because it not use authenticate
             throw new APIGenericException(AUTHENTICATION_FAILED);
         }
-        if (!PasswordHash.verify(login.getPassword(), user.getPasswordHash())) {
-            log.warn("IP {} tried to login with username {} and password {}", IPUtil.getRequestIp(request), login.getUser(), login.getPassword());
-            throw new APIGenericException(AUTHENTICATION_FAILED, "Username or Password incorrect");
+        if(!authenticationService.authenticate(user,login.getPassword(),ip)){
+            log.info("IP {} tried to login to user {} with bad password.",ip, login.getUser());
+            throw new APIGenericException(AUTHENTICATION_FAILED);
         }
+
         StpUtil.login(user.getId());
         return getUserBasicInformation(user);
     }

@@ -7,9 +7,11 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
+import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.SettingService;
 import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.util.IPUtil;
 import com.rometools.rome.feed.rss.Category;
 import com.rometools.rome.feed.rss.Channel;
 import com.rometools.rome.feed.rss.Description;
@@ -46,6 +48,8 @@ public class FeedController {
     private SettingService settingService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @GetMapping("/subscribe")
     public String feed(@RequestParam Map<String, String> params) throws FeedException {
@@ -53,7 +57,7 @@ public class FeedController {
         if (StringUtils.isEmpty(passkey)) {
             throw new APIGenericException(APIErrorCode.MISSING_PARAMETERS, "Passkey is required");
         }
-        User user = userService.getUserByPasskey(passkey);
+        User user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
         if (user == null) {
             throw new APIGenericException(APIErrorCode.USER_NOT_FOUND, "Unauthorized");
         }

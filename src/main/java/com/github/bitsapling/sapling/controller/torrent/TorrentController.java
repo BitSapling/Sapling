@@ -20,6 +20,7 @@ import com.github.bitsapling.sapling.exception.EmptyTorrentFileException;
 import com.github.bitsapling.sapling.exception.InvalidTorrentVersionException;
 import com.github.bitsapling.sapling.exception.TorrentException;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
+import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.SettingService;
@@ -27,6 +28,7 @@ import com.github.bitsapling.sapling.service.TagService;
 import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.service.TransferHistoryService;
 import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import com.github.bitsapling.sapling.util.URLEncodeUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -85,10 +87,12 @@ public class TorrentController {
     private PolicyFactory sanitizeFactory;
     @Autowired
     private TagService tagService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
-    public ResponseEntity<ResponsePojo> upload(@RequestBody TorrentUploadForm form) throws IOException {
+    public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
         if (StringUtils.isEmpty(form.getTitle())) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
         }
@@ -145,13 +149,6 @@ public class TorrentController {
         }
     }
 
-//    @GetMapping("/list")
-//    @SaCheckPermission("torrent:list")
-//    public List<TorrentSearchResultResponseDTO> list() throws IOException {
-//        boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:see_anonymous");
-//        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
-//    }
-
     @PostMapping("/search")
     @SaCheckPermission("torrent:search")
     public TorrentSearchResultResponseDTO search(@RequestBody SearchTorrentRequestDTO searchRequestDTO) {
@@ -174,7 +171,7 @@ public class TorrentController {
     public HttpEntity<?> download(@PathVariable("info_hash") String infoHash, @RequestParam @NotNull Map<String, String> params) throws IOException, TorrentException {
         User user;
         if (params.containsKey("passkey")) {
-            user = userService.getUserByPasskey(params.get("passkey"));
+            user = authenticationService.authenticate(params.get("passkey"), IPUtil.getRequestIp(request));
         } else {
             user = userService.getUser(StpUtil.getLoginIdAsLong());
         }

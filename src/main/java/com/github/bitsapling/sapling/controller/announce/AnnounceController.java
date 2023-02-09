@@ -10,6 +10,7 @@ import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.service.AnnouncePerformanceMonitorService;
 import com.github.bitsapling.sapling.service.AnnounceService;
+import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.BlacklistClientService;
 import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PeerService;
@@ -82,6 +83,8 @@ public class AnnounceController {
     private CategoryService categoryService;
     @Autowired
     private SettingService settingService;
+    @Autowired
+    private AuthenticationService authenticationService;
 
 
     @GetMapping("/scrape")
@@ -97,7 +100,7 @@ public class AnnounceController {
         }
         checkClient();
         checkScrapeFields(gets);
-        User user = userService.getUserByPasskey(passkey);
+        User user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
         if (user == null) {
             throw new InvalidAnnounceException("Unauthorized");
         }
@@ -163,7 +166,7 @@ public class AnnounceController {
         int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
         // User permission checks
         log.debug("Passkey: " + passkey);
-        User user = userService.getUserByPasskey(passkey);
+        User user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
         if (user == null) {
             throw new InvalidAnnounceException("Unauthorized");
         }
