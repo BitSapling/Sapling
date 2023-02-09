@@ -24,6 +24,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/debug")
 @Slf4j
 public class DebugController {
     @Autowired
@@ -154,7 +156,7 @@ public class DebugController {
         }
     }
 
-    @GetMapping("/debug/parseTorrents")
+    @GetMapping("/parseTorrents")
     public String parseTorrent() throws IOException, TorrentException {
         StringJoiner joiner = new StringJoiner("\n");
         TorrentParser parser = new TorrentParser(new File("1.torrent"));
@@ -165,7 +167,7 @@ public class DebugController {
         return joiner.toString();
     }
 
-    @GetMapping("/debug/initTables")
+    @GetMapping("/initTables")
     @Transactional
     public String initTables() {
         try {
