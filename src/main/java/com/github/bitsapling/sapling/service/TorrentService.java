@@ -66,13 +66,18 @@ public class TorrentService {
 
     @NotNull
     public Page<Torrent> search(@NotNull SearchTorrentRequestDTO searchRequestDTO) {
-        return search(searchRequestDTO.getKeyword(), searchRequestDTO.getCategory(), searchRequestDTO.getPromotion(), Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage()));
+        return search(searchRequestDTO.getKeyword(),
+                searchRequestDTO.getCategory(),
+                searchRequestDTO.getPromotion(),
+                searchRequestDTO.getTag(),
+                Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage()));
     }
 
     @NotNull
-    public Page<Torrent> search(@NotNull String keyword, @NotNull List<String> categoriesRequired, @NotNull List<String> promotionRequired, @NotNull Pageable pageable) {
+    public Page<Torrent> search(@NotNull String keyword, @NotNull List<String> categoriesRequired, @NotNull List<String> promotionRequired, @NotNull List<String> tagRequired, @NotNull Pageable pageable) {
         List<Long> categoriesRequiredId = new ArrayList<>();
         List<Long> promotionRequiredId = new ArrayList<>();
+        List<Long> tagRequiredId = new ArrayList<>();
         for (String categorySlug : categoriesRequired) {
             Category category = categoryService.getCategory(categorySlug);
             if (category != null) {
@@ -83,6 +88,12 @@ public class TorrentService {
             Category promotion = categoryService.getCategory(promotionSlug);
             if (promotion != null) {
                 promotionRequiredId.add(promotion.getId());
+            }
+        }
+        for (String tagSlug : tagRequired) {
+            Category tag = categoryService.getCategory(tagSlug);
+            if (tag != null) {
+                tagRequiredId.add(tag.getId());
             }
         }
         return torrentRepository.findAll((root, query, criteriaBuilder) -> {
@@ -98,6 +109,9 @@ public class TorrentService {
             }
             if (!promotionRequired.isEmpty()) {
                 predicates.add(root.get("promotion").in(promotionRequiredId));
+            }
+            if (!tagRequired.isEmpty()) {
+                predicates.add(root.get("tag").in(tagRequiredId));
             }
             query.orderBy(criteriaBuilder.desc(root.get("id")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

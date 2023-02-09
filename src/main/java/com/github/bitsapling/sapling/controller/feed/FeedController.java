@@ -46,17 +46,18 @@ public class FeedController {
     private SettingService settingService;
     @Autowired
     private HttpServletRequest request;
+
     @GetMapping("/subscribe")
     public String feed(@RequestParam Map<String, String> params) throws FeedException {
         String passkey = params.get("passkey");
-        if(StringUtils.isEmpty(passkey)){
-           throw new APIGenericException(APIErrorCode.MISSING_PARAMETERS,"Passkey is required");
+        if (StringUtils.isEmpty(passkey)) {
+            throw new APIGenericException(APIErrorCode.MISSING_PARAMETERS, "Passkey is required");
         }
         User user = userService.getUserByPasskey(passkey);
-        if(user == null){
+        if (user == null) {
             throw new APIGenericException(APIErrorCode.USER_NOT_FOUND, "Unauthorized");
         }
-        if(!StpUtil.hasPermission(user.getId(), "feed:subscribe")){
+        if (!StpUtil.hasPermission(user.getId(), "feed:subscribe")) {
             throw new NotPermissionException("feed:subscribe");
         }
         int entries = Math.min(Integer.parseInt(params.getOrDefault("entries", "50")), 300);
@@ -64,9 +65,12 @@ public class FeedController {
         String[] categorySlugs = categorySlug != null ? categorySlug.split(",") : new String[0];
         String promotionSlug = params.get("promotion");
         String[] promotionSlugs = promotionSlug != null ? promotionSlug.split(",") : new String[0];
+        String tag = params.get("tag");
+        String[] tags = tag != null ? tag.split(",") : new String[0];
         List<Torrent> torrentList = torrentService
                 .search("", Arrays.stream(categorySlugs).toList()
-                        ,Arrays.stream(promotionSlugs).toList(), Pageable.ofSize(entries))
+                        , Arrays.stream(promotionSlugs).toList(),
+                        Arrays.stream(tags).toList(), Pageable.ofSize(entries))
                 .getContent();
         return makeFeed(passkey, torrentList, false);
     }
@@ -74,7 +78,7 @@ public class FeedController {
     private String makeFeed(String passkey, List<Torrent> torrentList, boolean canSeeAnonymous) throws FeedException {
         SiteBasicConfig basicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
         Channel channel = new Channel("rss_2.0");
-        channel.setTitle(basicConfig.getSiteName() +" - "+basicConfig.getSiteSubName());
+        channel.setTitle(basicConfig.getSiteName() + " - " + basicConfig.getSiteSubName());
         channel.setGenerator("Sapling RSS Generator - v1.0");
         channel.setEncoding("UTF-8");
         channel.setPubDate(new Date());
@@ -103,7 +107,7 @@ public class FeedController {
                 Description description = new Description();
                 item.setDescription(description);
                 items.add(item);
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error("Error when generating RSS item for torrent: {}", torrent, e);
             }
         }

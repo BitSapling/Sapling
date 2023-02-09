@@ -11,6 +11,7 @@ public class SearchTorrentRequestDTO extends ResponsePojo {
     private String keyword;
     private List<String> promotion;
     private List<String> category;
+    private List<String> tag;
     private boolean includeDeadTorrent;
     private int page;
     private int entriesPerPage;

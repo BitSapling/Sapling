@@ -1,11 +1,14 @@
 package com.github.bitsapling.sapling.controller.dto.response;
 
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
+import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Getter;
 
 import java.sql.Timestamp;
+import java.util.List;
+
 @Getter
 public class TorrentBasicResponseDTO extends ResponsePojo {
     private final long id;
@@ -20,6 +23,7 @@ public class TorrentBasicResponseDTO extends ResponsePojo {
     private final boolean anonymous;
     private final CategoryResponseDTO category;
     private final PromotionPolicy promotionPolicy;
+    private final List<String> tag;
 
     public TorrentBasicResponseDTO(Torrent torrent){
         super(0);
@@ -39,5 +43,6 @@ public class TorrentBasicResponseDTO extends ResponsePojo {
         this.anonymous = torrent.isAnonymous();
         this.category = new CategoryResponseDTO(torrent.getCategory());
         this.promotionPolicy = torrent.getPromotionPolicy();
+        this.tag = torrent.getTag().stream().map(Tag::getName).toList();
     }
 }

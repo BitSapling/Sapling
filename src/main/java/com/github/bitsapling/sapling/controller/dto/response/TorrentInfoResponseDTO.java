@@ -1,12 +1,15 @@
 package com.github.bitsapling.sapling.controller.dto.response;
 
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
+import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.sql.Timestamp;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TorrentInfoResponseDTO extends ResponsePojo {
@@ -24,6 +27,7 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
     private CategoryResponseDTO category;
     private PromotionPolicy promotionPolicy;
     private String description;
+    private List<String> tag;
 
     public TorrentInfoResponseDTO(Torrent torrent){
         super(0);
@@ -45,5 +49,6 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
         this.category = new CategoryResponseDTO(torrent.getCategory());
         this.promotionPolicy = torrent.getPromotionPolicy();
         this.description = torrent.getDescription();
+        this.tag = torrent.getTag().stream().map(Tag::getName).toList();
     }
 }

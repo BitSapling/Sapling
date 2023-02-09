@@ -15,7 +15,7 @@ public class TorrentUploadForm {
     private String subtitle;
     private String description;
     private String category;
-    private List<String> tags;
+    private List<String> tag;
     private boolean anonymous;
     private MultipartFile file;
 }

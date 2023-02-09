@@ -1,12 +1,14 @@
 package com.github.bitsapling.sapling.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -17,6 +19,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "torrents",
@@ -67,7 +70,11 @@ public class Torrent {
     private PromotionPolicy promotionPolicy;
     @Column(name = "description", nullable = false, columnDefinition = "mediumtext")
     private String description;
-
+    @Cascade({CascadeType.ALL})
+    @OneToMany
+    @PrimaryKeyJoinColumn
+    @JsonManagedReference
+    private List<Tag> tag;
 
     public String getUsernameWithAnonymous(boolean canSeeAnonymous) {
         return canSeeAnonymous || !anonymous ? user.getUsername() : "Anonymous";

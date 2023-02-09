@@ -12,6 +12,7 @@ import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentUplo
 import com.github.bitsapling.sapling.controller.torrent.form.TorrentUploadForm;
 import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
+import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIGenericException;
@@ -22,6 +23,7 @@ import com.github.bitsapling.sapling.objects.ResponsePojo;
 import com.github.bitsapling.sapling.service.CategoryService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.SettingService;
+import com.github.bitsapling.sapling.service.TagService;
 import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.service.TransferHistoryService;
 import com.github.bitsapling.sapling.service.UserService;
@@ -50,7 +52,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -77,6 +83,8 @@ public class TorrentController {
     private SettingService settingService;
     @Autowired
     private PolicyFactory sanitizeFactory;
+    @Autowired
+    private TagService tagService;
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
@@ -115,8 +123,17 @@ public class TorrentController {
             if (torrentService.getTorrent(infoHash) != null) {
                 throw new APIGenericException(TORRENT_ALREADY_EXISTS, "The torrent's info_hash has been exists on this tracker.");
             }
+            List<Tag> tags = new ArrayList<>();
+            for (String tag : form.getTag()) {
+                Tag t = tagService.getTag(tag);
+                tags.add(Objects.requireNonNullElseGet(t, () -> tagService.save(new Tag(0, tag))));
+            }
             Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
-            Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(), form.getSubtitle(), parser.getTorrentFilesSize(), 0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), StpUtil.hasPermission("torrent:bypass_review"), form.isAnonymous(), category, promotionPolicy, form.getDescription());
+            Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(),
+                    form.getSubtitle(), parser.getTorrentFilesSize(), 0L,
+                    Timestamp.from(Instant.now()), Timestamp.from(Instant.now()),
+                    StpUtil.hasPermission("torrent:bypass_review"), form.isAnonymous(), category,
+                    promotionPolicy, form.getDescription(), tags);
             torrent = torrentService.save(torrent);
             return ResponseEntity.ok().body(new TorrentUploadSuccessResponseDTO(torrent.getId(), parser.getInfoHash(), form.getFile()));
         } catch (EmptyTorrentFileException e) {
@@ -138,10 +155,8 @@ public class TorrentController {
     @GetMapping("/search")
     @SaCheckPermission("torrent:search")
     public TorrentSearchResultResponseDTO search(SearchTorrentRequestDTO searchRequestDTO) {
-//        if (StringUtils.isEmpty(searchRequestDTO.getKeyword())) {
-//            throw new APIGenericException(MISSING_PARAMETERS, "You must provide a keyword.");
-//        }
         searchRequestDTO.setEntriesPerPage(Math.min(searchRequestDTO.getEntriesPerPage(), 300));
+        searchRequestDTO.setTag(searchRequestDTO.getTag().stream().map(s -> s.toLowerCase(Locale.ROOT)).toList());
         Page<Torrent> torrents = torrentService.search(searchRequestDTO);
         return new TorrentSearchResultResponseDTO(torrents.getTotalElements(), torrents.getTotalPages(), torrents.getContent());
     }
@@ -167,7 +182,7 @@ public class TorrentController {
         if (user == null) {
             throw new APIGenericException(AUTHENTICATION_FAILED, "Neither passkey or session provided.");
         }
-        if(!StpUtil.hasPermission(user.getId(),"torrent:download")){
+        if (!StpUtil.hasPermission(user.getId(), "torrent:download")) {
             throw new NotPermissionException("torrent:download");
         }
         TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
@@ -179,7 +194,7 @@ public class TorrentController {
             throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
         }
         if (torrent.isUnderReview()) {
-            if(!StpUtil.hasPermission(user.getId(), "torrent:download_review")){
+            if (!StpUtil.hasPermission(user.getId(), "torrent:download_review")) {
                 throw new NotPermissionException("torrent:download_review");
             }
         }
