@@ -64,6 +64,7 @@ public class AuthController {
         if (user == null) {
             log.info("IP {} tried to login with not exists username {}.",ip, login.getUser());
             authenticationService.markUserLoginFail(ip); // Mark fail because it not use authenticate
+            authenticationService.checkAccountLoginAttempts(ip);
             throw new APIGenericException(AUTHENTICATION_FAILED);
         }
         if(!authenticationService.authenticate(user,login.getPassword(),ip)){

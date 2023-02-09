@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test.caching,db-tencentcloud
+    active: test,caching,db-tencentcloud
   jpa:
     properties:
       hibernate:
@@ -52,3 +52,7 @@ sa-token:
   is-concurrent: true
   is-share: false
   token-style: random-128
+
+sapling:
+  security:
+    maxAuthenticationAttempt: 10

@@ -5,6 +5,7 @@ import com.github.bitsapling.sapling.config.TrackerConfig;
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.exception.APIGenericException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.exception.InvalidAnnounceException;
 import com.github.bitsapling.sapling.exception.RetryableAnnounceException;
@@ -100,14 +101,10 @@ public class AnnounceController {
         }
         checkClient();
         checkScrapeFields(gets);
-        User user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
-        if (user == null) {
-            throw new InvalidAnnounceException("Unauthorized");
-        }
+        User user = safeParseUser(passkey);
         if (!StpUtil.hasPermission(user.getId(), "torrent:scrape")) {
             throw new InvalidAnnounceException("Permission Denied");
         }
-
         Map<String, Object> dict = new LinkedHashMap<>();
         Map<String, Integer> flags = new LinkedHashMap<>();
         flags.put("min_request_interval", randomInterval());
@@ -132,6 +129,19 @@ public class AnnounceController {
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(resp);
+    }
+    @NotNull
+    private User safeParseUser(@NotNull String passkey) throws InvalidAnnounceException {
+        User user;
+        try {
+            user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
+            if (user == null) {
+                throw new InvalidAnnounceException("Unauthorized");
+            }
+        }catch (APIGenericException e){
+            throw new InvalidAnnounceException("APIError: "+e.getErrorText()+" -> "+e.getMessage());
+        }
+        return user;
     }
 
 
@@ -166,10 +176,7 @@ public class AnnounceController {
         int redundant = Integer.parseInt(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("redundant"), gets.get("redundant_peers"), gets.get("redundant peers"), gets.get("redundant_peers"))).orElse("0"));
         // User permission checks
         log.debug("Passkey: " + passkey);
-        User user = authenticationService.authenticate(passkey, IPUtil.getRequestIp(request));
-        if (user == null) {
-            throw new InvalidAnnounceException("Unauthorized");
-        }
+        User user = safeParseUser(passkey);
         if (!StpUtil.hasPermission(user.getId(), "torrent:announce")) {
             throw new InvalidAnnounceException("Permission Denied");
         }
