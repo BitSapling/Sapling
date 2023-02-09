@@ -2,6 +2,7 @@ package com.github.bitsapling.sapling.util;
 
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
+import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.EmptyTorrentFileException;
 import com.github.bitsapling.sapling.exception.InvalidTorrentFileException;
 import com.github.bitsapling.sapling.exception.InvalidTorrentVerifyException;
@@ -178,7 +179,7 @@ public class TorrentParser {
         editDict.remove("nodes");
         return BencodeUtil.bittorrent().encode(editDict);
     }
-    public static byte @NotNull [] rewriteForUser(byte[] data, @NotNull List<String> trackers ,@NotNull String passkey) {
+    public static byte @NotNull [] rewriteForUser(byte[] data, @NotNull List<String> trackers ,@NotNull String passkey, @NotNull User user) {
         Map<String, Object> editDict = BencodeUtil.bittorrent().decode(data, Type.DICTIONARY);
         for (int i = 0; i < trackers.size(); i++) {
             if (i == 0) {
@@ -186,6 +187,8 @@ public class TorrentParser {
             }
             editDict.put("announce-list", trackers.get(i) + "?passkey=" + passkey);
         }
+        editDict.put("torrent-downloader", user.getUsername());
+        editDict.put("torrent-downloader-id", user.getId());
         return BencodeUtil.bittorrent().encode(editDict);
     }
 }

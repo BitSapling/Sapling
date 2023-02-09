@@ -52,6 +52,7 @@ dependencies {
     implementation 'org.redisson:redisson-hibernate-6:3.19.3'
     implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1'
     implementation 'org.apache.commons:commons-pool2'
+    implementation 'com.rometools:rome:1.18.0'
 }
 
 tasks.named('test') {

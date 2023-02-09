@@ -40,7 +40,7 @@ public class TorrentService {
         return entity.orElse(null);
     }
 
-    public List<Torrent> getAllTorrents(){
+    public List<Torrent> getAllTorrents() {
         return new ArrayList<>(torrentRepository.findAll());
     }
 
@@ -65,26 +65,39 @@ public class TorrentService {
     }
 
     @NotNull
-    public Page<Torrent> search(@NotNull SearchTorrentRequestDTO searchRequestDTO){
-        Pageable pageable = Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage());
-        List<String> categoriesRequired = searchRequestDTO.getCategory();
+    public Page<Torrent> search(@NotNull SearchTorrentRequestDTO searchRequestDTO) {
+        return search(searchRequestDTO.getKeyword(), searchRequestDTO.getCategory(), searchRequestDTO.getPromotion(), Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage()));
+    }
+
+    @NotNull
+    public Page<Torrent> search(@NotNull String keyword, @NotNull List<String> categoriesRequired, @NotNull List<String> promotionRequired, @NotNull Pageable pageable) {
         List<Long> categoriesRequiredId = new ArrayList<>();
-        for(String categorySlug : categoriesRequired){
+        List<Long> promotionRequiredId = new ArrayList<>();
+        for (String categorySlug : categoriesRequired) {
             Category category = categoryService.getCategory(categorySlug);
-            if(category != null){
+            if (category != null) {
                 categoriesRequiredId.add(category.getId());
+            }
+        }
+        for (String promotionSlug : promotionRequired) {
+            Category promotion = categoryService.getCategory(promotionSlug);
+            if (promotion != null) {
+                promotionRequiredId.add(promotion.getId());
             }
         }
         return torrentRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if(!searchRequestDTO.getKeyword().isEmpty()){
+            if (!keyword.isEmpty()) {
                 predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("title"), "%" + searchRequestDTO.getKeyword() + "%"),
-                        criteriaBuilder.like(root.get("subTitle"), "%" + searchRequestDTO.getKeyword() + "%")
+                        criteriaBuilder.like(root.get("title"), "%" + keyword + "%"),
+                        criteriaBuilder.like(root.get("subTitle"), "%" + keyword + "%")
                 ));
             }
-            if(!categoriesRequiredId.isEmpty()){
+            if (!categoriesRequiredId.isEmpty()) {
                 predicates.add(root.get("category").in(categoriesRequiredId));
+            }
+            if (!promotionRequired.isEmpty()) {
+                predicates.add(root.get("promotion").in(promotionRequiredId));
             }
             query.orderBy(criteriaBuilder.desc(root.get("id")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

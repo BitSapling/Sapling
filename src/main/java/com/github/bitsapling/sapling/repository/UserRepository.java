@@ -15,7 +15,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findByEmail(@NotNull String email);
 
-    Optional<User> findByPasskey(@NotNull String passkey);
+    Optional<User> findByPasskeyIgnoreCase(@NotNull String passkey);
 
     Optional<User> findByPersonalAccessTokenIgnoreCase(@NotNull String personalAccessToken);
 

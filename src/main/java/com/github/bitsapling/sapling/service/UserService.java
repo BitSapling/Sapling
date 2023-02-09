@@ -37,7 +37,7 @@ public class UserService {
 
     @Nullable
     public User getUserByPasskey(String passkey) {
-        Optional<User> userEntity = repository.findByPasskey(passkey);
+        Optional<User> userEntity = repository.findByPasskeyIgnoreCase(passkey);
         return userEntity.orElse(null);
     }
     @Nullable

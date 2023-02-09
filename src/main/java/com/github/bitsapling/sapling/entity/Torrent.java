@@ -69,4 +69,7 @@ public class Torrent {
     private String description;
 
 
+    public String getUsernameWithAnonymous(boolean canSeeAnonymous) {
+        return canSeeAnonymous || !anonymous ? user.getUsername() : "Anonymous";
+    }
 }

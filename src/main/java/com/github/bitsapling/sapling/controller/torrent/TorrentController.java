@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.controller.torrent;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.config.SiteBasicConfig;
 import com.github.bitsapling.sapling.config.TrackerConfig;
@@ -29,6 +30,7 @@ import com.github.bitsapling.sapling.util.URLEncodeUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -47,6 +50,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Map;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -153,9 +157,19 @@ public class TorrentController {
     }
 
     @GetMapping("/download/{info_hash}")
-    @SaCheckPermission("torrent:download")
-    public HttpEntity<?> download(@PathVariable("info_hash") String infoHash) throws IOException, TorrentException {
-        // SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
+    public HttpEntity<?> download(@PathVariable("info_hash") String infoHash, @RequestParam @NotNull Map<String, String> params) throws IOException, TorrentException {
+        User user;
+        if (params.containsKey("passkey")) {
+            user = userService.getUserByPasskey(params.get("passkey"));
+        } else {
+            user = userService.getUser(StpUtil.getLoginIdAsLong());
+        }
+        if (user == null) {
+            throw new APIGenericException(AUTHENTICATION_FAILED, "Neither passkey or session provided.");
+        }
+        if(!StpUtil.hasPermission(user.getId(),"torrent:download")){
+            throw new NotPermissionException("torrent:download");
+        }
         TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
         if (StringUtils.isEmpty(infoHash)) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a info_hash.");
@@ -165,13 +179,15 @@ public class TorrentController {
             throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
         }
         if (torrent.isUnderReview()) {
-            StpUtil.checkPermission("torrent:download_review");
+            if(!StpUtil.hasPermission(user.getId(), "torrent:download_review")){
+                throw new NotPermissionException("torrent:download_review");
+            }
         }
         File torrentFile = new File(torrentsDirectory, infoHash + ".torrent");
         if (!torrentFile.exists()) {
             throw new APIGenericException(TORRENT_FILE_MISSING, "This torrent's file are missing on this tracker, please contact with system administrator.");
         }
-        byte[] bytes = TorrentParser.rewriteForUser(Files.readAllBytes(torrentFile.toPath()), trackerConfig.getTrackerURL(), torrent.getUser().getPasskey());
+        byte[] bytes = TorrentParser.rewriteForUser(Files.readAllBytes(torrentFile.toPath()), trackerConfig.getTrackerURL(), torrent.getUser().getPasskey(), user);
         String fileName = "[" + trackerConfig.getTorrentPrefix() + "] " + torrent.getTitle() + ".torrent";
         HttpHeaders header = new HttpHeaders();
         header.set(HttpHeaders.CONTENT_TYPE, "application/x-bittorrent");
