@@ -116,17 +116,17 @@ public class TorrentController {
             publisher = "Anonymous";
             publisherUrl = siteBasicConfig.getSiteBaseURL();
         }
+        List<Tag> tags = new ArrayList<>();
+        for (String tag : form.getTag()) {
+            Tag t = tagService.getTag(tag);
+            tags.add(Objects.requireNonNullElseGet(t, () -> tagService.save(new Tag(0, tag))));
+        }
         try {
             byte[] torrentContent = TorrentParser.rewriteForTracker(form.getFile().getBytes(), siteBasicConfig.getSiteName(), publisher, publisherUrl);
             TorrentParser parser = new TorrentParser(torrentContent);
             String infoHash = parser.getInfoHash();
             if (torrentService.getTorrent(infoHash) != null) {
                 throw new APIGenericException(TORRENT_ALREADY_EXISTS, "The torrent's info_hash has been exists on this tracker.");
-            }
-            List<Tag> tags = new ArrayList<>();
-            for (String tag : form.getTag()) {
-                Tag t = tagService.getTag(tag);
-                tags.add(Objects.requireNonNullElseGet(t, () -> tagService.save(new Tag(0, tag))));
             }
             Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
             Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(),
