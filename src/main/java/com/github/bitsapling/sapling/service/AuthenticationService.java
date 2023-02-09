@@ -70,7 +70,8 @@ public class AuthenticationService {
 
     public void cleanUserLoginFail(@Nullable String ip) {
         if(ip == null) return;
-        repository.deleteByIp(ip);
+        Optional<RedisLoginAttempt> optional = repository.findByIp(ip);
+        optional.ifPresent(redisLoginAttempt -> repository.delete(redisLoginAttempt));
     }
 
     public long markUserLoginFail(@Nullable String ip) {
