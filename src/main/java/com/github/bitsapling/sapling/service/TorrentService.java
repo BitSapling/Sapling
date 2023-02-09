@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,16 +36,14 @@ public class TorrentService {
     }
 
     public List<Torrent> getAllTorrents(){
-        List<Torrent> torrents = new ArrayList<>();
-        torrentRepository.findAll().forEach(torrents::add);
-        return torrents;
+        return new ArrayList<>(torrentRepository.findAll());
     }
 
     @Nullable
     public List<Torrent> getTorrentWithCategory(@Nullable String categorySlug) {
         List<Torrent> torrents = new ArrayList<>();
         if (categorySlug == null) {
-            torrentRepository.findAll().forEach(torrents::add);
+            torrents.addAll(torrentRepository.findAll());
         } else {
             Category category = categoryService.getCategory(categorySlug);
             if (category != null) {
@@ -57,6 +57,11 @@ public class TorrentService {
     public Torrent save(@NotNull Torrent torrent) {
         torrent.setInfoHash(torrent.getInfoHash());
         return torrentRepository.save(torrent);
+    }
+
+    @NotNull
+    public Page<Torrent> searchByKeyword(@NotNull String keyword, @NotNull Pageable pageable){
+        return torrentRepository.searchByTitleLikeIgnoreCase(keyword, pageable);
     }
 
 }

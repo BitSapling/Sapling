@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.bean;
+package com.github.bitsapling.sapling.controller.dto.response;
 
 import com.github.bitsapling.sapling.entity.User;
 import lombok.Data;
@@ -7,11 +7,11 @@ import org.jetbrains.annotations.NotNull;
 import java.math.BigDecimal;
 
 @Data
-public class UserBean {
+public class UserResponseDTO {
     private long id;
     private String email;
     private String username;
-    private UserGroupBean group;
+    private UserGroupResponseDTO group;
     private long createdAt;
     private String avatar;
     private String customTitle;
@@ -28,11 +28,11 @@ public class UserBean {
     private int inviteSlot;
     private long seedingTime;
 
-    public UserBean(@NotNull User user) {
+    public UserResponseDTO(@NotNull User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.username = user.getUsername();
-        this.group = new UserGroupBean(user.getGroup());
+        this.group = new UserGroupResponseDTO(user.getGroup());
         this.createdAt = user.getCreatedAt().getTime();
         this.avatar = user.getAvatar();
         this.customTitle = user.getCustomTitle();

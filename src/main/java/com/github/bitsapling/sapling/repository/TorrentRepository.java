@@ -4,14 +4,17 @@ import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TorrentRepository extends CrudRepository<Torrent, Long> {
+public interface TorrentRepository extends JpaRepository<Torrent, Long>, JpaSpecificationExecutor<Torrent>{
     Optional<Torrent> findByInfoHashIgnoreCase(@NotNull String infoHash);
 
     @NotNull
@@ -31,4 +34,6 @@ public interface TorrentRepository extends CrudRepository<Torrent, Long> {
 
     @NotNull
     List<Torrent> findAllByCategory(@NotNull Category category);
+
+    Page<Torrent> searchByTitleLikeIgnoreCase(@NotNull String keyword, @NotNull Pageable pageable);
 }

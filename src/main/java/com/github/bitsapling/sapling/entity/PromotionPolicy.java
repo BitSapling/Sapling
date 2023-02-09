@@ -27,6 +27,9 @@ public class PromotionPolicy {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 
+    @Column(name = "slug", nullable = false)
+    private String slug;
+
     @Column(name = "display_name", nullable = false)
     private String displayName;
 

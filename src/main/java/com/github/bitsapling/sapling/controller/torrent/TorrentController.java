@@ -4,10 +4,10 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.config.SiteBasicConfig;
 import com.github.bitsapling.sapling.config.TrackerConfig;
+import com.github.bitsapling.sapling.controller.dto.response.TorrentInfoResponseDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentSearchResultResponseDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentUploadSuccessResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.form.TorrentUploadForm;
-import com.github.bitsapling.sapling.controller.torrent.response.TorrentInfo;
-import com.github.bitsapling.sapling.controller.torrent.response.TorrentSearchResult;
-import com.github.bitsapling.sapling.controller.torrent.response.TorrentUploadSuccess;
 import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.entity.Torrent;
@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -47,7 +46,6 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -115,7 +113,7 @@ public class TorrentController {
             Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
             Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(), form.getSubtitle(), parser.getTorrentFilesSize(), 0L, Timestamp.from(Instant.now()), Timestamp.from(Instant.now()), StpUtil.hasPermission("torrent:bypass_review"), form.isAnonymous(), category, promotionPolicy, form.getDescription());
             torrent = torrentService.save(torrent);
-            return ResponseEntity.ok().body(new TorrentUploadSuccess(torrent.getId(), parser.getInfoHash(), form.getFile()));
+            return ResponseEntity.ok().body(new TorrentUploadSuccessResponseDTO(torrent.getId(), parser.getInfoHash(), form.getFile()));
         } catch (EmptyTorrentFileException e) {
             throw new APIGenericException(INVALID_TORRENT_FILE, "This torrent is empty.");
         } catch (InvalidTorrentVersionException e) {
@@ -127,27 +125,33 @@ public class TorrentController {
 
     @GetMapping("/list")
     @SaCheckPermission("torrent:list")
-    public List<TorrentSearchResult> list() throws IOException {
+    public List<TorrentSearchResultResponseDTO> list() throws IOException {
         boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:see_anonymous");
-        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResult(t, permissionToSeeAnonymous)).toList();
+        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
+    }
+
+    @GetMapping("/search")
+    @SaCheckPermission("torrent:search")
+    public List<TorrentSearchResultResponseDTO> search() throws IOException {
+        boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:search");
+        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
     }
 
     @GetMapping("/view/{info_hash}")
     @SaCheckPermission("torrent:view")
-    public TorrentInfo view(@PathVariable("info_hash") String infoHash) {
+    public TorrentInfoResponseDTO view(@PathVariable("info_hash") String infoHash) {
         Torrent torrent = torrentService.getTorrent(infoHash);
         if (torrent == null) {
             throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
         }
-        return new TorrentInfo(torrent);
+        return new TorrentInfoResponseDTO(torrent);
     }
 
-    @GetMapping("/download")
+    @GetMapping("/download/{info_hash}")
     @SaCheckPermission("torrent:download")
-    public HttpEntity<?> download(@RequestParam Map<String, String> gets) throws IOException, TorrentException {
+    public HttpEntity<?> download(@PathVariable("info_hash") String infoHash) throws IOException, TorrentException {
        // SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
         TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
-        String infoHash = gets.get("info_hash");
         if (StringUtils.isEmpty(infoHash)) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a info_hash.");
         }

@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +27,13 @@ public class PromotionService {
     @Nullable
     public PromotionPolicy getDefaultPromotionPolicy() {
         return repository.findAll().iterator().next();
+    }
+
+    @NotNull
+    public List<PromotionPolicy> getAllPromotionPolicies() {
+        List<PromotionPolicy> policies = new ArrayList<>();
+        repository.findAll().forEach(policies::add);
+        return policies;
     }
 
     @NotNull

@@ -1,9 +1,13 @@
 package com.github.bitsapling.sapling.controller.auth;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
-import com.github.bitsapling.sapling.controller.bean.LoginStatusBean;
-import com.github.bitsapling.sapling.controller.bean.UserBean;
+import com.github.bitsapling.sapling.controller.auth.dto.request.LoginRequestDTO;
+import com.github.bitsapling.sapling.controller.auth.dto.request.RegisterRequestDTO;
+import com.github.bitsapling.sapling.controller.dto.response.LoginStatusResponseDTO;
+import com.github.bitsapling.sapling.controller.dto.response.UserSessionResponseDTO;
+import com.github.bitsapling.sapling.controller.dto.response.UserResponseDTO;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
@@ -12,11 +16,9 @@ import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.PasswordHash;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +48,7 @@ public class AuthController {
     private UserGroupService userGroupService;
 
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody LoginDto login) {
+    public UserSessionResponseDTO login(@RequestBody LoginRequestDTO login) {
         if (StringUtils.isEmpty(login.getUser())) {
             throw new APIGenericException(MISSING_PARAMETERS, "User parameter is required");
         }
@@ -80,21 +82,21 @@ public class AuthController {
     }
 
     @GetMapping("/status")
-    public LoginStatusBean status() {
+    public LoginStatusResponseDTO status() {
         try {
             User user = userService.getUser(StpUtil.getLoginIdAsLong());
             if (user == null) {
-                return new LoginStatusBean(false, false, false, null);
+                return new LoginStatusResponseDTO(false, false, false, null);
             } else {
-                return new LoginStatusBean(true, true, false, getUserBasicInformation(user));
+                return new LoginStatusResponseDTO(true, true, false, getUserBasicInformation(user));
             }
-        }catch (NotLoginException e){
-            return new LoginStatusBean(false, false, false, null);
+        } catch (NotLoginException e) {
+            return new LoginStatusResponseDTO(false, false, false, null);
         }
     }
 
     @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody RegisterDto register) {
+    public UserSessionResponseDTO register(@RequestBody RegisterRequestDTO register) {
         if (StringUtils.isEmpty(register.getEmail())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Email parameter is required");
         }
@@ -136,30 +138,15 @@ public class AuthController {
         return getUserBasicInformation(user);
     }
 
-    private Map<String, Object> getUserBasicInformation(User user) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        //loginResponse.put("status", "ok");
-        response.put("token", StpUtil.getTokenInfo());
-        response.put("user", new UserBean(user));
-        return response;
+    @NotNull
+    private UserSessionResponseDTO getUserBasicInformation(User user) {
+        SaTokenInfo tokenInfo = null;
+        try {
+            tokenInfo = StpUtil.getTokenInfo();
+        } catch (NotLoginException ignored) {
+
+        }
+        return new UserSessionResponseDTO(tokenInfo, new UserResponseDTO(user));
     }
 
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    static class LoginDto {
-        private String user;
-        private String password;
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    private static class RegisterDto {
-        private String username;
-        private String password;
-        private String email;
-
-    }
 }

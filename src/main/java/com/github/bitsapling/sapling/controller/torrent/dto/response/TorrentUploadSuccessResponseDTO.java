@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.controller.torrent.response;
+package com.github.bitsapling.sapling.controller.torrent.dto.response;
 
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
@@ -9,14 +9,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class TorrentUploadSuccess extends ResponsePojo {
+public class TorrentUploadSuccessResponseDTO extends ResponsePojo {
     private final String originalName;
     private final String name;
     private final long size;
     private final String infoHash;
     private final long id;
 
-    public TorrentUploadSuccess(long id, @NotNull String infoHash, @Nullable MultipartFile multipartFile) {
+    public TorrentUploadSuccessResponseDTO(long id, @NotNull String infoHash, @Nullable MultipartFile multipartFile) {
         super(0);
         this.id = id;
         this.infoHash = infoHash;
