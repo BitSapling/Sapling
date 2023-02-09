@@ -99,7 +99,7 @@ public class AnnounceService {
         Timestamp lastUpdateAt = torrent.getUpdatedAt();
         if (uploadedOffset < 0) uploadedOffset = task.uploaded();
         if (downloadedOffset < 0) downloadedOffset = task.downloaded();
-
+        long announceInterval = Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli();
         peer.setUploaded(task.uploaded() + uploadedOffset);
         peer.setDownloaded(task.downloaded() + downloadedOffset);
         peer.setLeft(task.left());
@@ -107,13 +107,16 @@ public class AnnounceService {
         peer.setUpdateAt(Timestamp.from(Instant.now()));
         peer.setSeedingTime(peer.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         peer.setPartialSeeder(task.event() == AnnounceEventType.PAUSED);
+        // Update user peer speed
+        long bytesPerSecondUploading = uploadedOffset / (announceInterval / 1000);
+        long bytesPerSecondDownloading = downloadedOffset / (announceInterval / 1000);
+        peer.setUploadSpeed(bytesPerSecondUploading);
+        peer.setDownloadSpeed(bytesPerSecondDownloading);
         peer = peerService.save(peer);
-
         // Update real user data
         user.setRealDownloaded(user.getRealDownloaded() + lastDownload);
         user.setRealUploaded(user.getRealUploaded() + lastUploaded);
         // Apply user promotion policy
-
         long promotionUploadOffset = (long) user.getGroup().getPromotionPolicy().applyUploadRatio(lastDownload);
         long promotionDownloadOffset = (long) user.getGroup().getPromotionPolicy().applyDownloadRatio(lastUploaded);
         // Apply torrent promotion policy
@@ -170,6 +173,7 @@ public class AnnounceService {
                 task.event() == AnnounceEventType.PAUSED,
                 task.passKey(),
                 Timestamp.from(Instant.now()),
+                0,0,
                 0
         );
     }

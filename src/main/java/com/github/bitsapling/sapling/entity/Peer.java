@@ -53,4 +53,9 @@ public class Peer {
     private Timestamp updateAt;
     @Column(name = "seeding_time", nullable = false)
     private long seedingTime;
+    @Column(name = "upload_speed", nullable = false)
+    private long uploadSpeed;
+    @Column(name = "download_speed", nullable = false)
+    private long downloadSpeed;
+
 }
