@@ -5,6 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.config.SiteBasicConfig;
 import com.github.bitsapling.sapling.config.TrackerConfig;
 import com.github.bitsapling.sapling.controller.dto.response.TorrentInfoResponseDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentSearchResultResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentUploadSuccessResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.form.TorrentUploadForm;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.owasp.html.PolicyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -123,18 +124,22 @@ public class TorrentController {
         }
     }
 
-    @GetMapping("/list")
-    @SaCheckPermission("torrent:list")
-    public List<TorrentSearchResultResponseDTO> list() throws IOException {
-        boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:see_anonymous");
-        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
-    }
+//    @GetMapping("/list")
+//    @SaCheckPermission("torrent:list")
+//    public List<TorrentSearchResultResponseDTO> list() throws IOException {
+//        boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:see_anonymous");
+//        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
+//    }
 
     @GetMapping("/search")
     @SaCheckPermission("torrent:search")
-    public List<TorrentSearchResultResponseDTO> search() throws IOException {
-        boolean permissionToSeeAnonymous = StpUtil.hasPermission("torrent:search");
-        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
+    public TorrentSearchResultResponseDTO search(SearchTorrentRequestDTO searchRequestDTO) {
+//        if (StringUtils.isEmpty(searchRequestDTO.getKeyword())) {
+//            throw new APIGenericException(MISSING_PARAMETERS, "You must provide a keyword.");
+//        }
+        searchRequestDTO.setEntriesPerPage(Math.min(searchRequestDTO.getEntriesPerPage(), 300));
+        Page<Torrent> torrents = torrentService.search(searchRequestDTO);
+        return new TorrentSearchResultResponseDTO(torrents.getTotalElements(), torrents.getTotalPages(), torrents.getContent());
     }
 
     @GetMapping("/view/{info_hash}")
@@ -150,7 +155,7 @@ public class TorrentController {
     @GetMapping("/download/{info_hash}")
     @SaCheckPermission("torrent:download")
     public HttpEntity<?> download(@PathVariable("info_hash") String infoHash) throws IOException, TorrentException {
-       // SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
+        // SiteBasicConfig siteBasicConfig = settingService.get(SiteBasicConfig.getConfigKey(), SiteBasicConfig.class);
         TrackerConfig trackerConfig = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
         if (StringUtils.isEmpty(infoHash)) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a info_hash.");

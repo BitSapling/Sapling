@@ -8,9 +8,9 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @Data
 public class LoginStatusResponseDTO extends ResponsePojo {
-    private final boolean isLoggedIn;
-    private final boolean isSafe;
-    private final boolean isSwitch;
-    private final UserSessionResponseDTO user;
+    private boolean isLoggedIn;
+    private boolean isSafe;
+    private boolean isSwitch;
+    private UserSessionResponseDTO user;
 
 }

@@ -24,7 +24,7 @@ import java.util.List;
 @Table(name = "user_groups",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"}),
-
+                @UniqueConstraint(columnNames = {"slug"}),
         }
 )
 @Data
@@ -35,8 +35,8 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
-    @Column(name = "code", nullable = false, updatable = false)
-    private String code;
+    @Column(name = "slug", nullable = false, updatable = false)
+    private String slug;
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany
@@ -58,7 +58,7 @@ public class UserGroup {
 
     public boolean hasPermission(String permission) {
         for (Permission perm : permissionEntities) {
-            if (perm.getCode().equals(permission)) {
+            if (perm.getSlug().equals(permission)) {
                 return true;
             }
         }

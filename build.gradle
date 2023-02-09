@@ -68,3 +68,7 @@ bootJar {
                 'Start-Class': 'com.github.bitsapling.sapling.SaplingApplication' //  springboot项目的启动类
     }
 }
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}

@@ -21,7 +21,7 @@ public class ExamPlanService {
 
     @Nullable
     public ExamPlan getExamPlan(@NotNull String code) {
-        return repository.findByCode(code).orElse(null);
+        return repository.findBySlug(code).orElse(null);
     }
 
 }

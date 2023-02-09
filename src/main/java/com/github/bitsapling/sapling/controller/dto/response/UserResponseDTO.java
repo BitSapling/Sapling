@@ -1,13 +1,16 @@
 package com.github.bitsapling.sapling.controller.dto.response;
 
 import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class UserResponseDTO {
+public class UserResponseDTO extends ResponsePojo {
     private long id;
     private String email;
     private String username;

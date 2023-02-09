@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "promotion_policies",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"})
+                @UniqueConstraint(columnNames = {"id"}),
+                @UniqueConstraint(columnNames = {"slug"}),
         }
 )
 

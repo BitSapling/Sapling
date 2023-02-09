@@ -1,8 +1,11 @@
 package com.github.bitsapling.sapling.service;
 
+import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
 import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +25,8 @@ public class TorrentService {
     private TorrentRepository torrentRepository;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private EntityManager entityManager;
 
     @Nullable
     public Torrent getTorrent(long id) {
@@ -60,8 +65,31 @@ public class TorrentService {
     }
 
     @NotNull
-    public Page<Torrent> searchByKeyword(@NotNull String keyword, @NotNull Pageable pageable){
-        return torrentRepository.searchByTitleLikeIgnoreCase(keyword, pageable);
+    public Page<Torrent> search(@NotNull SearchTorrentRequestDTO searchRequestDTO){
+        Pageable pageable = Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage());
+        List<String> categoriesRequired = searchRequestDTO.getCategory();
+        List<Long> categoriesRequiredId = new ArrayList<>();
+        for(String categorySlug : categoriesRequired){
+            Category category = categoryService.getCategory(categorySlug);
+            if(category != null){
+                categoriesRequiredId.add(category.getId());
+            }
+        }
+        return torrentRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if(!searchRequestDTO.getKeyword().isEmpty()){
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("title"), "%" + searchRequestDTO.getKeyword() + "%"),
+                        criteriaBuilder.like(root.get("subTitle"), "%" + searchRequestDTO.getKeyword() + "%")
+                ));
+            }
+            if(!categoriesRequiredId.isEmpty()){
+                predicates.add(root.get("category").in(categoriesRequiredId));
+            }
+            query.orderBy(criteriaBuilder.desc(root.get("id")));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+
     }
 
 }

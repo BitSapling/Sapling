@@ -3,29 +3,25 @@ package com.github.bitsapling.sapling.controller.dto.response;
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.sql.Timestamp;
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class TorrentInfoResponseDTO extends ResponsePojo {
-    private long id;
-    private String infoHash;
-    private UserResponseDTO user;
-    private String title;
-    private String subTitle;
-    private long size;
-    private long finishes;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-    private boolean underReview;
-    private boolean anonymous;
-    private CategoryResponseDTO category;
-    private PromotionPolicy promotionPolicy;
-    private String description;
+@Getter
+public class TorrentBasicResponseDTO extends ResponsePojo {
+    private final long id;
+    private final String infoHash;
+    private final UserResponseDTO user;
+    private final String title;
+    private final String subTitle;
+    private final long size;
+    private final long finishes;
+    private final Timestamp createdAt;
+    private final boolean underReview;
+    private final boolean anonymous;
+    private final CategoryResponseDTO category;
+    private final PromotionPolicy promotionPolicy;
 
-    public TorrentInfoResponseDTO(Torrent torrent){
+    public TorrentBasicResponseDTO(Torrent torrent){
         super(0);
         this.id = torrent.getId();
         this.infoHash = torrent.getInfoHash();
@@ -39,11 +35,9 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
         this.size = torrent.getSize();
         this.finishes = torrent.getFinishes();
         this.createdAt = torrent.getCreatedAt();
-        this.updatedAt = torrent.getUpdatedAt();
         this.underReview = torrent.isUnderReview();
         this.anonymous = torrent.isAnonymous();
         this.category = new CategoryResponseDTO(torrent.getCategory());
         this.promotionPolicy = torrent.getPromotionPolicy();
-        this.description = torrent.getDescription();
     }
 }

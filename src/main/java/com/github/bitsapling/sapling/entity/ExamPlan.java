@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "exam_plans",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"}),
-                @UniqueConstraint(columnNames = {"code"})
+                @UniqueConstraint(columnNames = {"slug"})
         }
 )
 @Data
@@ -26,8 +26,8 @@ public class ExamPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
-    @Column(name = "code", nullable = false, updatable = false)
-    private String code;
+    @Column(name = "slug", nullable = false, updatable = false)
+    private String slug;
     @Column(name = "displayName", nullable = false)
     private String displayName;
     @Column(name = "uploaded", nullable = false)

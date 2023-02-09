@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "permissions",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id"}),
-                @UniqueConstraint(columnNames = {"code"})
+                @UniqueConstraint(columnNames = {"slug"})
         }
 )
 
@@ -27,8 +27,8 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
-    @Column(name = "code", nullable = false, updatable = false)
-    private String code;
+    @Column(name = "slug", nullable = false, updatable = false)
+    private String slug;
     @Column(name = "def", nullable = false)
     private boolean def;
 }

@@ -29,7 +29,7 @@ public class SaTokenPermImpl implements StpInterface {
             if (user == null) {
                 throw new NotLoginException("You hadn't logged in yet!", loginType, "Not logged in");
             }
-            return user.getGroup().getPermissionEntities().stream().map(Permission::getCode).toList();
+            return user.getGroup().getPermissionEntities().stream().map(Permission::getSlug).toList();
         }finally {
             sessionUtil.closeFromThread(participate);
         }
@@ -43,7 +43,7 @@ public class SaTokenPermImpl implements StpInterface {
             if (user == null) {
                 throw new NotLoginException("You hadn't logged in yet!", loginType, "Not logged in");
             }
-            return List.of(user.getGroup().getCode());
+            return List.of(user.getGroup().getSlug());
         }finally {
             sessionUtil.closeFromThread(participate);
         }

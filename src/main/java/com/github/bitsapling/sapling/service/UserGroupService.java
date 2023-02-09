@@ -22,7 +22,7 @@ public class UserGroupService {
     public UserGroup getUserGroup(long id) {
         return repository.findById(id).map(userGroup -> new UserGroup(
                 userGroup.getId(),
-                userGroup.getCode(),
+                userGroup.getSlug(),
                 userGroup.getDisplayName(),
                 userGroup.getPermissionEntities().stream()
                         .map(perm -> permissionService.getPermission(perm.getId())).toList(),

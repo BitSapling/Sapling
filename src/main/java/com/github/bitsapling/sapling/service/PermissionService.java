@@ -20,10 +20,10 @@ public class PermissionService {
 
     @NotNull
     public Permission registerPermission(@NotNull String code, boolean def) {
-        Optional<Permission> permission = repository.findByCode(code);
+        Optional<Permission> permission = repository.findBySlug(code);
         if (permission.isPresent()) {
             Permission entity = permission.get();
-            return new Permission(entity.getId(), entity.getCode(), entity.isDef());
+            return new Permission(entity.getId(), entity.getSlug(), entity.isDef());
         }
         Permission entity = new Permission(0, code, def);
         entity = repository.save(entity);
@@ -38,7 +38,7 @@ public class PermissionService {
 
     @Nullable
     public Permission getPermission(@NotNull String code) {
-        Optional<Permission> permission = repository.findByCode(code);
+        Optional<Permission> permission = repository.findBySlug(code);
         return permission.orElse(null);
     }
 
