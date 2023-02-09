@@ -43,6 +43,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,7 +55,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -88,7 +88,7 @@ public class TorrentController {
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
-    public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
+    public ResponseEntity<ResponsePojo> upload(@RequestBody TorrentUploadForm form) throws IOException {
         if (StringUtils.isEmpty(form.getTitle())) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
         }
@@ -152,11 +152,10 @@ public class TorrentController {
 //        return torrentService.getAllTorrents().stream().map(t -> new TorrentSearchResultResponseDTO(t, permissionToSeeAnonymous)).toList();
 //    }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @SaCheckPermission("torrent:search")
-    public TorrentSearchResultResponseDTO search(SearchTorrentRequestDTO searchRequestDTO) {
+    public TorrentSearchResultResponseDTO search(@RequestBody SearchTorrentRequestDTO searchRequestDTO) {
         searchRequestDTO.setEntriesPerPage(Math.min(searchRequestDTO.getEntriesPerPage(), 300));
-        searchRequestDTO.setTag(searchRequestDTO.getTag().stream().map(s -> s.toLowerCase(Locale.ROOT)).toList());
         Page<Torrent> torrents = torrentService.search(searchRequestDTO);
         return new TorrentSearchResultResponseDTO(torrents.getTotalElements(), torrents.getTotalPages(), torrents.getContent());
     }

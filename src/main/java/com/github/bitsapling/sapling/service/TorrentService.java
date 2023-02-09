@@ -66,11 +66,28 @@ public class TorrentService {
 
     @NotNull
     public Page<Torrent> search(@NotNull SearchTorrentRequestDTO searchRequestDTO) {
-        return search(searchRequestDTO.getKeyword(),
-                searchRequestDTO.getCategory(),
-                searchRequestDTO.getPromotion(),
-                searchRequestDTO.getTag(),
-                Pageable.ofSize(searchRequestDTO.getEntriesPerPage()).withPage(searchRequestDTO.getPage()));
+        List<String> categoriesRequired = new ArrayList<>();
+        List<String> promotionRequired = new ArrayList<>();
+        List<String> tagRequired = new ArrayList<>();
+        String keyword;
+        if(searchRequestDTO.getKeyword() == null) keyword = "";
+        else keyword = searchRequestDTO.getKeyword();
+        if (searchRequestDTO.getCategory() != null) {
+            categoriesRequired.addAll(searchRequestDTO.getCategory());
+        }
+        if (searchRequestDTO.getPromotion() != null) {
+            promotionRequired.addAll(searchRequestDTO.getPromotion());
+        }
+        if (searchRequestDTO.getTag() != null) {
+            tagRequired.addAll(searchRequestDTO.getTag());
+        }
+
+        return search(keyword,
+                categoriesRequired,
+                promotionRequired,
+                tagRequired,
+                Pageable.ofSize(searchRequestDTO.getEntriesPerPage())
+                        .withPage(searchRequestDTO.getPage()));
     }
 
     @NotNull

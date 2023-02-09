@@ -179,6 +179,9 @@ public class DebugController {
             permissions.add(new Permission(0, "torrent:view", false));
             permissions.add(new Permission(0, "torrent:download", false));
             permissions.add(new Permission(0, "torrent:download_review", false));
+            permissions.add(new Permission(0, "torrent:search", false));
+            permissions.add(new Permission(0, "promotion:list", false));
+            permissions.add(new Permission(0, "category:list", false));
             permissions.add(new Permission(0,"torrent:publish_anonymous", false));
             permissions.add(new Permission(0,"torrent:bypass_review", false));
             permissions.add(new Permission(0,"feed:subscribe", false));
