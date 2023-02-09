@@ -120,6 +120,7 @@ public class AnnounceController {
             meta.put("downloaded", peerStatus.downloaded());
             meta.put("complete", peerStatus.complete());
             meta.put("incomplete", peerStatus.incomplete());
+            meta.put("downloaders", peerStatus.downloaders());
             files.put(infoHash, meta);
         }
         dict.put("files", files);
@@ -295,6 +296,7 @@ public class AnnounceController {
         dict.put("interval", randomInterval());
         dict.put("complete", peers.complete());
         dict.put("incomplete", peers.incomplete());
+        dict.put("downloaders", peers.downloaders());
         dict.put("peers", BencodeUtil.compactPeers(peers.peers(), false));
         if (peers.peers6().size() > 0) {
             dict.put("peers6", BencodeUtil.compactPeers(peers.peers6(), true));
@@ -321,6 +323,7 @@ public class AnnounceController {
         dict.put("interval", randomInterval());
         dict.put("complete", peers.complete());
         dict.put("incomplete", peers.incomplete());
+        dict.put("downloaders",peers.downloaders());
         dict.put("peers", peerList);
         return dict;
     }
@@ -331,9 +334,10 @@ public class AnnounceController {
         List<Peer> torrentPeers = RandomUtil.getRandomElements(allPeers, numWant);
         List<Peer> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
         List<Peer> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
+        int downloaders = (int) torrentPeers.stream().filter(Peer::isPartialSeeder).count();
         long completed = torrentPeers.stream().filter(Peer::isSeeder).count();
         long incompleted = torrentPeers.size() - completed;
-        return new PeerResult(v4, v6, completed, incompleted);
+        return new PeerResult(v4, v6, completed, incompleted,downloaders);
     }
 
     private int randomInterval() {
@@ -346,6 +350,7 @@ public class AnnounceController {
         List<Peer> peers = peerService.getPeers(infoHash);
         int complete = (int) peers.stream().filter(Peer::isSeeder).count();
         int incomplete = (int) peers.stream().filter(peer -> !peer.isSeeder()).count();
+        int downloaders = (int) peers.stream().filter(Peer::isPartialSeeder).count();
         Torrent torrent = torrentService.getTorrent(infoHash);
         int downloaded;
         if (torrent != null) {
@@ -353,13 +358,13 @@ public class AnnounceController {
         } else {
             downloaded = 0;
         }
-        return new PeerStatus(complete, incomplete, downloaded);
+        return new PeerStatus(complete, incomplete, downloaded,downloaders);
     }
 
-    record PeerResult(@NotNull List<Peer> peers, List<Peer> peers6, long complete, long incomplete) {
+    record PeerResult(@NotNull List<Peer> peers, List<Peer> peers6, long complete, long incomplete, int downloaders) {
     }
 
-    record PeerStatus(int complete, int incomplete, int downloaded) {
+    record PeerStatus(int complete, int incomplete, int downloaded, int downloaders) {
 
     }
 }

@@ -45,6 +45,8 @@ public class Peer {
     private long left;
     @Column(name = "seeder", nullable = false)
     private boolean seeder;
+    @Column(name = "partial_seeder", nullable = false)
+    private boolean partialSeeder;
     @Column(name = "passkey", nullable = false)
     private String passKey;
     @Column(name = "update_at", nullable = false)
