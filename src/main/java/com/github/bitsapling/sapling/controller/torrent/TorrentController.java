@@ -5,9 +5,9 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.config.SiteBasicConfig;
 import com.github.bitsapling.sapling.config.TrackerConfig;
-import com.github.bitsapling.sapling.controller.dto.response.PeerInfoResponseDTO;
 import com.github.bitsapling.sapling.controller.dto.response.ScrapeContainerDTO;
 import com.github.bitsapling.sapling.controller.dto.response.TorrentInfoResponseDTO;
+import com.github.bitsapling.sapling.controller.dto.response.TransferHistoryDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.request.TorrentScrapeRequestDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentScrapeResponseDTO;
@@ -65,7 +65,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -180,7 +179,7 @@ public class TorrentController {
     @SaCheckPermission("torrent:scrape")
     public TorrentScrapeResponseDTO scrape(@RequestBody TorrentScrapeRequestDTO scrapeRequestDTO) {
         Map<String, ScrapeContainerDTO> scrapes = new HashMap<>();
-        Map<String, List<PeerInfoResponseDTO>> details = new HashMap<>();
+        Map<String, List<TransferHistoryDTO>> details = new HashMap<>();
         for (String infoHash : scrapeRequestDTO.getTorrents()) {
             Torrent torrent = torrentService.getTorrent(infoHash);
             if (torrent == null) {
@@ -188,7 +187,7 @@ public class TorrentController {
             }
             PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
             scrapes.put(infoHash, new ScrapeContainerDTO(peerStatus.downloaded(), peerStatus.complete(), peerStatus.incomplete(), peerStatus.downloaders()));
-            details.put(infoHash, peerService.getPeers(infoHash).stream().map(PeerInfoResponseDTO::new).collect(Collectors.toList()));
+            details.put(infoHash, transferHistoryService.getTransferHistory(torrent).stream().map(TransferHistoryDTO::new).toList());
         }
         return new TorrentScrapeResponseDTO(scrapes, details);
     }

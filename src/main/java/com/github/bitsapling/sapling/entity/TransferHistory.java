@@ -50,4 +50,16 @@ public class TransferHistory {
     private Timestamp startedAt;
     @Column(name = "updated_at", nullable = false)
     private Timestamp updatedAt;
+    @Column(name = "uploaded", nullable = false)
+    private long uploaded;
+    @Column(name = "downloaded", nullable = false)
+    private long downloaded;
+    @Column(name = "actual_uploaded", nullable = false)
+    private long actualUploaded;
+    @Column(name = "actual_downloaded", nullable = false)
+    private long actualDownloaded;
+    @Column(name = "upload_speed", nullable = false)
+    private long uploadSpeed;
+    @Column(name = "download_speed", nullable = false)
+    private long downloadSpeed;
 }

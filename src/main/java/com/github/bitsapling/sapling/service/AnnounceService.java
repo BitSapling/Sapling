@@ -129,15 +129,24 @@ public class AnnounceService {
         TransferHistory transferHistory = transferHistoryService.getTransferHistory(user, torrent);
         if(transferHistory != null){
             long torrentLeft = transferHistory.getLeft();
-            if(torrentLeft != 0 && task.left() == 0){
-                torrent.setFinishes(torrent.getFinishes()+1);
+            if (torrentLeft != 0 && task.left() == 0) {
+                torrent.setFinishes(torrent.getFinishes() + 1);
             }
             transferHistory.setUpdatedAt(Timestamp.from(Instant.now()));
             transferHistory.setLeft(task.left());
-        }else{
-            transferHistory = new TransferHistory(0, user, torrent, task.left(), Timestamp.from(Instant.now()), Timestamp.from(Instant.now()));
-            if(task.left() == 0){
-                torrent.setFinishes(torrent.getFinishes()+1);
+            transferHistory.setUploaded(transferHistory.getUploaded() + promotionUploadOffset);
+            transferHistory.setDownloaded(transferHistory.getDownloaded() + promotionDownloadOffset);
+            transferHistory.setActualUploaded(transferHistory.getActualUploaded() + uploadedOffset);
+            transferHistory.setActualDownloaded(transferHistory.getActualDownloaded() + downloadedOffset);
+            transferHistory.setUploadSpeed(bytesPerSecondUploading);
+            transferHistory.setDownloadSpeed(bytesPerSecondDownloading);
+        }else {
+            transferHistory = new TransferHistory(0, user, torrent,
+                    task.left(), Timestamp.from(Instant.now()),
+                    Timestamp.from(Instant.now()),
+                    promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset, bytesPerSecondUploading, bytesPerSecondDownloading);
+            if (task.left() == 0) {
+                torrent.setFinishes(torrent.getFinishes() + 1);
             }
         }
         transferHistoryService.save(transferHistory);

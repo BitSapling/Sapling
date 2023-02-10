@@ -23,7 +23,6 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private boolean underReview;
-    private boolean anonymous;
     private CategoryResponseDTO category;
     private PromotionPolicy promotionPolicy;
     private String description;
@@ -45,7 +44,6 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
         this.createdAt = torrent.getCreatedAt();
         this.updatedAt = torrent.getUpdatedAt();
         this.underReview = torrent.isUnderReview();
-        this.anonymous = torrent.isAnonymous();
         this.category = new CategoryResponseDTO(torrent.getCategory());
         this.promotionPolicy = torrent.getPromotionPolicy();
         this.description = torrent.getDescription();
