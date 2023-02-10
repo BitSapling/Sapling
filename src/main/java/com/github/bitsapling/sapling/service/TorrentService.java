@@ -58,7 +58,7 @@ public class TorrentService {
         } else {
             Category category = categoryService.getCategory(categorySlug);
             if (category != null) {
-                torrents.addAll(torrentRepository.findAllByCategory(category));
+                torrents.addAll(torrentRepository.findAllByCategoryOrderByIdDesc(category));
             }
         }
         return torrents;

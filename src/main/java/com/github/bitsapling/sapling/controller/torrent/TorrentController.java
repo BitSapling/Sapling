@@ -134,13 +134,13 @@ public class TorrentController {
             tags.add(Objects.requireNonNullElseGet(t, () -> tagService.save(new Tag(0, tag))));
         }
         try {
-            byte[] torrentContent = TorrentParser.rewriteForTracker(form.getFile().getBytes(), siteBasicConfig.getSiteName(), publisher, publisherUrl);
-            TorrentParser parser = new TorrentParser(torrentContent);
+            TorrentParser parser = new TorrentParser(form.getFile().getBytes());
+            parser.rewriteForTracker(siteBasicConfig.getSiteName(), publisher, publisherUrl);
             String infoHash = parser.getInfoHash();
             if (torrentService.getTorrent(infoHash) != null) {
                 throw new APIGenericException(TORRENT_ALREADY_EXISTS, "The torrent's info_hash has been exists on this tracker.");
             }
-            Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
+            Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), parser.save());
             Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(),
                     form.getSubtitle(), parser.getTorrentFilesSize(),
                     Timestamp.from(Instant.now()), Timestamp.from(Instant.now()),
@@ -223,11 +223,12 @@ public class TorrentController {
         if (!torrentFile.exists()) {
             throw new APIGenericException(TORRENT_FILE_MISSING, "This torrent's file are missing on this tracker, please contact with system administrator.");
         }
-        byte[] bytes = TorrentParser.rewriteForUser(Files.readAllBytes(torrentFile.toPath()), trackerConfig.getTrackerURL(), torrent.getUser().getPasskey(), user);
+        TorrentParser parser = new TorrentParser(Files.readAllBytes(torrentFile.toPath()));
+        parser.rewriteForUser(trackerConfig.getTrackerURL(), torrent.getUser().getPasskey(), user);
         String fileName = "[" + trackerConfig.getTorrentPrefix() + "] " + torrent.getTitle() + ".torrent";
         HttpHeaders header = new HttpHeaders();
         header.set(HttpHeaders.CONTENT_TYPE, "application/x-bittorrent");
         header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncodeUtil.urlEncode(fileName, false));
-        return new HttpEntity<>(bytes, header);
+        return new HttpEntity<>(parser.save(), header);
     }
 }
