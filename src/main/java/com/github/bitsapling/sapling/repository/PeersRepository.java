@@ -2,6 +2,7 @@ package com.github.bitsapling.sapling.repository;
 
 import com.github.bitsapling.sapling.entity.Peer;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,7 @@ public interface PeersRepository extends CrudRepository<Peer, Long> {
 
     Optional<Peer> findByPeerIdAndInfoHashIgnoreCase(@NotNull String peerId, @NotNull String infoHash);
 
-    List<Peer> findPeersByInfoHashIgnoreCase(@NotNull String infoHash);
+    List<Peer> findPeersByInfoHashIgnoreCaseOrderByUpdateAtDesc(@NotNull String infoHash, @NotNull Pageable singlePage);
 
     //List<PeerEntity> findPeersByUserId(long userId);
     List<Peer> findAllByUpdateAtIsLessThan(@NotNull Timestamp timestamp);

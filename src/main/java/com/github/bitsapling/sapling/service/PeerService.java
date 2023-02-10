@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +33,10 @@ public class PeerService {
     }
 
     @NotNull
-    public List<Peer> getPeers(@NotNull String infoHash) {
+    public List<Peer> getPeers(@NotNull String infoHash, int numWant) {
         infoHash = infoHash.toLowerCase(Locale.ROOT);
-        List<Peer> entities = repository.findPeersByInfoHashIgnoreCase(infoHash);
+        Pageable top = PageRequest.of(0, numWant);
+        List<Peer> entities = repository.findPeersByInfoHashIgnoreCaseOrderByUpdateAtDesc(infoHash, top);
         return entities.stream().toList();
     }
 

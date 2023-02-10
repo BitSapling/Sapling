@@ -28,7 +28,7 @@ public class TransferHistoryService {
 
     @NotNull
     public List<TransferHistory> getTransferHistory(@NotNull Torrent torrent) {
-        return repository.findAllByTorrent(torrent);
+        return repository.findAllByTorrentOrderByUpdatedAt(torrent);
     }
 
     @NotNull

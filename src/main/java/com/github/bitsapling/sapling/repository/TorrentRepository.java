@@ -18,7 +18,7 @@ public interface TorrentRepository extends JpaRepository<Torrent, Long>, JpaSpec
     Optional<Torrent> findByInfoHashIgnoreCase(@NotNull String infoHash);
 
     @NotNull
-    List<Torrent> findAllByUserId(long userId);
+    List<Torrent> findAllByUserIdOrderByIdDesc(long userId);
 
     @NotNull
     List<Torrent> findAllByTitle(@NotNull String title);
@@ -30,10 +30,10 @@ public interface TorrentRepository extends JpaRepository<Torrent, Long>, JpaSpec
     List<Torrent> findAllByAnonymousIs(boolean is);
 
     @NotNull
-    List<Torrent> findAllByUser(@NotNull User user);
+    List<Torrent> findAllByUserOrderByIdDesc(@NotNull User user);
 
     @NotNull
-    List<Torrent> findAllByCategory(@NotNull Category category);
+    List<Torrent> findAllByCategoryOrderByIdDesc(@NotNull Category category);
 
     Page<Torrent> searchByTitleLikeIgnoreCase(@NotNull String keyword, @NotNull Pageable pageable);
 }

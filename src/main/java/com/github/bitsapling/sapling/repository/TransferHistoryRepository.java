@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface TransferHistoryRepository extends CrudRepository<TransferHistory, Long> {
     Optional<TransferHistory> findByUserAndTorrent(@NotNull User user, @NotNull Torrent torrent);
-    List<TransferHistory> findAllByUser(@NotNull User user);
-    List<TransferHistory> findAllByTorrent(@NotNull Torrent torrent);
+
+    List<TransferHistory> findAllByUserOrderByUpdatedAt(@NotNull User user);
+
+    List<TransferHistory> findAllByTorrentOrderByUpdatedAt(@NotNull Torrent torrent);
 }

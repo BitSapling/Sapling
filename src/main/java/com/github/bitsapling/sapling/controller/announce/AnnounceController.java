@@ -26,7 +26,6 @@ import com.github.bitsapling.sapling.util.BooleanUtil;
 import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.InfoHashUtil;
 import com.github.bitsapling.sapling.util.MiscUtil;
-import com.github.bitsapling.sapling.util.RandomUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -133,6 +132,7 @@ public class AnnounceController {
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(resp);
     }
+
     @NotNull
     private User safeParseUser(@NotNull String passkey) throws InvalidAnnounceException {
         User user;
@@ -141,8 +141,8 @@ public class AnnounceController {
             if (user == null) {
                 throw new InvalidAnnounceException("Unauthorized");
             }
-        }catch (APIGenericException e){
-            throw new InvalidAnnounceException("APIError: "+e.getErrorText()+" -> "+e.getMessage());
+        } catch (APIGenericException e) {
+            throw new InvalidAnnounceException("APIError: " + e.getErrorText() + " -> " + e.getMessage());
         }
         return user;
     }
@@ -347,14 +347,14 @@ public class AnnounceController {
 
     @NotNull
     private PeerResult gatherPeers(@NotNull String infoHash, int numWant) {
-        List<Peer> allPeers = peerService.getPeers(infoHash);
-        List<Peer> torrentPeers = RandomUtil.getRandomElements(allPeers, numWant);
+        List<Peer> torrentPeers = peerService.getPeers(infoHash, numWant);
+        //List<Peer> torrentPeers = RandomUtil.getRandomElements(allPeers, numWant);
         List<Peer> v4 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet4Address(peer.getIp())).toList();
         List<Peer> v6 = torrentPeers.stream().filter(peer -> ipValidator.isValidInet6Address(peer.getIp())).toList();
         int downloaders = (int) torrentPeers.stream().filter(Peer::isPartialSeeder).count();
         long completed = torrentPeers.stream().filter(Peer::isSeeder).count();
         long incompleted = torrentPeers.size() - completed;
-        return new PeerResult(v4, v6, completed, incompleted,downloaders);
+        return new PeerResult(v4, v6, completed, incompleted, downloaders);
     }
 
     private int randomInterval() {
