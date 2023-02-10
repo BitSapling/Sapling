@@ -6,6 +6,10 @@
 
 http://sapling.ghostchu-services.top/
 
+**Demo站主要用于测试 WebUI，因此使用的版本可能并不是最新的，可能和 API 文档对不上！**
+
+**因开发测试需要，Demo 站经常会清空数据，因此不要真的当 PT 使用！**
+
 ## 关于 BitSapling
 
 BitSapling 是一个使用 Java 语言基于 Spring Boot 的 BitTorrent Private Tracker。此程序旨在创建一个安全，高性能的 PT 程序，
@@ -29,6 +33,7 @@ BitSapling 是一个典型的前后端分离设计，所有的操作均通过 Js
 ## BEP 进展
 
 ### 已实现的 BitTorrent BEP
+
 * [BEP 0003 - The BitTorrent Protocol Specification](http://bittorrent.org/beps/bep_0003.html)
 * [BEP 0007 - IPv6 Tracker Extension](http://bittorrent.org/beps/bep_0007.html)
 * [BEP 0012 - Multitracker Metadata Extension](http://bittorrent.org/beps/bep_0012.html)
@@ -54,38 +59,38 @@ BitSapling 是一个典型的前后端分离设计，所有的操作均通过 Js
 ## 功能TODO
 
 * [x] Tracker
-  * [x] 种子上传
-  * [x] 种子注册
-  * [x] Peers 追踪 (completed, incomplete, downloaders, finishes)
-  * [x] 上传/下载 统计和计算
-  * [x] 私有种子
-  * [x] IPV6 支持
-  * [x] 种子促销
-    * [x] 自定义促销规则
-    * [ ] 条件自动促销
-  * [x] 失效 Peers 清理
-  * [ ] User-Agent 客户端控制
-  * [ ] 反作弊
-  * [ ] SeedBox
-  * [ ] 速度限制
-  * [ ] 同伴查看
+    * [x] 种子上传
+    * [x] 种子注册
+    * [x] Peers 追踪 (completed, incomplete, downloaders, finishes)
+    * [x] 上传/下载 统计和计算
+    * [x] 私有种子
+    * [x] IPV6 支持
+    * [x] 种子促销
+        * [x] 自定义促销规则
+        * [ ] 条件自动促销
+    * [x] 失效 Peers 清理
+    * [ ] User-Agent 客户端控制
+    * [ ] 反作弊
+    * [ ] SeedBox
+    * [ ] 速度限制
+    * [ ] 同伴查看
 * [x] 用户管理
-  * [x] 用户登录
-  * [x] 用户注册
-  * [x] 权限控制
-    * [x] 权限节点
-    * [x] 用户组
-    * [ ] 权限管理
-      * [ ] 以其他用户身份登录
-      * [ ] 用户关联
+    * [x] 用户登录
+    * [x] 用户注册
+    * [x] 权限控制
+        * [x] 权限节点
+        * [x] 用户组
+        * [ ] 权限管理
+            * [ ] 以其他用户身份登录
+            * [ ] 用户关联
 * [x] 站点安全
-  * [x] bCrypt 加密
-  * [ ] 登录过程 RSA 非对称加密
-  * [x] 账户与 Passkey 防暴力破解
-  * [ ] IP 控制
-  * [ ] 小号控制
+    * [x] bCrypt 加密
+    * [ ] 登录过程 RSA 非对称加密
+    * [x] 账户与 Passkey 防暴力破解
+    * [ ] IP 控制
+    * [ ] 小号控制
 * [x] 发种
-  * [ ] 自定义模板
+    * [ ] 自定义模板
 * [x] 种子分区
 * [x] 种子标签
 * [ ] 字幕
