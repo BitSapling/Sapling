@@ -14,9 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.github.bitsapling.sapling.exception.APIErrorCode.MAX_UPLOAD_SIZE_EXCEEDED;
 
 @ControllerAdvice
 @Slf4j
@@ -99,5 +103,24 @@ public class GlobalControllerAdvice {
                         "type", classUtil.getClassSimpleName(exception.getClass()),
                         "message", exception.getMessage())
                 );
+    }
+
+
+    @ExceptionHandler(value = MultipartException.class)
+    @ResponseBody
+    public Object fileUploadExceptionHandler(MultipartException exception) {
+        Map<String, Object> map = new HashMap<>();
+        Throwable rootCause = exception.getRootCause();
+        if (rootCause instanceof MaxUploadSizeExceededException ex) {
+            return ResponseEntity
+                    .status(MAX_UPLOAD_SIZE_EXCEEDED.getStatusCode())
+                    .body(
+                            Map.of("status", "error",
+                                    "code", MAX_UPLOAD_SIZE_EXCEEDED.getCode(),
+                                    "type", classUtil.getClassSimpleName(exception.getClass()),
+                                    "message", exception.getMessage())
+                    );
+        }
+        return map;
     }
 }
