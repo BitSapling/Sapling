@@ -149,10 +149,6 @@ public class AnnounceService {
         }
         transferHistoryService.save(transferHistory);
         torrentService.save(torrent);
-
-        log.info("Updated user {}'s data: uploaded {}, downloaded {} with original data: actual-uploaded {}, actual-downloaded {} for ip address {} and port {}",
-                user.getUsername(), promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset,
-                task.ip(), task.port());
         if (task.event() == AnnounceEventType.STOPPED) {
             if (peer.getId() != 0) {
                 peerService.delete(peer);
