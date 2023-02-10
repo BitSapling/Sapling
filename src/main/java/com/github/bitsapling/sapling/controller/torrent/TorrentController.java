@@ -142,7 +142,7 @@ public class TorrentController {
             }
             Files.write(new File(torrentsDirectory, infoHash + ".torrent").toPath(), torrentContent);
             Torrent torrent = new Torrent(0, infoHash, user, form.getTitle(),
-                    form.getSubtitle(), parser.getTorrentFilesSize(), 0L,
+                    form.getSubtitle(), parser.getTorrentFilesSize(),
                     Timestamp.from(Instant.now()), Timestamp.from(Instant.now()),
                     StpUtil.hasPermission("torrent:bypass_review"), form.isAnonymous(), category,
                     promotionPolicy, form.getDescription(), tags);
@@ -185,7 +185,7 @@ public class TorrentController {
             if (torrent == null) {
                 continue;
             }
-            PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
+            TransferHistoryService.PeerStatus peerStatus = transferHistoryService.getPeerStatus(torrent);
             scrapes.put(infoHash, new ScrapeContainerDTO(peerStatus.downloaded(), peerStatus.complete(), peerStatus.incomplete(), peerStatus.downloaders()));
             details.put(infoHash, transferHistoryService.getTransferHistory(torrent).stream().map(TransferHistoryDTO::new).toList());
         }

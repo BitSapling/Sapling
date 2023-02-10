@@ -17,7 +17,6 @@ public class TorrentBasicResponseDTO extends ResponsePojo {
     private final String title;
     private final String subTitle;
     private final long size;
-    private final long finishes;
     private final Timestamp createdAt;
     private final boolean underReview;
     private final boolean anonymous;
@@ -37,7 +36,6 @@ public class TorrentBasicResponseDTO extends ResponsePojo {
         this.title = torrent.getTitle();
         this.subTitle = torrent.getSubTitle();
         this.size = torrent.getSize();
-        this.finishes = torrent.getFinishes();
         this.createdAt = torrent.getCreatedAt();
         this.underReview = torrent.isUnderReview();
         this.anonymous = torrent.isAnonymous();

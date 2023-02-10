@@ -127,10 +127,10 @@ public class AnnounceService {
         user.setSeedingTime(user.getSeedingTime() + (Instant.now().toEpochMilli() - lastUpdateAt.toInstant().toEpochMilli()));
         user = userService.save(user);
         TransferHistory transferHistory = transferHistoryService.getTransferHistory(user, torrent);
-        if(transferHistory != null){
+        if (transferHistory != null) {
             long torrentLeft = transferHistory.getLeft();
             if (torrentLeft != 0 && task.left() == 0) {
-                torrent.setFinishes(torrent.getFinishes() + 1);
+                transferHistory.setHaveCompleteHistory(true);
             }
             transferHistory.setUpdatedAt(Timestamp.from(Instant.now()));
             transferHistory.setLeft(task.left());
@@ -140,14 +140,12 @@ public class AnnounceService {
             transferHistory.setActualDownloaded(transferHistory.getActualDownloaded() + downloadedOffset);
             transferHistory.setUploadSpeed(bytesPerSecondUploading);
             transferHistory.setDownloadSpeed(bytesPerSecondDownloading);
-        }else {
+        } else {
             transferHistory = new TransferHistory(0, user, torrent,
                     task.left(), Timestamp.from(Instant.now()),
                     Timestamp.from(Instant.now()),
-                    promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset, bytesPerSecondUploading, bytesPerSecondDownloading);
-            if (task.left() == 0) {
-                torrent.setFinishes(torrent.getFinishes() + 1);
-            }
+                    promotionUploadOffset, promotionDownloadOffset, uploadedOffset, downloadedOffset,
+                    bytesPerSecondUploading, bytesPerSecondDownloading, task.event(), false);
         }
         transferHistoryService.save(transferHistory);
         torrentService.save(torrent);

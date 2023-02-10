@@ -102,7 +102,6 @@ public class DebugController {
         private final String title;
         private final String subTitle;
         private final long size;
-        private final long finishes;
         private final Timestamp createdAt;
         private final Timestamp updatedAt;
         private final boolean underReview;
@@ -116,7 +115,6 @@ public class DebugController {
             this.title = torrent.getTitle();
             this.subTitle = torrent.getSubTitle();
             this.size = torrent.getSize();
-            this.finishes = torrent.getFinishes();
             this.createdAt = torrent.getCreatedAt();
             this.updatedAt = torrent.getUpdatedAt();
             this.underReview = torrent.isUnderReview();

@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Peer;
-import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.repository.PeersRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -58,17 +57,5 @@ public class PeerService {
         return count;
     }
 
-    @NotNull
-    public PeerStatus getPeerStatus(@NotNull Torrent torrent) {
-        List<Peer> peers = getPeers(torrent.getInfoHash());
-        int complete = (int) peers.stream().filter(Peer::isSeeder).count();
-        int incomplete = (int) peers.stream().filter(peer -> !peer.isSeeder()).count();
-        int downloaders = (int) peers.stream().filter(Peer::isPartialSeeder).count();
-        int downloaded = (int) torrent.getFinishes();
-        return new PeerStatus(complete, incomplete, downloaded, downloaders);
-    }
 
-    public record PeerStatus(int complete, int incomplete, int downloaded, int downloaders) {
-
-    }
 }

@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.github.bitsapling.sapling.type.AnnounceEventType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -62,4 +63,8 @@ public class TransferHistory {
     private long uploadSpeed;
     @Column(name = "download_speed", nullable = false)
     private long downloadSpeed;
+    @Column(name = "last_event", nullable = false)
+    private AnnounceEventType lastEvent;
+    @Column(name = "have_complete_history", nullable = false)
+    private boolean haveCompleteHistory;
 }

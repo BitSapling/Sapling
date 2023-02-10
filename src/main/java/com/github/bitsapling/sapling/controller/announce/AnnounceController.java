@@ -18,6 +18,7 @@ import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.SettingService;
 import com.github.bitsapling.sapling.service.TorrentService;
+import com.github.bitsapling.sapling.service.TransferHistoryService;
 import com.github.bitsapling.sapling.service.UserService;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.BencodeUtil;
@@ -86,6 +87,8 @@ public class AnnounceController {
     private SettingService settingService;
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
+    private TransferHistoryService transferHistoryService;
 
 
     @GetMapping("/scrape")
@@ -116,7 +119,7 @@ public class AnnounceController {
                 continue;
             }
             Map<String, Object> meta = new LinkedHashMap<>();
-            PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
+            TransferHistoryService.PeerStatus peerStatus = transferHistoryService.getPeerStatus(torrent);
             meta.put("downloaded", peerStatus.downloaded());
             meta.put("complete", peerStatus.complete());
             meta.put("incomplete", peerStatus.incomplete());
@@ -302,7 +305,7 @@ public class AnnounceController {
     @NotNull
     private Map<String, Object> generatePeersResponseCompat(@NotNull Torrent torrent, int numWant) throws RetryableAnnounceException {
         PeerResult peers = gatherPeers(torrent.getInfoHash(), numWant);
-        PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
+        TransferHistoryService.PeerStatus peerStatus = transferHistoryService.getPeerStatus(torrent);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
         dict.put("complete", peerStatus.complete());
@@ -319,7 +322,7 @@ public class AnnounceController {
     @NotNull
     private Map<String, Object> generatePeersResponseNonCompat(@NotNull Torrent torrent, int numWant, boolean noPeerId) {
         PeerResult peers = gatherPeers(torrent.getInfoHash(), numWant);
-        PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
+        TransferHistoryService.PeerStatus peerStatus = transferHistoryService.getPeerStatus(torrent);
         List<Map<String, Object>> peerList = new ArrayList<>();
         List<Peer> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());

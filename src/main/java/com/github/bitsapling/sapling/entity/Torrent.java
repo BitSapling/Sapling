@@ -49,8 +49,6 @@ public class Torrent {
     private String subTitle;
     @Column(name = "size", nullable = false, updatable = false)
     private long size;
-    @Column(name = "finishes", nullable = false)
-    private long finishes;
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
     @Column(name = "updated_at", nullable = false)
