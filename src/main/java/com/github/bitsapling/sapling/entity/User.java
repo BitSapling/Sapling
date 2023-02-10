@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.github.bitsapling.sapling.type.PrivacyLevel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -81,6 +82,8 @@ public class User {
 
     @Column(name = "personal_access_token", nullable = false)
     private String personalAccessToken;
+    @Column(name = "privacy_level", nullable = false)
+    private PrivacyLevel privacyLevel;
 
     public UserGroup getGroup() {
         return group;

@@ -5,8 +5,12 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.config.SiteBasicConfig;
 import com.github.bitsapling.sapling.config.TrackerConfig;
+import com.github.bitsapling.sapling.controller.dto.response.PeerInfoResponseDTO;
+import com.github.bitsapling.sapling.controller.dto.response.ScrapeContainerDTO;
 import com.github.bitsapling.sapling.controller.dto.response.TorrentInfoResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.request.TorrentScrapeRequestDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentScrapeResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentSearchResultResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentUploadSuccessResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.form.TorrentUploadForm;
@@ -22,6 +26,7 @@ import com.github.bitsapling.sapling.exception.TorrentException;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.CategoryService;
+import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.SettingService;
 import com.github.bitsapling.sapling.service.TagService;
@@ -56,9 +61,11 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.github.bitsapling.sapling.exception.APIErrorCode.*;
 
@@ -89,6 +96,8 @@ public class TorrentController {
     private TagService tagService;
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
+    private PeerService peerService;
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
@@ -165,6 +174,23 @@ public class TorrentController {
             throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
         }
         return new TorrentInfoResponseDTO(torrent);
+    }
+
+    @PostMapping("/scrape")
+    @SaCheckPermission("torrent:scrape")
+    public TorrentScrapeResponseDTO scrape(@RequestBody TorrentScrapeRequestDTO scrapeRequestDTO) {
+        Map<String, ScrapeContainerDTO> scrapes = new HashMap<>();
+        Map<String, List<PeerInfoResponseDTO>> details = new HashMap<>();
+        for (String infoHash : scrapeRequestDTO.getTorrents()) {
+            Torrent torrent = torrentService.getTorrent(infoHash);
+            if (torrent == null) {
+                continue;
+            }
+            PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
+            scrapes.put(infoHash, new ScrapeContainerDTO(peerStatus.downloaded(), peerStatus.complete(), peerStatus.incomplete(), peerStatus.downloaders()));
+            details.put(infoHash, peerService.getPeers(infoHash).stream().map(PeerInfoResponseDTO::new).collect(Collectors.toList()));
+        }
+        return new TorrentScrapeResponseDTO(scrapes, details);
     }
 
     @GetMapping("/download/{info_hash}")

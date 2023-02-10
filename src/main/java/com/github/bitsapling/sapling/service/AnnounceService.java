@@ -90,7 +90,7 @@ public class AnnounceService {
         // Register torrent into peers
         Peer peer = peerService.getPeer(task.ip(), task.port(), task.infoHash());
         if (peer == null) {
-            peer = createNewPeer(task);
+            peer = createNewPeer(task, user);
         }
         long lastUploaded = peer.getUploaded();
         long lastDownload = peer.getDownloaded();
@@ -156,7 +156,7 @@ public class AnnounceService {
 
 
     @NotNull
-    private Peer createNewPeer(AnnounceTask task) {
+    private Peer createNewPeer(AnnounceTask task, User user) {
         log.debug("Creating a new peer for: {}", task.infoHash());
         // TorrentEntity torrent = torrentRepository.findByInfoHash(task.infoHash()).orElseThrow();
         return new Peer(
@@ -173,8 +173,9 @@ public class AnnounceService {
                 task.event() == AnnounceEventType.PAUSED,
                 task.passKey(),
                 Timestamp.from(Instant.now()),
-                0,0,
-                0
+                0, 0,
+                0,
+                user
         );
     }
 

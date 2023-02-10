@@ -96,6 +96,7 @@ public class TorrentService {
                         .withPage(searchRequestDTO.getPage()));
     }
 
+
     @NotNull
     public Page<Torrent> search(@NotNull String keyword, @NotNull List<String> categoriesRequired, @NotNull List<String> promotionRequired, @NotNull List<String> tagRequired, @NotNull Pageable pageable) {
         List<Category> categoriesRequiredId = new ArrayList<>();

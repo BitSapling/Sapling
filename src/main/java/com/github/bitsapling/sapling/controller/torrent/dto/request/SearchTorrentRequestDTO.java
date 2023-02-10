@@ -1,22 +1,27 @@
 package com.github.bitsapling.sapling.controller.torrent.dto.request;
 
-import com.github.bitsapling.sapling.objects.ResponsePojo;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-@EqualsAndHashCode(callSuper = true)
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearchTorrentRequestDTO extends ResponsePojo {
+public class SearchTorrentRequestDTO {
     private String keyword;
     private List<String> promotion;
     private List<String> category;
+
     private List<String> tag;
     private boolean includeDeadTorrent;
+    @PositiveOrZero
     private int page;
+    @Min(1)
+    @Max(300)
     private int entriesPerPage;
 }

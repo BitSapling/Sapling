@@ -17,6 +17,7 @@ import com.github.bitsapling.sapling.service.PermissionService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.UserGroupService;
 import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.type.PrivacyLevel;
 import com.github.bitsapling.sapling.util.TorrentParser;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
@@ -184,7 +185,8 @@ public class DebugController {
             permissions.add(new Permission(0, "category:list", false));
             permissions.add(new Permission(0,"torrent:publish_anonymous", false));
             permissions.add(new Permission(0,"torrent:bypass_review", false));
-            permissions.add(new Permission(0,"feed:subscribe", false));
+            permissions.add(new Permission(0, "feed:subscribe", false));
+            permissions.add(new Permission(0, "torrent:scrape", false));
             permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
             PromotionPolicy promotionPolicy = promotionService.save( new PromotionPolicy(0, "normal", "无促销", 1.0d, 1.0d));
             UserGroup userGroup = userGroupService.save(new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy));
@@ -209,7 +211,8 @@ public class DebugController {
                     BigDecimal.ZERO,
                     0,
                     0,
-                    new UUID(1,0).toString().replace("_","")));
+                    new UUID(1, 0).toString().replace("_", ""),
+                    PrivacyLevel.LOW));
             log.info("创建测试用户 1 成功");
             User user2 = userService.save(new User(0,
                     "test2@test.com",
@@ -232,7 +235,8 @@ public class DebugController {
                     BigDecimal.ZERO,
                     5,
                     0,
-                    new UUID(2,0).toString().replace("_","")));
+                    new UUID(2, 0).toString().replace("_", ""),
+                    PrivacyLevel.LOW));
             log.info("创建测试用户 2 成功");
             Category category = categoryService.save(new Category(0,"test-category", "这是一个测试分类", "fa fa-book"));
             return "初始化基本数据库测试内容成功";

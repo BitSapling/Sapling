@@ -116,7 +116,7 @@ public class AnnounceController {
                 continue;
             }
             Map<String, Object> meta = new LinkedHashMap<>();
-            PeerStatus peerStatus = getPeerStatus(infoHash);
+            PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
             meta.put("downloaded", peerStatus.downloaded());
             meta.put("complete", peerStatus.complete());
             meta.put("incomplete", peerStatus.incomplete());
@@ -202,7 +202,7 @@ public class AnnounceController {
         for (String filteredIp : filteredIps) {
             announceBackgroundJob.handleTask(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
-        String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(infoHash, numWant, compact)));
+        String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(torrent, numWant, compact)));
         log.debug("Base64 Response: {}", Base64.getEncoder().encodeToString(peers.getBytes(StandardCharsets.ISO_8859_1)));
         performanceMonitorService.recordStats(System.nanoTime() - ns);
         return ResponseEntity.ok()
@@ -289,24 +289,26 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponse(String infoHash, int numWant, boolean compact) throws RetryableAnnounceException {
+    private Map<String, Object> generatePeersResponse(Torrent torrent, int numWant, boolean compact) throws RetryableAnnounceException {
         Map<String, Object> resp;
         if (compact) {
-            resp = generatePeersResponseCompat(infoHash, numWant);
+            resp = generatePeersResponseCompat(torrent, numWant);
         } else {
-            resp = generatePeersResponseNonCompat(infoHash, numWant, compact);
+            resp = generatePeersResponseNonCompat(torrent, numWant, compact);
         }
         return resp;
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponseCompat(String infoHash, int numWant) throws RetryableAnnounceException {
-        PeerResult peers = gatherPeers(infoHash, numWant);
+    private Map<String, Object> generatePeersResponseCompat(@NotNull Torrent torrent, int numWant) throws RetryableAnnounceException {
+        PeerResult peers = gatherPeers(torrent.getInfoHash(), numWant);
+        PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
-        dict.put("complete", peers.complete());
-        dict.put("incomplete", peers.incomplete());
-        dict.put("downloaders", peers.downloaders());
+        dict.put("complete", peerStatus.complete());
+        dict.put("incomplete", peerStatus.incomplete());
+        dict.put("downloaded", peerStatus.downloaded());
+        dict.put("downloaders", peerStatus.downloaders());
         dict.put("peers", BencodeUtil.compactPeers(peers.peers(), false));
         if (peers.peers6().size() > 0) {
             dict.put("peers6", BencodeUtil.compactPeers(peers.peers6(), true));
@@ -315,8 +317,9 @@ public class AnnounceController {
     }
 
     @NotNull
-    private Map<String, Object> generatePeersResponseNonCompat(@NotNull String infoHash, int numWant, boolean noPeerId) {
-        PeerResult peers = gatherPeers(infoHash, numWant);
+    private Map<String, Object> generatePeersResponseNonCompat(@NotNull Torrent torrent, int numWant, boolean noPeerId) {
+        PeerResult peers = gatherPeers(torrent.getInfoHash(), numWant);
+        PeerService.PeerStatus peerStatus = peerService.getPeerStatus(torrent);
         List<Map<String, Object>> peerList = new ArrayList<>();
         List<Peer> allPeers = new ArrayList<>(peers.peers());
         allPeers.addAll(peers.peers6());
@@ -331,9 +334,10 @@ public class AnnounceController {
         }
         Map<String, Object> dict = new HashMap<>();
         dict.put("interval", randomInterval());
-        dict.put("complete", peers.complete());
-        dict.put("incomplete", peers.incomplete());
-        dict.put("downloaders",peers.downloaders());
+        dict.put("complete", peerStatus.complete());
+        dict.put("incomplete", peerStatus.incomplete());
+        dict.put("downloaded", peerStatus.downloaded());
+        dict.put("downloaders", peerStatus.downloaders());
         dict.put("peers", peerList);
         return dict;
     }
@@ -355,26 +359,7 @@ public class AnnounceController {
         return random.nextInt(trackerConfig.getTorrentIntervalMin(), trackerConfig.getTorrentIntervalMax());
     }
 
-    @NotNull
-    public PeerStatus getPeerStatus(@NotNull String infoHash) {
-        List<Peer> peers = peerService.getPeers(infoHash);
-        int complete = (int) peers.stream().filter(Peer::isSeeder).count();
-        int incomplete = (int) peers.stream().filter(peer -> !peer.isSeeder()).count();
-        int downloaders = (int) peers.stream().filter(Peer::isPartialSeeder).count();
-        Torrent torrent = torrentService.getTorrent(infoHash);
-        int downloaded;
-        if (torrent != null) {
-            downloaded = (int) torrent.getFinishes();
-        } else {
-            downloaded = 0;
-        }
-        return new PeerStatus(complete, incomplete, downloaded,downloaders);
-    }
-
     record PeerResult(@NotNull List<Peer> peers, List<Peer> peers6, long complete, long incomplete, int downloaders) {
     }
 
-    record PeerStatus(int complete, int incomplete, int downloaded, int downloaders) {
-
-    }
 }

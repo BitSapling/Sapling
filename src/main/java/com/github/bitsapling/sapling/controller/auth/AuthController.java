@@ -6,14 +6,15 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.controller.auth.dto.request.LoginRequestDTO;
 import com.github.bitsapling.sapling.controller.auth.dto.request.RegisterRequestDTO;
 import com.github.bitsapling.sapling.controller.dto.response.LoginStatusResponseDTO;
-import com.github.bitsapling.sapling.controller.dto.response.UserSessionResponseDTO;
 import com.github.bitsapling.sapling.controller.dto.response.UserResponseDTO;
+import com.github.bitsapling.sapling.controller.dto.response.UserSessionResponseDTO;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIErrorCode;
 import com.github.bitsapling.sapling.exception.APIGenericException;
 import com.github.bitsapling.sapling.service.AuthenticationService;
 import com.github.bitsapling.sapling.service.UserGroupService;
 import com.github.bitsapling.sapling.service.UserService;
+import com.github.bitsapling.sapling.type.PrivacyLevel;
 import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.PasswordHash;
 import jakarta.servlet.http.HttpServletRequest;
@@ -140,7 +141,7 @@ public class AuthController {
                 BigDecimal.ZERO,
                 0,
                 0L,
-                UUID.randomUUID().toString()));
+                UUID.randomUUID().toString(), PrivacyLevel.LOW));
         StpUtil.login(user.getId());
         return getUserBasicInformation(user);
     }
