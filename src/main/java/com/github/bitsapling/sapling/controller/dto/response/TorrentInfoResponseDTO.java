@@ -40,7 +40,6 @@ public class TorrentInfoResponseDTO extends ResponsePojo {
         this.title = torrent.getTitle();
         this.subTitle = torrent.getSubTitle();
         this.size = torrent.getSize();
-        this.finishes = torrent.getFinishes();
         this.createdAt = torrent.getCreatedAt();
         this.updatedAt = torrent.getUpdatedAt();
         this.underReview = torrent.isUnderReview();
