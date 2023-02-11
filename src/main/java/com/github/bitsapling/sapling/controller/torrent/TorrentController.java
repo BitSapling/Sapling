@@ -8,7 +8,9 @@ import com.github.bitsapling.sapling.config.TrackerConfig;
 import com.github.bitsapling.sapling.controller.dto.response.ScrapeContainerDTO;
 import com.github.bitsapling.sapling.controller.dto.response.TorrentInfoResponseDTO;
 import com.github.bitsapling.sapling.controller.dto.response.TransferHistoryDTO;
+import com.github.bitsapling.sapling.controller.dto.response.UserTinyResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.request.SearchTorrentRequestDTO;
+import com.github.bitsapling.sapling.controller.torrent.dto.request.ThanksResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.request.TorrentScrapeRequestDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentScrapeResponseDTO;
 import com.github.bitsapling.sapling.controller.torrent.dto.response.TorrentSearchResultResponseDTO;
@@ -17,6 +19,7 @@ import com.github.bitsapling.sapling.controller.torrent.form.TorrentUploadForm;
 import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.entity.Tag;
+import com.github.bitsapling.sapling.entity.Thanks;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.exception.APIGenericException;
@@ -30,6 +33,7 @@ import com.github.bitsapling.sapling.service.PeerService;
 import com.github.bitsapling.sapling.service.PromotionService;
 import com.github.bitsapling.sapling.service.SettingService;
 import com.github.bitsapling.sapling.service.TagService;
+import com.github.bitsapling.sapling.service.ThanksService;
 import com.github.bitsapling.sapling.service.TorrentService;
 import com.github.bitsapling.sapling.service.TransferHistoryService;
 import com.github.bitsapling.sapling.service.UserService;
@@ -50,6 +54,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,6 +102,8 @@ public class TorrentController {
     private AuthenticationService authenticationService;
     @Autowired
     private PeerService peerService;
+    @Autowired
+    private ThanksService thanksService;
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
@@ -190,6 +197,33 @@ public class TorrentController {
             details.put(infoHash, transferHistoryService.getTransferHistory(torrent).stream().map(TransferHistoryDTO::new).toList());
         }
         return new TorrentScrapeResponseDTO(scrapes, details);
+    }
+
+    @PutMapping("/thanks/{info_hash}")
+    @SaCheckPermission("torrent:thanks")
+    public HttpEntity<?> sayThanks(@PathVariable("info_hash") String infoHash) {
+        User user = userService.getUser(StpUtil.getLoginIdAsLong());
+        Torrent torrent = torrentService.getTorrent(infoHash);
+        if (torrent == null) {
+            throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
+        }
+        if (thanksService.sayThanks(torrent, user)) {
+            return ResponseEntity.ok().build();
+        } else {
+            throw new APIGenericException(YOU_ALREADY_THANKED_THIS_TORRENT, "You have already expressed your thanks for the current Torrent");
+        }
+    }
+
+    @GetMapping("/thanks/{info_hash}")
+    @SaCheckPermission("torrent:view")
+    public ThanksResponseDTO queryThanks(@PathVariable("info_hash") String infoHash) {
+        Torrent torrent = torrentService.getTorrent(infoHash);
+        if (torrent == null) {
+            throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
+        }
+        List<Thanks> thanks = thanksService.getLast15ThanksByTorrent(torrent);
+        long thanksAmount = thanksService.countThanksForTorrent(torrent);
+        return new ThanksResponseDTO(thanksAmount, thanks.stream().map(t -> new UserTinyResponseDTO(t.getUser())).toList());
     }
 
     @GetMapping("/download/{info_hash}")
