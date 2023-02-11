@@ -29,7 +29,7 @@ import java.util.List;
         },
         indexes = {
                 @Index(columnList = "title"),
-                @Index(columnList = "subtitle"),
+                @Index(columnList = "sub_title"),
                 @Index(columnList = "promotion_policy_id")
         }
 )
