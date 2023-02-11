@@ -221,7 +221,7 @@ public class TorrentController {
         if (torrent == null) {
             throw new APIGenericException(TORRENT_NOT_EXISTS, "This torrent not registered on this tracker");
         }
-        List<Thanks> thanks = thanksService.getLast15ThanksByTorrent(torrent);
+        List<Thanks> thanks = thanksService.getLast25ThanksByTorrent(torrent);
         long thanksAmount = thanksService.countThanksForTorrent(torrent);
         return new ThanksResponseDTO(thanksAmount, thanks.stream().map(t -> new UserTinyResponseDTO(t.getUser())).toList());
     }

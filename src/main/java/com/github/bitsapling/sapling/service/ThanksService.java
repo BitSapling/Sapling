@@ -29,8 +29,8 @@ public class ThanksService {
         return repository.existsByTorrentAndUser(torrent, user);
     }
 
-    public List<Thanks> getLast15ThanksByTorrent(Torrent torrent) {
-        return repository.getThanksByTorrentOrderByIdDesc(torrent, Pageable.ofSize(15).withPage(0));
+    public List<Thanks> getLast25ThanksByTorrent(Torrent torrent) {
+        return repository.getThanksByTorrentOrderByIdDesc(torrent, Pageable.ofSize(25).withPage(0));
     }
 
     public long countThanksForTorrent(Torrent torrent) {
