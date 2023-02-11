@@ -32,7 +32,7 @@ public class TorrentParser {
     private final Map<String, Long> fileList = new LinkedHashMap<>();
     private Map<String, Object> dict;
     private long totalSize;
-    private boolean calcFiles;
+    private final boolean calcFiles;
 
     public TorrentParser(File file, boolean calcFiles) throws IOException, BencodeException, TorrentException, ClassCastException {
         this.data = Files.readAllBytes(file.toPath());
