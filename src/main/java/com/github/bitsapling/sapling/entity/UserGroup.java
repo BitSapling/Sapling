@@ -23,7 +23,6 @@ import java.util.List;
 @Entity
 @Table(name = "user_groups",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
                 @UniqueConstraint(columnNames = {"slug"}),
         }
 )

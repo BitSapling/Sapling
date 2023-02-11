@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -21,8 +22,10 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "exams",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"})
-                , @UniqueConstraint(columnNames = {"user_id"})
+                @UniqueConstraint(columnNames = {"user_id"})
+        },
+        indexes = {
+                @Index(columnList = "user_id")
         }
 )
 @Data

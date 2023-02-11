@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "permissions",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
                 @UniqueConstraint(columnNames = {"slug"})
         }
 )

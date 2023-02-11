@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "exam_plans",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
                 @UniqueConstraint(columnNames = {"slug"})
+        },
+        indexes = {
+                @Index(columnList = "slug")
         }
 )
 @Data

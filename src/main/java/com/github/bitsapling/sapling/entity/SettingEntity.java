@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "settings",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
                 @UniqueConstraint(columnNames = {"setting_key"})
         }
 )

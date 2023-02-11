@@ -16,8 +16,7 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 @Table(name = "tags",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"})
-                , @UniqueConstraint(columnNames = {"name"})
+                 @UniqueConstraint(columnNames = {"name"})
         }
 )
 @Data

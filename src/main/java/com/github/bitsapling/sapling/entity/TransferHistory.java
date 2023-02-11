@@ -22,9 +22,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "transfer_history",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
-                @UniqueConstraint(columnNames = {"user_id"}),
-                @UniqueConstraint(columnNames = {"torrent_id"})
+                @UniqueConstraint(columnNames = {"user_id", "torrent_id"})
         }
 )
 @Data

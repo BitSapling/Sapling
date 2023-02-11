@@ -40,3 +40,4 @@ out/
 /config
 /src/main/resources/application-db-tencentcloud.yml
 /src/main/resources/application-db-vultr.yml
+/public/

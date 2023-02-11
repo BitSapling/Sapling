@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,10 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 @Table(name = "categories",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"})
-                , @UniqueConstraint(columnNames = {"slug"})
+                @UniqueConstraint(columnNames = {"slug"})
+        },
+        indexes = {
+                @Index(columnList = "slug")
         }
 )
 @Data

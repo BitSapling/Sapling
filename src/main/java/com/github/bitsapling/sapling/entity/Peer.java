@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -22,6 +23,9 @@ import java.sql.Timestamp;
 @Table(name = "peers",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"ip", "port", "info_hash"})
+        },
+        indexes = {
+                @Index(columnList = "updateAt")
         }
 )
 @Data

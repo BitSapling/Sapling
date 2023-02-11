@@ -7,10 +7,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,9 +21,8 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "login_history",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"id"}),
-
+        indexes = {
+                @Index(columnList = "loginTime")
         }
 )
 @Data
