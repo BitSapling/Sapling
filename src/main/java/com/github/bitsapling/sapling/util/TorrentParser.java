@@ -32,33 +32,40 @@ public class TorrentParser {
     private final Map<String, Long> fileList = new LinkedHashMap<>();
     private Map<String, Object> dict;
     private long totalSize;
+    private boolean calcFiles;
 
-    public TorrentParser(File file) throws IOException, BencodeException, TorrentException, ClassCastException {
+    public TorrentParser(File file, boolean calcFiles) throws IOException, BencodeException, TorrentException, ClassCastException {
         this.data = Files.readAllBytes(file.toPath());
+        this.calcFiles = calcFiles;
         init();
     }
 
-    public TorrentParser(InputStream stream) throws IOException, BencodeException, TorrentException, ClassCastException {
+    public TorrentParser(InputStream stream, boolean calcFiles) throws IOException, BencodeException, TorrentException, ClassCastException {
         this.data = stream.readAllBytes();
+        this.calcFiles = calcFiles;
         init();
     }
 
-    public TorrentParser(URL url) throws IOException, BencodeException, TorrentException, ClassCastException {
+    public TorrentParser(URL url, boolean calcFiles) throws IOException, BencodeException, TorrentException, ClassCastException {
         try (InputStream stream = url.openStream()) {
             this.data = stream.readAllBytes();
         }
+        this.calcFiles = calcFiles;
         init();
     }
 
-    public TorrentParser(byte[] data) throws BencodeException, TorrentException, ClassCastException {
+    public TorrentParser(byte[] data, boolean calcFiles) throws BencodeException, TorrentException, ClassCastException {
         this.data = data;
+        this.calcFiles = calcFiles;
         init();
     }
 
     private void init() throws InvalidTorrentVerifyException, InvalidTorrentVersionException, InvalidTorrentFileException, ClassCastException, EmptyTorrentFileException {
         this.dict = BencodeUtil.bittorrent().decode(this.data, Type.DICTIONARY);
         validate();
-        verifyAndCalcFiles();
+        if (calcFiles) {
+            verifyAndCalcFiles();
+        }
     }
 
     private void validate() throws InvalidTorrentFileException, InvalidTorrentVersionException, InvalidTorrentVerifyException, ClassCastException {
@@ -119,7 +126,7 @@ public class TorrentParser {
             String finalPath = pathBuilder.toString();
             // BitComet stuff
             if (finalPath.contains("_____padding_file_")) {
-                log.debug("Skipped {} because it's a BitComet padding file.", finalPath);
+                //log.debug("Skipped {} because it's a BitComet padding file.", finalPath);
                 continue;
             }
             this.fileList.put(finalPath, size);
@@ -133,6 +140,9 @@ public class TorrentParser {
     }
 
     public long getTorrentFilesSize() {
+        if (!calcFiles) {
+            throw new IllegalStateException("Files not calculated yet!");
+        }
         return totalSize;
     }
 
@@ -149,6 +159,9 @@ public class TorrentParser {
     }
 
     public Map<String, Long> getFileList() {
+        if (!calcFiles) {
+            throw new IllegalStateException("Files not calculated yet!");
+        }
         return fileList;
     }
 

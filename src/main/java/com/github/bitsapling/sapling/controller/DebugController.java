@@ -158,7 +158,7 @@ public class DebugController {
     @GetMapping("/parseTorrents")
     public String parseTorrent() throws IOException, TorrentException {
         StringJoiner joiner = new StringJoiner("\n");
-        TorrentParser parser = new TorrentParser(new File("1.torrent"));
+        TorrentParser parser = new TorrentParser(new File("1.torrent"), true);
         joiner.add("File Size: " + parser.getTorrentFilesSize());
         joiner.add("Pieces Length: " + parser.getTorrentFilesSize());
         Map<String, Long> fileList = parser.getFileList();

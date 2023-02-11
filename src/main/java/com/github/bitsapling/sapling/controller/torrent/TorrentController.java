@@ -141,7 +141,7 @@ public class TorrentController {
             tags.add(Objects.requireNonNullElseGet(t, () -> tagService.save(new Tag(0, tag))));
         }
         try {
-            TorrentParser parser = new TorrentParser(form.getFile().getBytes());
+            TorrentParser parser = new TorrentParser(form.getFile().getBytes(), true);
             parser.rewriteForTracker(siteBasicConfig.getSiteName(), publisher, publisherUrl);
             String infoHash = parser.getInfoHash();
             if (torrentService.getTorrent(infoHash) != null) {
@@ -257,7 +257,7 @@ public class TorrentController {
         if (!torrentFile.exists()) {
             throw new APIGenericException(TORRENT_FILE_MISSING, "This torrent's file are missing on this tracker, please contact with system administrator.");
         }
-        TorrentParser parser = new TorrentParser(Files.readAllBytes(torrentFile.toPath()));
+        TorrentParser parser = new TorrentParser(Files.readAllBytes(torrentFile.toPath()), false);
         parser.rewriteForUser(trackerConfig.getTrackerURL(), torrent.getUser().getPasskey(), user);
         String fileName = "[" + trackerConfig.getTorrentPrefix() + "] " + torrent.getTitle() + ".torrent";
         HttpHeaders header = new HttpHeaders();
