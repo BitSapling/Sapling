@@ -73,11 +73,11 @@ public class DebugController {
         int debugTorrents = 0;
         long dbTimeStart = System.currentTimeMillis();
         for (Torrent entity : torrentRepository.findAll()) {
-            debugTorrents ++;
+            debugTorrents++;
             torrentsJoiner.add(new DebugTorrent(entity).toString());
         }
         for (Peer peer : peersRepository.findAll()) {
-            debugPeers ++;
+            debugPeers++;
             peersJoiner.add(new DebugPeer(peer).toString());
         }
         long dbTimeEnd = System.currentTimeMillis() - dbTimeStart;
@@ -93,66 +93,6 @@ public class DebugController {
         resp = resp.replace("%%debug_page_consumed%%", String.valueOf(System.currentTimeMillis() - startTime));
         resp = resp.replace("%%announce_job_avg%%", String.valueOf(announcePerformanceMonitorService.avgJobMs()));
         return resp;
-    }
-    @Getter
-    @ToString
-    static class DebugTorrent{
-        private final long id;
-        private final String infoHash;
-        private final String title;
-        private final String subTitle;
-        private final long size;
-        private final Timestamp createdAt;
-        private final Timestamp updatedAt;
-        private final boolean underReview;
-        private final boolean anonymous;
-        private final Category category;
-        private final PromotionPolicy promotionPolicy;
-        private final String description;
-        public DebugTorrent(Torrent torrent){
-            this.id = torrent.getId();
-            this.infoHash = torrent.getInfoHash();
-            this.title = torrent.getTitle();
-            this.subTitle = torrent.getSubTitle();
-            this.size = torrent.getSize();
-            this.createdAt = torrent.getCreatedAt();
-            this.updatedAt = torrent.getUpdatedAt();
-            this.underReview = torrent.isUnderReview();
-            this.anonymous = torrent.isAnonymous();
-            this.category = torrent.getCategory();
-            this.promotionPolicy = torrent.getPromotionPolicy();
-            this.description = torrent.getDescription();
-
-        }
-    }
-    @Getter
-    @ToString
-    static class DebugPeer{
-        private final long id;
-        private final String ip;
-        private final int port;
-        private final String infoHash;
-        private final String userAgent;
-        private final long uploaded;
-        private final long downloaded;
-        private final long left;
-        private final boolean seeder;
-        private final Timestamp updateAt;
-        private final long seedingTime;
-
-        public DebugPeer(Peer peer){
-            this.id = peer.getId();
-            this.ip = peer.getIp();
-            this.port = peer.getPort();
-            this.infoHash = peer.getInfoHash();
-            this.userAgent = peer.getUserAgent();
-            this.uploaded = peer.getUploaded();
-            this.downloaded = peer.getDownloaded();
-            this.left = peer.getLeft();
-            this.seeder = peer.isSeeder();
-            this.updateAt = peer.getUpdateAt();
-            this.seedingTime = peer.getSeedingTime();
-        }
     }
 
     @GetMapping("/parseTorrents")
@@ -181,12 +121,12 @@ public class DebugController {
             permissions.add(new Permission(0, "torrent:search", false));
             permissions.add(new Permission(0, "promotion:list", false));
             permissions.add(new Permission(0, "category:list", false));
-            permissions.add(new Permission(0,"torrent:publish_anonymous", false));
-            permissions.add(new Permission(0,"torrent:bypass_review", false));
+            permissions.add(new Permission(0, "torrent:publish_anonymous", false));
+            permissions.add(new Permission(0, "torrent:bypass_review", false));
             permissions.add(new Permission(0, "feed:subscribe", false));
             permissions.add(new Permission(0, "torrent:thanks", false));
             permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
-            PromotionPolicy promotionPolicy = promotionService.save( new PromotionPolicy(0, "normal", "无促销", 1.0d, 1.0d));
+            PromotionPolicy promotionPolicy = promotionService.save(new PromotionPolicy(0, "normal", "无促销", 1.0d, 1.0d));
             UserGroup userGroup = userGroupService.save(new UserGroup(0, "default", "Lv.1 青铜", permissions, promotionPolicy));
             User user = userService.save(new User(0,
                     "test@test.com",
@@ -236,11 +176,90 @@ public class DebugController {
                     new UUID(2, 0).toString().replace("_", ""),
                     PrivacyLevel.LOW));
             log.info("创建测试用户 2 成功");
-            Category category = categoryService.save(new Category(0,"test-category", "这是一个测试分类", "fa fa-book"));
+            categoryService.save(new Category(0, "test-category", "这是一个测试分类", "fa fa-book"));
+            categoryService.save(new Category(0, "movie-sd", "电影/标清", "fa fa-book"));
+            categoryService.save(new Category(0, "movie-hd", "电影/高清", "fa fa-book"));
+            categoryService.save(new Category(0, "movie-dvd", "电影/DVDISO", "fa fa-book"));
+            categoryService.save(new Category(0, "movie-bluray", "电影/Blu-Ray", "fa fa-book"));
+            categoryService.save(new Category(0, "movie-remux", "电影/Remux", "fa fa-book"));
+            categoryService.save(new Category(0, "tv-sd", "影视剧/标清", "fa fa-book"));
+            categoryService.save(new Category(0, "tv-hd", "影视剧/高清", "fa fa-book"));
+            categoryService.save(new Category(0, "tv-dvd", "影视剧/DVDISO", "fa fa-book"));
+            categoryService.save(new Category(0, "tv-bluray", "影视剧/Blu-Ray", "fa fa-book"));
+            categoryService.save(new Category(0, "documentary-edu", "纪录片/教育", "fa fa-book"));
+            categoryService.save(new Category(0, "anime", "动画", "fa fa-book"));
+            categoryService.save(new Category(0, "sports", "体育", "fa fa-book"));
+            categoryService.save(new Category(0, "software", "软件", "fa fa-book"));
+            categoryService.save(new Category(0, "game", "游戏", "fa fa-book"));
+            categoryService.save(new Category(0, "ebook", "电子书", "fa fa-book"));
+            categoryService.save(new Category(0, "other", "其它", "fa fa-book"));
             return "初始化基本数据库测试内容成功";
         } catch (Exception e) {
             log.error("Error: ", e);
             throw e;
+        }
+    }
+
+    @Getter
+    @ToString
+    static class DebugTorrent {
+        private final long id;
+        private final String infoHash;
+        private final String title;
+        private final String subTitle;
+        private final long size;
+        private final Timestamp createdAt;
+        private final Timestamp updatedAt;
+        private final boolean underReview;
+        private final boolean anonymous;
+        private final Category category;
+        private final PromotionPolicy promotionPolicy;
+        private final String description;
+
+        public DebugTorrent(Torrent torrent) {
+            this.id = torrent.getId();
+            this.infoHash = torrent.getInfoHash();
+            this.title = torrent.getTitle();
+            this.subTitle = torrent.getSubTitle();
+            this.size = torrent.getSize();
+            this.createdAt = torrent.getCreatedAt();
+            this.updatedAt = torrent.getUpdatedAt();
+            this.underReview = torrent.isUnderReview();
+            this.anonymous = torrent.isAnonymous();
+            this.category = torrent.getCategory();
+            this.promotionPolicy = torrent.getPromotionPolicy();
+            this.description = torrent.getDescription();
+
+        }
+    }
+
+    @Getter
+    @ToString
+    static class DebugPeer {
+        private final long id;
+        private final String ip;
+        private final int port;
+        private final String infoHash;
+        private final String userAgent;
+        private final long uploaded;
+        private final long downloaded;
+        private final long left;
+        private final boolean seeder;
+        private final Timestamp updateAt;
+        private final long seedingTime;
+
+        public DebugPeer(Peer peer) {
+            this.id = peer.getId();
+            this.ip = peer.getIp();
+            this.port = peer.getPort();
+            this.infoHash = peer.getInfoHash();
+            this.userAgent = peer.getUserAgent();
+            this.uploaded = peer.getUploaded();
+            this.downloaded = peer.getDownloaded();
+            this.left = peer.getLeft();
+            this.seeder = peer.isSeeder();
+            this.updateAt = peer.getUpdateAt();
+            this.seedingTime = peer.getSeedingTime();
         }
     }
 }
