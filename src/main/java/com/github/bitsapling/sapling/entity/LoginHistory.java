@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "login_history",
         indexes = {
-                @Index(columnList = "loginTime")
+                @Index(columnList = "time")
         }
 )
 @Data

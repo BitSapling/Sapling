@@ -184,7 +184,6 @@ public class DebugController {
             permissions.add(new Permission(0,"torrent:publish_anonymous", false));
             permissions.add(new Permission(0,"torrent:bypass_review", false));
             permissions.add(new Permission(0, "feed:subscribe", false));
-            permissions.add(new Permission(0, "torrent:scrape", false));
             permissions.add(new Permission(0, "torrent:thanks", false));
             permissions = permissions.stream().map(p -> permissionService.save(p)).toList();
             PromotionPolicy promotionPolicy = promotionService.save( new PromotionPolicy(0, "normal", "无促销", 1.0d, 1.0d));

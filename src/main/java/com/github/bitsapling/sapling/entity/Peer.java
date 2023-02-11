@@ -25,7 +25,7 @@ import java.sql.Timestamp;
                 @UniqueConstraint(columnNames = {"ip", "port", "info_hash"})
         },
         indexes = {
-                @Index(columnList = "updateAt")
+                @Index(columnList = "update_at")
         }
 )
 @Data
