@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -32,8 +35,14 @@ public class TransferHistoryService {
     }
 
     @NotNull
+    public List<TransferHistory> getTransferHistoryActive(@NotNull Torrent torrent) {
+        Timestamp timestamp = Timestamp.from(Instant.now().minus(2, ChronoUnit.HOURS));
+        return repository.findAllByTorrentAndUpdatedAtAfterOrderByUpdatedAt(torrent, timestamp);
+    }
+
+    @NotNull
     public PeerStatus getPeerStatus(@NotNull Torrent torrent) {
-        List<TransferHistory> histories = getTransferHistory(torrent);
+        List<TransferHistory> histories = getTransferHistoryActive(torrent);
         int complete = 0;
         int incomplete = 0;
         int downloaders = 0;

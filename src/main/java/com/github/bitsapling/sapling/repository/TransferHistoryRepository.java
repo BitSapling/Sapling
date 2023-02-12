@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 @Repository
@@ -16,4 +17,6 @@ public interface TransferHistoryRepository extends CrudRepository<TransferHistor
     List<TransferHistory> findAllByUserOrderByUpdatedAt(@NotNull User user);
 
     List<TransferHistory> findAllByTorrentOrderByUpdatedAt(@NotNull Torrent torrent);
+
+    List<TransferHistory> findAllByTorrentAndUpdatedAtAfterOrderByUpdatedAt(@NotNull Torrent torrent, Timestamp after);
 }
