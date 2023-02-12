@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.repository.PeersRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +20,7 @@ import java.util.Locale;
 @Service
 @Repository
 @Slf4j
-@Transactional
+
 public class PeerService {
     @Autowired
     private PeersRepository repository;

@@ -4,7 +4,6 @@ import com.github.bitsapling.sapling.entity.LoginHistory;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.repository.LoginHistoryRepository;
 import com.github.bitsapling.sapling.type.LoginType;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Service
-@Transactional
+
 public class LoginHistoryService {
     @Autowired
     private LoginHistoryRepository repository;

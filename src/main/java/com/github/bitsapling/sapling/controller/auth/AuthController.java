@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -104,6 +105,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Transactional
     public UserSessionResponseDTO register(@RequestBody RegisterRequestDTO register) {
         if (StringUtils.isEmpty(register.getEmail())) {
             throw new APIGenericException(MISSING_PARAMETERS, "Email parameter is required");

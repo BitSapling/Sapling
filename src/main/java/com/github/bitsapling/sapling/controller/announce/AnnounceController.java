@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -89,6 +91,7 @@ public class AnnounceController {
 
 
     @GetMapping("/scrape")
+    @Transactional
     public ResponseEntity<String> scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
         // https://wiki.vuze.com/w/Scrape
         String passkey = gets.get("passkey");
@@ -145,6 +148,7 @@ public class AnnounceController {
 
 
     @GetMapping("/announce")
+    @Transactional
     public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, RetryableAnnounceException {
         long ns = System.nanoTime();
         String[] ipv4 = request.getParameterValues("ipv4");
@@ -167,7 +171,7 @@ public class AnnounceController {
         boolean noPeerId = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("nopeerid"), gets.get("no_peerid"), gets.get("no_peer_id"))).orElse("0"));
         boolean supportCrypto = BooleanUtil.parseBoolean(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("supportcrypto"), gets.get("support crypto"), gets.get("support_crypto"))).orElse("0"));
         boolean compact = BooleanUtil.parseBoolean(gets.get("compact"));
-        String peerIp = Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(IPUtil.getRequestIp(request));
+        List<String> peerIp = cutIps(Optional.ofNullable(MiscUtil.anyNotNull(gets.get("ip"), gets.get("address"), gets.get("ipaddress"), gets.get("ip_address"), gets.get("ip address"))).orElse(IPUtil.getRequestIp(request)));
         String infoHash = InfoHashUtil.parseInfoHash(readInfoHash(request.getQueryString()));
         long downloaded = Math.max(0, Long.parseLong(gets.get("downloaded")));
         long uploaded = Math.max(0, Long.parseLong(gets.get("uploaded")));
@@ -183,8 +187,8 @@ public class AnnounceController {
         }
         // User had permission to announce torrents
         // Create an announce tasks and drop into background, end this request as fast as possible
-        Set<String> peerIps = new HashSet<>();
-        peerIps.add(peerIp);
+        Set<String> peerIps = new HashSet<>(peerIp);
+
         if (ipv4 != null) {
             peerIps.addAll(List.of(ipv4));
         }
@@ -204,6 +208,16 @@ public class AnnounceController {
         return ResponseEntity.ok()
                 .header("Content-Type", "text/plain; charset=iso-8859-1")
                 .body(peers);
+    }
+
+    private List<String> cutIps(String str) {
+        List<String> ips = new ArrayList<>();
+        if (str.contains(",")) {
+            ips.addAll(Arrays.stream(str.split(",")).map(String::trim).toList());
+        } else {
+            ips.add(str);
+        }
+        return ips;
     }
 
     @Nullable

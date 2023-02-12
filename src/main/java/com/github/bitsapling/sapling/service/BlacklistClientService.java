@@ -3,7 +3,6 @@ package com.github.bitsapling.sapling.service;
 import com.github.bitsapling.sapling.exception.BrowserReadableAnnounceException;
 import com.github.bitsapling.sapling.exception.FixedAnnounceException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,7 @@ import java.util.Arrays;
 
 @Service
 @Repository
-@Transactional
+
 public class BlacklistClientService {
     private static final String[] BROWSER_BOT_SOFTWARE_KEYWORDS = new String[]{
             "Mozilla",

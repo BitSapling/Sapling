@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.repository.PromotionPolicyRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+
 public class PromotionService {
     @Autowired
     private PromotionPolicyRepository repository;

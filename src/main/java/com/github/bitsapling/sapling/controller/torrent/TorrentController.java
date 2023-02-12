@@ -51,6 +51,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -107,6 +108,7 @@ public class TorrentController {
 
     @PostMapping("/upload")
     @SaCheckPermission("torrent:upload")
+    @Transactional
     public ResponseEntity<ResponsePojo> upload(TorrentUploadForm form) throws IOException {
         if (StringUtils.isEmpty(form.getTitle())) {
             throw new APIGenericException(MISSING_PARAMETERS, "You must provide a title.");
@@ -204,6 +206,7 @@ public class TorrentController {
 
     @PutMapping("/thanks/{info_hash}")
     @SaCheckPermission("torrent:thanks")
+    @Transactional
     public HttpEntity<?> sayThanks(@PathVariable("info_hash") String infoHash) {
         User user = userService.getUser(StpUtil.getLoginIdAsLong());
         Torrent torrent = torrentService.getTorrent(infoHash);

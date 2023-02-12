@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Permission;
 import com.github.bitsapling.sapling.repository.PermissionRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @Repository
-@Transactional
+
 public class PermissionService {
     @Autowired
     private PermissionRepository repository;

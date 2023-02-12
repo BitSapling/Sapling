@@ -2,13 +2,12 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Exam;
 import com.github.bitsapling.sapling.repository.ExamRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
+
 public class ExamService {
     @Autowired
     private ExamRepository repository;

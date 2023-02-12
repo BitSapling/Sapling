@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Category;
 import com.github.bitsapling.sapling.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
+
 public class CategoryService {
     @Autowired
     private CategoryRepository repository;

@@ -8,7 +8,6 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.repository.TorrentRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+
 public class TorrentService {
     @Autowired
     private TorrentRepository torrentRepository;

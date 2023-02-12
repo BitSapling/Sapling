@@ -5,7 +5,6 @@ import cn.dev33.satoken.stp.StpInterface;
 import com.github.bitsapling.sapling.entity.Permission;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.util.HibernateSessionUtil;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Component
 @Slf4j
-@Transactional
+
 public class SaTokenPermImpl implements StpInterface {
     @Autowired
     private UserService userService;

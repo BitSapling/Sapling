@@ -2,14 +2,13 @@ package com.github.bitsapling.sapling.service;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Component
-@Transactional
+
 public class AnnouncePerformanceMonitorService {
     private final Instant startTime = Instant.now();
     private final Cache<UUID, Long> announceTimes = CacheBuilder

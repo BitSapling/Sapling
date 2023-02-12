@@ -2,14 +2,13 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.UserGroup;
 import com.github.bitsapling.sapling.repository.UserGroupRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
+
 public class UserGroupService {
     @Autowired
     private UserGroupRepository repository;

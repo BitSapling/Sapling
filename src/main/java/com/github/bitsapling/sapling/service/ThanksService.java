@@ -4,7 +4,6 @@ import com.github.bitsapling.sapling.entity.Thanks;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.repository.ThanksRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Transactional
+
 public class ThanksService {
     @Autowired
     private ThanksRepository repository;

@@ -5,7 +5,6 @@ import com.github.bitsapling.sapling.entity.TransferHistory;
 import com.github.bitsapling.sapling.entity.User;
 import com.github.bitsapling.sapling.repository.TransferHistoryRepository;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
-@Transactional
+
 public class TransferHistoryService {
     @Autowired
     private TransferHistoryRepository repository;

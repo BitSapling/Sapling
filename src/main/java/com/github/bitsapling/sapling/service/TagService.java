@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.service;
 
 import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.repository.TagRepository;
-import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Locale;
 
 @Service
-@Transactional
+
 public class TagService {
     @Autowired
     private TagRepository repository;
