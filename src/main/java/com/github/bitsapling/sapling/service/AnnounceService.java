@@ -4,13 +4,16 @@ import com.github.bitsapling.sapling.entity.Peer;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.TransferHistory;
 import com.github.bitsapling.sapling.entity.User;
+import com.github.bitsapling.sapling.exception.AnnounceBusyException;
 import com.github.bitsapling.sapling.type.AnnounceEventType;
 import com.github.bitsapling.sapling.util.ExecutorUtil;
+import com.github.bitsapling.sapling.util.HibernateSessionUtil;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -20,7 +23,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 @Service
 @Slf4j
-
 public class AnnounceService {
     private final BlockingDeque<AnnounceTask> taskQueue = new LinkedBlockingDeque<>(40960);
     @Autowired
@@ -37,50 +39,41 @@ public class AnnounceService {
     private AnnouncePerformanceMonitorService monitorService;
     @Autowired
     private TransferHistoryService transferHistoryService;
+    @Autowired
+    private HibernateSessionUtil sessionUtil;
 
     public AnnounceService() {
+        Thread announceHandleThread = new Thread(() -> {
+            while (true) {
+                try {
+                    AnnounceTask announceTask = taskQueue.take();
+                    boolean participate = sessionUtil.bindToThread();
+                    try {
+                        long start = System.nanoTime();
+                        handleTask(announceTask);
+                        monitorService.recordJobStats(System.nanoTime() - start);
+                    } catch (Exception e) {
+                        log.error("Error handling task: {}", announceTask, e);
+                    } finally {
+                        sessionUtil.closeFromThread(participate);
+                    }
+                } catch (InterruptedException e) {
+                    log.error("Announce handling thread interrupted", e);
+                }
+            }
+        });
+        announceHandleThread.setName("Announce Handling");
+        announceHandleThread.setDaemon(true);
+        announceHandleThread.start();
     }
 
-//    public void schedule(@NotNull AnnounceTask announceTask) {
-//        try {
-//            executor.getAnnounceExecutor().submit(() -> {
-//                SessionFactory sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-//                boolean participate = bindHibernateSessionToThread(sessionFactory);
-//                try {
-//                    long start = System.nanoTime();
-//                    handleTask(announceTask);
-//                    monitorService.recordJobStats(System.nanoTime() - start);
-//                } catch (Exception e) {
-//                    log.error("Error handling task: {}", announceTask, e);
-//                } finally {
-//                    closeHibernateSessionFromThread(participate, sessionFactory);
-//                }
-//            });
-//        }catch (RejectedExecutionException)
-//    }
-//
-//    public void closeHibernateSessionFromThread(boolean participate, Object sessionFactory) {
-//        if (!participate) {
-//            SessionHolder sessionHolder = (SessionHolder) TransactionSynchronizationManager
-//                    .unbindResource(sessionFactory);
-//            SessionFactoryUtils.closeSession(sessionHolder.getSession());
-//        }
-//    }
-//
-//    public boolean bindHibernateSessionToThread(SessionFactory sessionFactory) {
-//        if (TransactionSynchronizationManager.hasResource(sessionFactory)) {
-//            // Do not modify the Session: just set the participate flag.
-//            return true;
-//        } else {
-//            Session session = sessionFactory.openSession();
-//            session.setFlushMode(FlushMode.MANUAL.toJpaFlushMode());
-//            SessionHolder sessionHolder = new SessionHolder(session);
-//            TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
-//        }
-//        return false;
-//    }
+    public void schedule(@NotNull AnnounceTask announceTask) throws AnnounceBusyException {
+        if (!this.taskQueue.offer(announceTask))
+            throw new AnnounceBusyException();
+    }
 
-    public void handleTask(AnnounceTask task) throws NoSuchElementException {
+    @Transactional
+    void handleTask(AnnounceTask task) throws NoSuchElementException {
         // Multi-threaded
         User user = userService.getUser(task.userId());
         if (user == null) throw new IllegalStateException("User not exists anymore");

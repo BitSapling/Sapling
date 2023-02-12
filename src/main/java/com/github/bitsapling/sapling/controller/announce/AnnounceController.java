@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -91,7 +90,6 @@ public class AnnounceController {
 
 
     @GetMapping("/scrape")
-    @Transactional
     public ResponseEntity<String> scrape(@RequestParam Map<String, String> gets) throws FixedAnnounceException {
         // https://wiki.vuze.com/w/Scrape
         String passkey = gets.get("passkey");
@@ -148,7 +146,6 @@ public class AnnounceController {
 
 
     @GetMapping("/announce")
-    @Transactional
     public ResponseEntity<String> announce(@RequestParam Map<String, String> gets) throws FixedAnnounceException, RetryableAnnounceException {
         long ns = System.nanoTime();
         String[] ipv4 = request.getParameterValues("ipv4");
@@ -201,7 +198,7 @@ public class AnnounceController {
             throw new InvalidAnnounceException("Invalid IP address");
         }
         for (String filteredIp : filteredIps) {
-            announceBackgroundJob.handleTask(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
+            announceBackgroundJob.schedule(new AnnounceService.AnnounceTask(filteredIp, port, infoHash, peerId, uploaded, downloaded, left, event, numWant, user.getId(), compact, noPeerId, supportCrypto, redundant, request.getHeader("User-Agent"), passkey, torrent.getId()));
         }
         String peers = BencodeUtil.convertToString(BencodeUtil.bittorrent().encode(generatePeersResponse(torrent, numWant, compact)));
         performanceMonitorService.recordStats(System.nanoTime() - ns);
