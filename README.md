@@ -30,6 +30,10 @@ BitSapling 是一个使用 Java 语言基于 Spring Boot 的 BitTorrent Private 
 BitSapling 是一个典型的前后端分离设计，所有的操作均通过 JsonAPI 交互完成。  
 默认情况下，API 端点位于 `/api` 下，例如：`http://localhost:8081/api/user/login`。
 
+对于 API 文档，您可参考： [BitSapling on APIFox](https://www.apifox.cn/apidoc/shared-ada880b4-d488-4716-93c9-c7f160cd582e)
+
+**目前项目还在大量修改和添加功能，API 可能会随时发生变化**
+
 ## BEP 进展
 
 ### 已实现的 BitTorrent BEP

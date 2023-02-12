@@ -13,7 +13,7 @@ import java.util.List;
 public class TorrentBasicResponseDTO extends ResponsePojo {
     private final long id;
     private final String infoHash;
-    private final UserResponseDTO user;
+    private final UserTinyResponseDTO user;
     private final String title;
     private final String subTitle;
     private final long size;
@@ -31,7 +31,7 @@ public class TorrentBasicResponseDTO extends ResponsePojo {
         if(torrent.isAnonymous()){
             this.user = null;
         }else{
-            this.user = new UserResponseDTO(torrent.getUser());
+            this.user = new UserTinyResponseDTO(torrent.getUser());
         }
         this.title = torrent.getTitle();
         this.subTitle = torrent.getSubTitle();
