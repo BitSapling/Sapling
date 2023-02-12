@@ -3,10 +3,12 @@ package com.github.bitsapling.sapling.controller.dto.response;
 import com.github.bitsapling.sapling.entity.TransferHistory;
 import com.github.bitsapling.sapling.type.PrivacyLevel;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
 import java.sql.Timestamp;
 
 @Data
+@Validated
 public class TransferHistoryDTO {
     private long id;
     private UserBasicResponseDTO user;

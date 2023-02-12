@@ -6,12 +6,14 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.validation.annotation.Validated;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class TorrentInfoResponseDTO extends ResponsePojo {
     private long id;
     private String infoHash;

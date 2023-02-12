@@ -5,9 +5,11 @@ import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.validation.annotation.Validated;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class UserGroupResponseDTO extends ResponsePojo {
     private long id;
     private String slug;

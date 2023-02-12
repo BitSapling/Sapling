@@ -185,6 +185,9 @@ public class TorrentController {
     @PostMapping("/scrape")
     @SaCheckPermission("torrent:scrape")
     public TorrentScrapeResponseDTO scrape(@RequestBody TorrentScrapeRequestDTO scrapeRequestDTO) {
+        if (scrapeRequestDTO.getTorrents() == null) {
+            throw new APIGenericException(MISSING_PARAMETERS, "You must provide a list of info_hash");
+        }
         Map<String, ScrapeContainerDTO> scrapes = new HashMap<>();
         Map<String, List<TransferHistoryDTO>> details = new HashMap<>();
         for (String infoHash : scrapeRequestDTO.getTorrents()) {

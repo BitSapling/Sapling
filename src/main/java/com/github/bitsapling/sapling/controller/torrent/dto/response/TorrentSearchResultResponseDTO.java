@@ -5,11 +5,13 @@ import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class TorrentSearchResultResponseDTO extends ResponsePojo {
     private long totalElements;
     private int totalPages;

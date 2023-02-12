@@ -5,11 +5,13 @@ import com.github.bitsapling.sapling.entity.Tag;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Getter;
+import org.springframework.validation.annotation.Validated;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
+@Validated
 public class TorrentBasicResponseDTO extends ResponsePojo {
     private final long id;
     private final String infoHash;

@@ -5,11 +5,13 @@ import com.github.bitsapling.sapling.objects.ResponsePojo;
 import com.github.bitsapling.sapling.type.PrivacyLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.validation.annotation.Validated;
 
 import java.sql.Timestamp;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class PeerInfoResponseDTO extends ResponsePojo {
     private long id;
     private UserBasicResponseDTO user;

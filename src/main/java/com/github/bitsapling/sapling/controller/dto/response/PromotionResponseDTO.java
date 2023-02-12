@@ -4,9 +4,11 @@ import com.github.bitsapling.sapling.entity.PromotionPolicy;
 import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.validation.annotation.Validated;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class PromotionResponseDTO extends ResponsePojo {
     private long id;
     private String slug;

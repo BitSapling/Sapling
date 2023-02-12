@@ -5,11 +5,13 @@ import com.github.bitsapling.sapling.objects.ResponsePojo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class UserResponseDTO extends ResponsePojo {
     private long id;
     private String email;

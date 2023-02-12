@@ -5,10 +5,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Validated
 public class TorrentUploadSuccessResponseDTO extends ResponsePojo {
     private final String originalName;
     private final String name;
