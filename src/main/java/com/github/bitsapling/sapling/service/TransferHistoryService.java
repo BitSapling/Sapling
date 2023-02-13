@@ -69,6 +69,9 @@ public class TransferHistoryService {
                 if (history.getLeft() == 0) { // 下载报告已完成
                     complete++;
                 }
+                if (history.isHaveCompleteHistory()) { // 曾经完成过下载
+                    downloaded++;
+                }
             }
         }
         return new PeerStatus(complete, incomplete, downloaded, downloaders);
