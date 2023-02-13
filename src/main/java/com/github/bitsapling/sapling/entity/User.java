@@ -14,8 +14,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -43,7 +41,6 @@ public class User {
     @Column(name = "username", nullable = false)
     private String username;
     @PrimaryKeyJoinColumn(name = "group", referencedColumnName = "id")
-    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private UserGroup group;

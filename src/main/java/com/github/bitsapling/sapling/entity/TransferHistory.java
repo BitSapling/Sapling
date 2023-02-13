@@ -14,8 +14,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
 
@@ -36,12 +34,10 @@ public class TransferHistory {
     @PrimaryKeyJoinColumn
     @ManyToOne
     @JsonBackReference
-    @Cascade({CascadeType.ALL})
     private User user;
     @PrimaryKeyJoinColumn
     @ManyToOne
     @JsonBackReference
-    @Cascade({CascadeType.ALL})
     private Torrent torrent;
     @Column(name = "to_go", nullable = false)
     private long left;

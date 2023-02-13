@@ -16,8 +16,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -45,7 +43,6 @@ public class Torrent {
     @Column(name = "info_hash", nullable = false, updatable = false)
     private String infoHash;
     @PrimaryKeyJoinColumn
-    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private User user;
@@ -67,14 +64,12 @@ public class Torrent {
     @JsonBackReference
     @PrimaryKeyJoinColumn
     private Category category;
-    @Cascade({CascadeType.ALL})
     @ManyToOne
     @PrimaryKeyJoinColumn
     @JsonBackReference
     private PromotionPolicy promotionPolicy;
     @Column(name = "description", nullable = false, columnDefinition = "mediumtext")
     private String description;
-    @Cascade({CascadeType.ALL})
     @OneToMany
     @PrimaryKeyJoinColumn
     @JsonManagedReference

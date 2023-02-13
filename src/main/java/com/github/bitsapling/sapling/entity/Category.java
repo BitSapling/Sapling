@@ -11,8 +11,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "categories",
@@ -32,10 +30,8 @@ public class Category {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
     @Column(name = "slug", nullable = false, updatable = false)
-    @Cascade({CascadeType.ALL})
     private String slug;
     @Column(name = "name", nullable = false)
-    @Cascade({CascadeType.ALL})
     private String name;
     @Column(name = "icon", nullable = false)
     private String icon;

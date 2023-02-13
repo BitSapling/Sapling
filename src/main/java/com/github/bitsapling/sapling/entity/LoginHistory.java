@@ -14,8 +14,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.sql.Timestamp;
 
@@ -34,7 +32,6 @@ public class LoginHistory {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
     @PrimaryKeyJoinColumn(name = "group", referencedColumnName = "id")
-    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private User user;

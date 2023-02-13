@@ -10,8 +10,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "tags",
@@ -28,6 +26,5 @@ public class Tag {
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
     @Column(name = "name", nullable = false, updatable = false)
-    @Cascade({CascadeType.ALL})
     private String name;
 }

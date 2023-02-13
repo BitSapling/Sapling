@@ -1,10 +1,8 @@
 package com.github.bitsapling.sapling.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -67,7 +65,7 @@ public class Peer {
     @Column(name = "download_speed", nullable = false)
     private long downloadSpeed;
     @PrimaryKeyJoinColumn
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonBackReference
     private User user;
 

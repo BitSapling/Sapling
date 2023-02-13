@@ -15,8 +15,6 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import java.util.List;
 
@@ -39,13 +37,11 @@ public class UserGroup {
     @Column(name = "display_name", nullable = false)
     private String displayName;
     @OneToMany
-    @Cascade({CascadeType.ALL})
     @PrimaryKeyJoinColumn
     @JsonManagedReference
     private List<Permission> permissionEntities;
 
     @PrimaryKeyJoinColumn
-    @Cascade({CascadeType.ALL})
     @ManyToOne
     @JsonBackReference
     private PromotionPolicy promotionPolicy;
