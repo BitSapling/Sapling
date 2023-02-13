@@ -16,6 +16,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@DynamicUpdate
 public class Torrent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

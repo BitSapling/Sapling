@@ -14,6 +14,8 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SelectBeforeUpdate;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -29,6 +31,8 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicUpdate
+@SelectBeforeUpdate
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
