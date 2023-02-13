@@ -2,9 +2,9 @@ package com.github.bitsapling.sapling.autoconfig;
 
 import com.github.bitsapling.sapling.crontask.PeersCleanup;
 import org.jetbrains.annotations.NotNull;
-import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.spi.JobFactory;
@@ -15,10 +15,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
-
-import javax.sql.DataSource;
 
 @Configuration
 @EnableScheduling
@@ -26,7 +23,8 @@ public class QuartzConfig {
     @Bean
     public JobDetail jobDetail() {
         return JobBuilder.newJob(PeersCleanup.class)
-                .withIdentity("peers_cleanup", "system_tasks")
+                .withIdentity("peers_cleanup")
+                .withDescription("Peers Cleanup")
                 .storeDurably()
                 .build();
     }
@@ -35,9 +33,8 @@ public class QuartzConfig {
     public Trigger trigger() {
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail())
-                .withIdentity("peers_cleanup", "system_tasks")
+                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
                 .startNow()
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/20 * * * ?"))
                 .build();
     }
 
@@ -46,18 +43,6 @@ public class QuartzConfig {
         AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
         jobFactory.setApplicationContext(applicationContext);
         return jobFactory;
-    }
-
-    @Bean(destroyMethod = "destroy")
-    public SchedulerFactoryBean schedulerFactoryBean(JobFactory jobFactory, DataSource dataSource) {
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-        schedulerFactoryBean.setJobFactory(jobFactory);
-        schedulerFactoryBean.setOverwriteExistingJobs(true);
-        schedulerFactoryBean.setStartupDelay(2);
-        schedulerFactoryBean.setAutoStartup(true);
-        schedulerFactoryBean.setDataSource(dataSource);
-        schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContext");
-        return schedulerFactoryBean;
     }
 
     public static class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory implements ApplicationContextAware {

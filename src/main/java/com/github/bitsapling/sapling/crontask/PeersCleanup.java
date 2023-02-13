@@ -15,7 +15,7 @@ public class PeersCleanup extends QuartzJobBean {
     private PeerService peerService;
 
     @Override
-    protected void executeInternal(@NotNull JobExecutionContext context) {
+    public void executeInternal(@NotNull JobExecutionContext context) {
         log.info("Executing the peers cleanup...");
         int count = peerService.cleanup();
         log.info("Peers cleanup complete! Purged {} peers.", count);
