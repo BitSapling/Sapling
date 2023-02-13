@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1'
     implementation 'org.apache.commons:commons-pool2'
     implementation 'com.rometools:rome:1.18.0'
+    implementation "com.alicp.jetcache:jetcache-starter-redis:2.7.3"
 }
 
 tasks.named('test') {

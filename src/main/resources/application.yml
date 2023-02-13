@@ -1,3 +1,7 @@
+redis:
+  host: localhost
+  port: 6379
+  database: 3
 spring:
   profiles:
     active: test,caching,db-tencentcloud
@@ -10,11 +14,10 @@ spring:
           auto: update
   data:
     redis:
-      database: 3
+      database: ${redis.database}
       timeout: 3000
-      #password: 123456
-      port: 6379
-      host: localhost
+      port: ${redis.host}
+      host: ${redis.host}
       jedis:
         pool:
           max-idle: 8

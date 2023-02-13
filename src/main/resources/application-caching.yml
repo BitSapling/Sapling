@@ -18,3 +18,24 @@ spring:
       time-to-live: 86400
       enable-statistics: true
       use-key-prefix: true
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: caffeine #other choose：caffeine
+      keyConvertor: jackson #other choose：fastjson/jackson
+      limit: 100
+  remote:
+    default:
+      type: redis
+      keyConvertor: jackson #other choose：fastjson/jackson
+      broadcastChannel: sapling
+      valueEncoder: java #other choose：kryo/kryo5
+      valueDecoder: java #other choose：kryo/kryo5
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      host: ${redis.host}
+      port: ${redis.port}
