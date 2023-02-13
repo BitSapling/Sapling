@@ -1,5 +1,7 @@
 package com.github.bitsapling.sapling.service;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import com.github.bitsapling.sapling.config.TrackerConfig;
 import com.github.bitsapling.sapling.entity.Torrent;
 import com.github.bitsapling.sapling.entity.TransferHistory;
@@ -44,6 +46,7 @@ public class TransferHistoryService {
     }
 
     @NotNull
+    @Cached(expire = 600, cacheType = CacheType.BOTH)
     public PeerStatus getPeerStatus(@NotNull Torrent torrent) {
         TrackerConfig config = settingService.get(TrackerConfig.getConfigKey(), TrackerConfig.class);
         List<TransferHistory> histories = getTransferHistory(torrent);
