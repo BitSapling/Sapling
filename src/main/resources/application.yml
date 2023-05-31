@@ -28,6 +28,8 @@ spring:
     job-store-type: jdbc
     wait-for-jobs-to-complete-on-shutdown: true
     overwrite-existing-jobs: true
+    jdbc:
+      initialize-schema: always
     properties:
       org:
         quartz:
