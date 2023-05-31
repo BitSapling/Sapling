@@ -16,7 +16,7 @@ spring:
     redis:
       database: ${redis.database}
       timeout: 3000
-      port: ${redis.host}
+      port: ${redis.port}
       host: ${redis.host}
       jedis:
         pool:
