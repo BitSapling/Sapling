@@ -41,3 +41,5 @@ out/
 /src/main/resources/application-db-tencentcloud.yml
 /src/main/resources/application-db-vultr.yml
 /public/
+
+application*.yml
