@@ -2,11 +2,7 @@ package com.github.bitsapling.sapling.autoconfig;
 
 import com.github.bitsapling.sapling.crontask.PeersCleanup;
 import org.jetbrains.annotations.NotNull;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
