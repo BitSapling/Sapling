@@ -43,3 +43,6 @@ out/
 /public/
 
 application*.yml
+application.yml
+application-caching.yml
+application-test.yml
