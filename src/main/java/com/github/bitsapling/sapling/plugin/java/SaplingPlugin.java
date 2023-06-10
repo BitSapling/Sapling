@@ -1,16 +1,23 @@
 package com.github.bitsapling.sapling.plugin.java;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.File;
 
 public abstract class SaplingPlugin {
+    private final File pluginFile;
+    private final PluginDescriptionFile description;
+    private final File dataFolder;
+    private final Logger pluginLogger;
     private boolean isEnabled = false;
-    private File pluginFile = null;
-    private PluginDescriptionFile description = null;
-    private File dataFolder = null;
-    private File configFile = null;
-    private Logger pluginLogger = null;
+
+    protected SaplingPlugin(@NotNull Logger logger, @NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile, @NotNull File dataFolder) {
+        this.pluginLogger = logger;
+        this.pluginFile = pluginFile;
+        this.description = descriptionFile;
+        this.dataFolder = dataFolder;
+    }
 
     public abstract void onLoad();
 
@@ -18,19 +25,31 @@ public abstract class SaplingPlugin {
 
     public abstract void onDisable();
 
+    @NotNull
     public File getDataFolder() {
         return dataFolder;
     }
 
+    @NotNull
     public PluginDescriptionFile getDescription() {
         return description;
     }
 
+    @NotNull
     public Logger getLogger() {
         return pluginLogger;
     }
 
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    protected void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    @NotNull
+    protected File getPluginFile() {
+        return pluginFile;
     }
 }

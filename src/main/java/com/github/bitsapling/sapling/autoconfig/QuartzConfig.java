@@ -1,8 +1,6 @@
 package com.github.bitsapling.sapling.autoconfig;
 
-import com.github.bitsapling.sapling.crontask.PeersCleanup;
 import org.jetbrains.annotations.NotNull;
-import org.quartz.*;
 import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -16,23 +14,23 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 @Configuration
 @EnableScheduling
 public class QuartzConfig {
-    @Bean
-    public JobDetail jobDetail() {
-        return JobBuilder.newJob(PeersCleanup.class)
-                .withIdentity("peers_cleanup")
-                .withDescription("Peers Cleanup")
-                .storeDurably()
-                .build();
-    }
+//    @Bean
+//    public JobDetail jobDetail() {
+//        return JobBuilder.newJob(PeersCleanup.class)
+//                .withIdentity("peers_cleanup")
+//                .withDescription("Peers Cleanup")
+//                .storeDurably()
+//                .build();
+//    }
 
-    @Bean
-    public Trigger trigger() {
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail())
-                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
-                .startNow()
-                .build();
-    }
+//    @Bean
+//    public Trigger trigger() {
+//        return TriggerBuilder.newTrigger()
+//                .forJob(jobDetail())
+//                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(30))
+//                .startNow()
+//                .build();
+//    }
 
     @Bean
     public JobFactory jobFactory(ApplicationContext applicationContext) {
