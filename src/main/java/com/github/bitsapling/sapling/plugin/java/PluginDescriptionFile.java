@@ -17,7 +17,7 @@ public class PluginDescriptionFile {
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9 _.-]+$");
     private final String name;
     private final String main;
-    private final String scanPackage;
+    private final List<String> scanPackage;
     private final String versionPlain;
     private final String description;
     private final List<String> authors;
@@ -38,7 +38,7 @@ public class PluginDescriptionFile {
         configNode = configurationLoader.load();
         this.name = configNode.node("name").getString();
         this.main = configNode.node("main").getString();
-        this.scanPackage = configNode.node("scan-package").getString();
+        this.scanPackage = configNode.node("scan-package").getList(String.class);
         this.versionPlain = configNode.node("version").getString();
         this.description = configNode.node("description").getString();
         this.authors = configNode.node("authors").getList(String.class);
@@ -54,9 +54,9 @@ public class PluginDescriptionFile {
         if (this.main == null) {
             throw new PluginDescriptionFileException("Invalid plugin main: " + this.main + ", it must not be null");
         }
-        if (this.scanPackage == null) {
-            throw new PluginDescriptionFileException("Invalid plugin scan-package: " + this.scanPackage + ", it must not be null");
-        }
+//        if (this.scanPackage.isEmpty()) {
+//            throw new PluginDescriptionFileException("Invalid plugin scan-package: " + this.scanPackage + ", it must not be empty");
+//        }
         if (this.versionPlain == null) {
             throw new PluginDescriptionFileException("Invalid plugin version: " + this.versionPlain + ", it must not be null");
         }
@@ -115,8 +115,7 @@ public class PluginDescriptionFile {
     }
 
     @NotNull
-    public String getScanPackage() {
+    public List<String> getScanPackage() {
         return scanPackage;
     }
-
 }
