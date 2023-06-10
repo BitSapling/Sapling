@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling;
 
 import com.github.bitsapling.sapling.plugin.PluginManager;
+import com.github.bitsapling.sapling.plugin.java.DummyScanObject;
 import com.github.bitsapling.sapling.plugin.java.DummyStub;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -45,7 +47,8 @@ public class SaplingApplication {
         //DummyScanObject scanObject = new DummyScanObject();
         // System.out.println(Arrays.toString(scanObject.getClass().getDeclaredAnnotations()));
         System.out.println(Arrays.toString(clazz.getDeclaredAnnotations()));
-        SpringApplication.run(SaplingApplication.class, args);
+        System.out.println("Debugging the annotation: " + Arrays.toString(DummyScanObject.class.getAnnotation(ComponentScan.class).basePackages()));
+        SpringApplication.run(new Class[]{SaplingApplication.class, clazz}, args);
     }
 
     private void preInit() {
