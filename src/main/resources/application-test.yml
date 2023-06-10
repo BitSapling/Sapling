@@ -1,8 +1,0 @@
-sa-token:
-  is-log: true
-logging:
-  level:
-    com.github.bitsapling.sapling: debug
-#spring:
-#  jpa:
-#    show-sql: true
