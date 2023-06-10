@@ -1,7 +1,6 @@
 package com.github.bitsapling.sapling;
 
 import com.github.bitsapling.sapling.plugin.PluginManager;
-import com.github.bitsapling.sapling.plugin.java.DummyScanObject;
 import com.github.bitsapling.sapling.plugin.java.DummyStub;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -33,8 +32,8 @@ public class SaplingApplication {
         var scan = info.getAnnotation("org.springframework.context.annotation.ComponentScan");
         var arr = new ArrayMemberValue(constpool);
         arr.setValue(new StringMemberValue[]{
-                new StringMemberValue("test.a", constpool),
-                new StringMemberValue("test.b", constpool),
+                new StringMemberValue("org.test", constpool),
+                // new StringMemberValue("test.b", constpool),
         });
         scan.addMemberValue("basePackages", arr);
         var base = scan.getMemberValue("basePackages");
@@ -43,8 +42,8 @@ public class SaplingApplication {
         classFile.addAttribute(info);
         System.out.println(base.toString());
         var clazz = ctClass.toClass(DummyStub.class);
-        DummyScanObject scanObject = new DummyScanObject();
-        System.out.println(Arrays.toString(scanObject.getClass().getDeclaredAnnotations()));
+        //DummyScanObject scanObject = new DummyScanObject();
+        // System.out.println(Arrays.toString(scanObject.getClass().getDeclaredAnnotations()));
         System.out.println(Arrays.toString(clazz.getDeclaredAnnotations()));
         SpringApplication.run(SaplingApplication.class, args);
     }
