@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling;
 
 import com.github.bitsapling.sapling.plugin.PluginManager;
+import com.github.bitsapling.sapling.plugin.java.DummyScanObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,8 +15,8 @@ public class SaplingApplication {
     @SuppressWarnings("FieldCanBeLocal")
     private PluginManager pluginManager;
 
-    public static void main(String[] args) {
-        new SaplingApplication().preInit();
+    public static void main(String[] args) throws Throwable {
+        DummyScanObject scanObject = new DummyScanObject();
         SpringApplication.run(SaplingApplication.class, args);
     }
 
