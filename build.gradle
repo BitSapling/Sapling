@@ -73,6 +73,7 @@ dependencies {
     implementation 'com.vdurmont:semver4j:3.1.0'
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.73'
     implementation("org.spongepowered:configurate-yaml:4.1.2")
+    implementation 'org.javassist:javassist:3.29.2-GA'
 }
 
 dependencyManagement {
