@@ -127,6 +127,7 @@ public class PluginManager {
     }
 
     public void enablePlugin() {
+        LOGGER.info("Enabling plugins...");
         for (SaplingPlugin plugin : plugins) {
             try {
                 plugin.getLogger().info("Enabling plugin " + plugin.getDescription().getName() + " v" + plugin.getDescription().getVersion() + "...");
