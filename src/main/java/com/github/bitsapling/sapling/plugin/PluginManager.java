@@ -24,6 +24,9 @@ public class PluginManager {
     private List<SaplingPlugin> plugins = new ArrayList<>();
 
     public void loadPlugins() throws IOException {
+        if (!isLoading) {
+            throw new IllegalStateException("Cannot load plugins while not loading");
+        }
         if (!pluginsDirectory.exists()) {
             if (!pluginsDirectory.mkdirs()) {
                 throw new IllegalStateException("Could not create plugins directory at " + pluginsDirectory.getAbsolutePath());
@@ -55,6 +58,9 @@ public class PluginManager {
     }
 
     private void loadPlugin(@NotNull File pluginFile) throws IOException, PluginDescriptionFileException {
+        if (!isLoading) {
+            throw new IllegalStateException("Cannot load plugins while not loading");
+        }
         if (!pluginFile.exists()) {
             throw new IOException("Plugin file does not exist at " + pluginFile.getAbsolutePath());
         }
