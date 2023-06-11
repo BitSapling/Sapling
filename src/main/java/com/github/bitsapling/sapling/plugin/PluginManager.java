@@ -127,6 +127,9 @@ public class PluginManager {
     }
 
     public void enablePlugin() {
+        if (!isLoading) {
+            throw new IllegalStateException("Cannot load plugins while not loading");
+        }
         LOGGER.info("Enabling plugins...");
         for (SaplingPlugin plugin : plugins) {
             try {

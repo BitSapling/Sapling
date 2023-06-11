@@ -15,5 +15,6 @@ public class PluginManagerStartupHook implements ApplicationListener<Application
     @Override
     public void onApplicationEvent(@NotNull ApplicationStartedEvent event) {
         pluginManager.enablePlugin();
+        pluginManager.setLoading(false);
     }
 }

@@ -32,7 +32,6 @@ public class SaplingApplication {
         } catch (Exception e) {
             LOGGER.error("Failed to load plugins", e);
         }
-        pluginManager.setLoading(false);
         return pluginManager.getAllPlugins().stream().map(SaplingPlugin::getMainClass).toList();
     }
 
