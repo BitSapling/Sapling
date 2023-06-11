@@ -11,9 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -71,15 +69,6 @@ public class PluginManager {
             }
             PluginDescriptionFile descriptionFile = new PluginDescriptionFile(new String(jar.getInputStream(jarEntry).readAllBytes(), StandardCharsets.UTF_8));
         }
-    }
-
-    public Set<String> getPluginScanPackages() {
-        Set<String> packages = new HashSet<>();
-        for (SaplingPlugin plugin : plugins) {
-            packages.add(plugin.getClass().getPackageName());
-            packages.addAll(plugin.getDescription().getScanPackage());
-        }
-        return packages;
     }
 
     public boolean isLoading() {
