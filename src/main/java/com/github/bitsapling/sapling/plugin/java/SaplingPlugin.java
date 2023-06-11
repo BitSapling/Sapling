@@ -10,9 +10,11 @@ public abstract class SaplingPlugin {
     private final PluginDescriptionFile description;
     private final File dataFolder;
     private final Logger pluginLogger;
+    private final ClassLoader classloader;
     private boolean isEnabled = false;
 
-    protected SaplingPlugin(@NotNull Logger logger, @NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile, @NotNull File dataFolder) {
+    protected SaplingPlugin(ClassLoader classLoader, @NotNull Logger logger, @NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile, @NotNull File dataFolder) {
+        this.classloader = classLoader;
         this.pluginLogger = logger;
         this.pluginFile = pluginFile;
         this.description = descriptionFile;
@@ -51,5 +53,9 @@ public abstract class SaplingPlugin {
     @NotNull
     protected File getPluginFile() {
         return pluginFile;
+    }
+
+    public ClassLoader getPluginClassloader() {
+        return classloader;
     }
 }
