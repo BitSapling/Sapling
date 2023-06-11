@@ -24,4 +24,8 @@ public class PluginClassLoader extends URLClassLoader {
         return super.loadClass(className);
     }
 
+    @Override
+    public void addURL(URL url) {
+        super.addURL(url);
+    }
 }

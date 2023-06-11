@@ -12,8 +12,13 @@ public abstract class SaplingPlugin {
     private final Logger pluginLogger;
     private final ClassLoader classloader;
     private boolean isEnabled = false;
+    private Class<SaplingPlugin> mainClass;
 
-    protected SaplingPlugin(ClassLoader classLoader, @NotNull Logger logger, @NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile, @NotNull File dataFolder) {
+    protected SaplingPlugin(@NotNull ClassLoader classLoader, @NotNull Class<SaplingPlugin> mainClass, @NotNull Logger logger, @NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile, @NotNull File dataFolder) {
+        // check if classLoader is com.github.bitsapling.sapling.plugin.java.PluginClassLoader
+        if (!(classLoader instanceof PluginClassLoader)) {
+            throw new IllegalArgumentException("ClassLoader must be an instance of PluginClassLoader");
+        }
         this.classloader = classLoader;
         this.pluginLogger = logger;
         this.pluginFile = pluginFile;
@@ -55,7 +60,8 @@ public abstract class SaplingPlugin {
         return pluginFile;
     }
 
-    public ClassLoader getPluginClassloader() {
-        return classloader;
+    @NotNull
+    public Class<SaplingPlugin> getMainClass() {
+        return mainClass;
     }
 }
