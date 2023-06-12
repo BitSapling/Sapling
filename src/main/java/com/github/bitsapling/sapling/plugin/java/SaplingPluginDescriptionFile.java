@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.plugin.java;
 
+import com.github.bitsapling.sapling.plugin.PluginDescriptionFile;
 import com.vdurmont.semver4j.Semver;
 import com.vdurmont.semver4j.SemverException;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class PluginDescriptionFile {
+public class SaplingPluginDescriptionFile implements PluginDescriptionFile {
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9 _.-]+$");
     private final String name;
     private final String main;
@@ -27,7 +28,7 @@ public class PluginDescriptionFile {
     private final CommentedConfigurationNode configNode;
     private Semver version = null;
 
-    public PluginDescriptionFile(String yaml) throws ConfigurateException, PluginDescriptionFileException {
+    public SaplingPluginDescriptionFile(String yaml) throws ConfigurateException, PluginDescriptionFileException {
         if (yaml == null) {
             throw new PluginDescriptionFileException("PluginDescriptionFile input cannot be null");
         }
@@ -79,41 +80,49 @@ public class PluginDescriptionFile {
         }
     }
 
+    @Override
     @NotNull
     public List<String> getAuthors() {
         return authors;
     }
 
+    @Override
     @NotNull
     public List<String> getContributors() {
         return contributors;
     }
 
+    @Override
     @NotNull
     public String getDescription() {
         return description;
     }
 
+    @Override
     @NotNull
     public Semver getVersion() {
         return version;
     }
 
+    @Override
     @NotNull
     public String getMain() {
         return main;
     }
 
+    @Override
     @NotNull
     public String getName() {
         return name;
     }
 
+    @Override
     @NotNull
     public String getWebsite() {
         return website;
     }
 
+    @Override
     @NotNull
     public List<String> getScanPackage() {
         return scanPackage;

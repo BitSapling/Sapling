@@ -1,6 +1,6 @@
 package com.github.bitsapling.sapling.hook;
 
-import com.github.bitsapling.sapling.plugin.PluginManager;
+import com.github.bitsapling.sapling.plugin.java.SaplingPluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PluginManagerStartupHook implements ApplicationListener<ApplicationStartedEvent> {
     @Autowired
-    private PluginManager pluginManager;
+    private SaplingPluginManager saplingPluginManager;
 
     @Override
     public void onApplicationEvent(@NotNull ApplicationStartedEvent event) {
-        pluginManager.enablePlugin();
-        pluginManager.setLoading(false);
+        saplingPluginManager.enablePlugin();
+        saplingPluginManager.setLoading(false);
     }
 }
