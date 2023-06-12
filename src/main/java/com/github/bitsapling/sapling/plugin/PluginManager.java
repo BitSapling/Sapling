@@ -28,7 +28,7 @@ public class PluginManager {
     private final List<SaplingPlugin> plugins = new ArrayList<>();
     private boolean isLoading;
 
-    public void loadPlugins() throws IOException {
+    public void loadPlugins() {
         if (!isLoading) {
             throw new IllegalStateException("Cannot load plugins while not loading");
         }
@@ -90,7 +90,8 @@ public class PluginManager {
         }
     }
 
-    private SaplingPlugin loadPluginToSaplingPlugin(File pluginFile, PluginDescriptionFile descriptionFile) throws MalformedURLException, InvalidPluginException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    @NotNull
+    private SaplingPlugin loadPluginToSaplingPlugin(@NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile) throws MalformedURLException, InvalidPluginException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         try {
             testPluginMainValidate(pluginFile, descriptionFile);
         } catch (Exception e) {
@@ -102,7 +103,7 @@ public class PluginManager {
         return (SaplingPlugin) constructor.newInstance(pluginClassLoader, mainClass, LoggerFactory.getLogger(descriptionFile.getName()), pluginsDirectory, descriptionFile, pluginFile);
     }
 
-    private void testPluginMainValidate(File pluginFile, PluginDescriptionFile descriptionFile) throws IOException, ClassNotFoundException, InvalidPluginException, NoSuchMethodException {
+    private void testPluginMainValidate(@NotNull File pluginFile, @NotNull PluginDescriptionFile descriptionFile) throws IOException, ClassNotFoundException, InvalidPluginException, NoSuchMethodException {
         try (PluginClassLoader validateClassLoader = new PluginClassLoader("validating-" + descriptionFile.getName(),
                 new URL[]{pluginFile.toURI().toURL()},
                 this.getClass().getClassLoader())) {
@@ -122,6 +123,7 @@ public class PluginManager {
         isLoading = loading;
     }
 
+    @NotNull
     public List<SaplingPlugin> getAllPlugins() {
         return ImmutableList.copyOf(this.plugins);
     }
