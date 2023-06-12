@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling;
 
+import com.github.bitsapling.sapling.plugin.Plugin;
 import com.github.bitsapling.sapling.plugin.PluginManager;
 import com.github.bitsapling.sapling.plugin.java.SaplingPlugin;
 import com.github.bitsapling.sapling.plugin.java.SaplingPluginManager;
@@ -33,7 +34,7 @@ public class SaplingApplication {
         } catch (Exception e) {
             LOGGER.error("Failed to load plugins", e);
         }
-        return saplingPluginManager.getAllPlugins().stream().map(SaplingPlugin::getMainClass).toList();
+        return saplingPluginManager.getAllPlugins().stream().map(Plugin::getMainClass).toList();
     }
 
     public static PluginManager getPluginManager() {
