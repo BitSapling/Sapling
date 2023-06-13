@@ -26,3 +26,21 @@ spring:
       save-mode: ON_SET_ATTRIBUTE
       flush-mode: ON_SAVE
       repository-type: default
+#  rabbitmq:
+#    addresses: 192.168.100.120:5672,192.168.100.121:5672,192.168.100.122:5672
+#    username: admin
+#    password: admin
+#    publisher-returns: true
+#    publisher-confirm-type: correlated
+#    virtual-host: /
+#    listener:
+#      type: simple
+#      simple:
+#        acknowledge-mode: auto
+#        prefetch: 1
+#        concurrency: 3
+#        max-concurrency: 3
+#        retry:
+#          enabled: true
+#          max-attempts: 5
+#          initial-interval: 3000
