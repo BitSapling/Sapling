@@ -20,20 +20,20 @@ services:
   mysql:
     image: 'mysql:latest'
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'MYSQL_DATABASE=sapling'
+      - 'MYSQL_PASSWORD=sapling'
+      - 'MYSQL_ROOT_PASSWORD=root'
+      - 'MYSQL_USER=sapling'
     ports:
-      - '3306'
+      - '36336:3306'
     volumes:
       - './data/mysql/etc/mysql/conf.d:/etc/mysql/conf.d'
       - './data/mysql/var/lib/mysql:/var/lib/mysql'
   rabbitmq:
     image: 'rabbitmq:latest'
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      - 'RABBITMQ_DEFAULT_PASS=sapling'
+      - 'RABBITMQ_DEFAULT_USER=sapling'
     ports:
       - '5672'
   redis:
