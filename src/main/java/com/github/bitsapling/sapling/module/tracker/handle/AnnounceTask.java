@@ -22,4 +22,6 @@ public class AnnounceTask {
     private final int redundant;
     private final @NotNull String userAgent;
     private final @NotNull String passKey;
+    private final long userId;
+    private final long torrentId;
 }
