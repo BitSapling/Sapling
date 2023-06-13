@@ -10,7 +10,7 @@ public class AnnounceTask {
     private final @NotNull String ip;
     private final int port;
     private final @NotNull String infoHash;
-    private final @NotNull String peerId;
+    private final byte[] peerId;
     private final long uploaded;
     private final long downloaded;
     private final long left;
