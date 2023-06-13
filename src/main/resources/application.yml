@@ -13,3 +13,16 @@ spring:
     sql-migration-suffixes: .sql
     validate-on-migrate: true
     baseline-on-migrate: true
+  data:
+    redis:
+      host: localhost
+      port: 16379
+  session:
+    store-type: redis
+    timeout: 8H
+    redis:
+      namespace: spring:sapling-session
+      cleanup-cron: 10 * * * * *
+      save-mode: ON_SET_ATTRIBUTE
+      flush-mode: ON_SAVE
+      repository-type: default
