@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.github.bitsapling.sapling.module.torrent.Torrent;
-import com.github.bitsapling.sapling.module.user.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -21,11 +19,11 @@ public class Peer implements Serializable {
     @TableField("id")
     private Long id;
     @TableField("torrent_id")
-    private Torrent torrent;
+    private Long torrent;
     @TableField("peer_id")
     private byte[] peerId;
     @TableField("user_id")
-    private User user;
+    private Long user;
     @TableField("ip")
     private String ip;
     @TableField("port")
