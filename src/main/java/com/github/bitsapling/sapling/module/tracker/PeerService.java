@@ -2,8 +2,8 @@ package com.github.bitsapling.sapling.module.tracker;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +11,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class PeerService {
+public abstract class PeerService implements IService<Peer> {
     @Autowired
     private PeerMapper mapper;
-
-    @NotNull
-    public List<Peer> getAllPeers() {
-        return mapper.selectList(Wrappers.lambdaQuery(Peer.class));
-    }
-
-    @Nullable
-    public Peer getPeer(@NotNull Long id) {
-        return mapper.selectById(id);
-    }
 
     @NotNull
     public List<Peer> getPeersByPeerId(byte[] peerId) {
@@ -67,17 +57,6 @@ public class PeerService {
         return mapper.selectList(wrapper);
     }
 
-    public void addPeer(@NotNull Peer peer) {
-        mapper.insert(peer);
-    }
-
-    public void deletePeer(@NotNull Peer peer) {
-        mapper.deleteById(peer.getId());
-    }
-
-    public void deletePeer(@NotNull Long id) {
-        mapper.deleteById(id);
-    }
 
     public void deletePeersByTorrentId(@NotNull Long torrentId) {
         mapper.delete(Wrappers.lambdaQuery(Peer.class)
@@ -93,10 +72,4 @@ public class PeerService {
         mapper.delete(Wrappers.lambdaQuery(Peer.class)
                 .le(Peer::getLastAction, earlyThan));
     }
-
-    public void updatePeer(@NotNull Peer peer) {
-        mapper.updateById(peer);
-    }
-
-
 }

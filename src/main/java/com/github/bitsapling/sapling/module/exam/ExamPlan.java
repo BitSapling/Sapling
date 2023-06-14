@@ -19,8 +19,6 @@ public class ExamPlan implements Serializable {
     private Long id;
     @TableField("name")
     private String name;
-    @TableField("exam_plan")
-    private Long examPlan;
     @TableField("duration")
     private BigInteger duration;
     @TableField("target_uploaded")
