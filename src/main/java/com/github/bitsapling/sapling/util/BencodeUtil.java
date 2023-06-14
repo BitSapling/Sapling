@@ -12,6 +12,10 @@ public class BencodeUtil {
         return new String(bytes, BITTORRENT_STANDARD.getCharset());
     }
 
+    public static byte[] convertToByteArray(String string) {
+        return string.getBytes(BITTORRENT_STANDARD.getCharset());
+    }
+
     public static Bencode bittorrent() {
         return BITTORRENT_STANDARD;
     }

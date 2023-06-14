@@ -78,6 +78,7 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk18on:1.73'
     implementation 'org.javassist:javassist:3.29.2-GA'
     implementation 'com.meilisearch.sdk:meilisearch-java:0.11.1'
+    implementation "org.springframework.integration:spring-integration-ip"
 }
 
 dependencyManagement {
