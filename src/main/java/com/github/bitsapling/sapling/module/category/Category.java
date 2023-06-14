@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @Accessors(chain = true)
 @TableName("categories")
-public class Category {
+public class Category implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @Data
-public class AnnounceTask {
+public class AnnounceTask implements Serializable {
     private final @NotNull String ip;
     private final int port;
     private final @NotNull String infoHash;

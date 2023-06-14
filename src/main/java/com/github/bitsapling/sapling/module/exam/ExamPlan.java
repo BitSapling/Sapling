@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @Data
 @Accessors(chain = true)
 @TableName("exams_plans")
-public class ExamPlan {
+public class ExamPlan implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

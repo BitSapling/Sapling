@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
 @TableName("audits")
-public class Audit {
+public class Audit implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

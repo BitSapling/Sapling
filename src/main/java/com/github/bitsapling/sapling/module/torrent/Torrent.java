@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
 @TableName("torrents")
-public class Torrent {
+public class Torrent implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

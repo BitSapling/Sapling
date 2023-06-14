@@ -7,13 +7,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 @Data
 @Accessors(chain = true)
 @TableName("user_metadata")
-public class UserMetadata {
+public class UserMetadata implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

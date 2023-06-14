@@ -9,13 +9,14 @@ import com.github.bitsapling.sapling.module.user.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
 @TableName("peers")
-public class Peer {
+public class Peer implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;

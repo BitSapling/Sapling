@@ -2,7 +2,9 @@ package com.github.bitsapling.sapling.module.mail;
 
 import org.jetbrains.annotations.Nullable;
 
-public enum MailDirection {
+import java.io.Serializable;
+
+public enum MailDirection implements Serializable {
     IN((short) 0),
     OUT((short) 1);
     private final short value;

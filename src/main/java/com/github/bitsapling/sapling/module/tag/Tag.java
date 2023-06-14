@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @Accessors(chain = true)
 @TableName("tags")
-public class Tag {
+public class Tag implements Serializable {
     @TableField("id")
     private Long id;
     @TableField("name")
