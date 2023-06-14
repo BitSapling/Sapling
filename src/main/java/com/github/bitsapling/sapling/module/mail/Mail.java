@@ -17,6 +17,8 @@ public class Mail implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField("id")
     private Long id;
+    @TableField("owner")
+    private Long owner;
     @TableField("sender")
     private Long sender;
     @TableField("sender_name")
