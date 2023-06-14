@@ -2,10 +2,9 @@ package com.github.bitsapling.sapling.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-import org.springframework.stereotype.Component;
 
-@Component
-public class PasswordUtil {
+//@Component
+public class Argon2idPwdUtil {
     private final static int SALT_LENGTH = 16384;
     private final static int HASH_LENGTH = 8;
     private final static int PARALLELISM = 4;

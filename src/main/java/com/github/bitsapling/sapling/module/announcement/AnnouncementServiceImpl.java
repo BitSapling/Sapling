@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 public class AnnouncementServiceImpl extends ServiceImpl<AnnouncementMapper, Announcement> implements AnnouncementService {
-    @Override
+   
     @NotNull
     public List<Announcement> getLastNAnnouncements(int count) {
         LambdaQueryWrapper<Announcement> wrapper = Wrappers

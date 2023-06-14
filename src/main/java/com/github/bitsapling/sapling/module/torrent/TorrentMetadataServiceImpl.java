@@ -8,8 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
-public class TorrentMetadataServiceImpl extends ServiceImpl<TorrentMetadataMapper, TorrentMetadata> implements TorrentMetadataService
+public class TorrentMetadataServiceImpl extends ServiceImpl<TorrentMetadataMapper, TorrentMetadata> implements TorrentMetadataService {
     @NotNull
     public List<TorrentMetadata> getAllTorrentMetadata() {
         return baseMapper.selectList(Wrappers.lambdaQuery(TorrentMetadata.class));
