@@ -13,8 +13,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("categories")
 public class Category implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("name")
     private String name;

@@ -14,8 +14,7 @@ import java.math.BigInteger;
 @Accessors(chain = true)
 @TableName("exams_plans")
 public class ExamPlan implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("name")
     private String name;

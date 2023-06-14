@@ -14,8 +14,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 @TableName("groups")
 public class Promotion implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("name")
     private String name;

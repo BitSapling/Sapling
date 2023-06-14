@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("torrent_metadata")
 public class TorrentComment implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("torrent")
     private Torrent torrent;

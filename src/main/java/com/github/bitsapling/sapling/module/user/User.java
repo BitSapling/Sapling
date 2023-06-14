@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 public class User implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("passkey")
     private String passkey;

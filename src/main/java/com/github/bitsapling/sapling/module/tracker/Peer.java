@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("peers")
 public class Peer implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("torrent_id")
     private Long torrent;

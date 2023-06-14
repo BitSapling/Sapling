@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("mails")
 public class Mail implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("owner")
     private Long owner;

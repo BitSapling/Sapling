@@ -15,8 +15,7 @@ import java.math.BigInteger;
 @Accessors(chain = true)
 @TableName("user_metadata")
 public class UserMetadata implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("user")
     private Long user;

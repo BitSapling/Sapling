@@ -13,8 +13,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("torrent_metadata")
 public class TorrentMetadata implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("torrent_id")
     private Long torrent;

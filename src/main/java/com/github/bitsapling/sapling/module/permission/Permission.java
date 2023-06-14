@@ -13,8 +13,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @TableName("permissions")
 public class Permission implements Serializable {
-    @TableId(type = IdType.INPUT)
-    @TableField("id")
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     @TableField("group")
     private Long group;
