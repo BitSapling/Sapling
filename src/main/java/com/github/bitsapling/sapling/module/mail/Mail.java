@@ -23,7 +23,7 @@ public class Mail implements Serializable {
     @TableField("sender_name")
     private String senderName;
     @TableField("direction")
-    private Short direction;
+    private MailDirection direction;
     @TableField("title")
     private String title;
     @TableField("description")
