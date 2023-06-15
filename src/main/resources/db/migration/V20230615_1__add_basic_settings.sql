@@ -7,7 +7,7 @@ VALUES (3, 'general.site-description', 'Upload and share your files! Powered by 
 INSERT INTO `settings` (`id`, `key`, `value`)
 VALUES (4, 'general.site-keywords', 'sapling,bittorrent,tracker');
 INSERT INTO `settings` (`id`, `key`, `value`)
-VALUES (5, 'tracker.prefix', 'Sapling');
+VALUES (5, 'tracker.torrent-prefix', '[Sapling]');
 INSERT INTO `settings` (`id`, `key`, `value`)
 VALUES (6, 'tracker.min-announce-interval', '56000');
 INSERT INTO `settings` (`id`, `key`, `value`)
