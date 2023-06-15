@@ -8,7 +8,9 @@ public enum BCUAMatchType implements Serializable {
     EQUALS((short) 0),
     CONTAINS((short) 1),
     NOT_CONTAINS((short) 2),
-    REGEX((short) 3);
+    START_WITH((short) 3),
+    END_WITH((short) 4),
+    REGEX((short) 5);
     private final short value;
 
     BCUAMatchType(short value) {
