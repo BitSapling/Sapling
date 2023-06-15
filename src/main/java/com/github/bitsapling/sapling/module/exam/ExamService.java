@@ -1,7 +1,31 @@
 package com.github.bitsapling.sapling.module.exam;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.bitsapling.sapling.module.common.CommonService;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
 
-public interface ExamService extends IService<Exam> {
+import java.util.List;
 
+@Service
+public class ExamService extends ServiceImpl<ExamMapper, Exam> implements CommonService<Exam> {
+
+    @NotNull
+    public List<Exam> getExamsByPlan(@NotNull Long examPlanId) {
+        LambdaQueryWrapper<Exam> wrapper = Wrappers
+                .lambdaQuery(Exam.class)
+                .eq(Exam::getExamPlan, examPlanId);
+        return baseMapper.selectList(wrapper);
+    }
+
+    @Nullable
+    public Exam getExamByUser(@NotNull Long userId) {
+        LambdaQueryWrapper<Exam> wrapper = Wrappers
+                .lambdaQuery(Exam.class)
+                .eq(Exam::getUser, userId);
+        return baseMapper.selectOne(wrapper);
+    }
 }

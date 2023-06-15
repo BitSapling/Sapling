@@ -11,5 +11,5 @@ public class InstanceSetupShell {
     private static final Logger LOGGER = LoggerFactory.getLogger(InstanceSetupShell.class);
     @Autowired
     private SettingService setting;
-    
+
 }
