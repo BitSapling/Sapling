@@ -1,7 +1,8 @@
-package com.github.bitsapling.sapling.util;
+package com.github.bitsapling.sapling.torrentparser;
 
 import com.dampcake.bencode.BencodeException;
 import com.dampcake.bencode.Type;
+import com.github.bitsapling.sapling.util.BencodeUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -16,9 +17,9 @@ public class TorrentParserV2 {
     private static final List<String> V2_KEYS = List.of("piece layers", "files tree");
     private final byte[] data;
     private final Map<String, Long> fileList = new LinkedHashMap<>();
+    private final boolean calcFiles;
     private Map<String, Object> dict;
     private long totalSize;
-    private final boolean calcFiles;
 
     public TorrentParserV2(File file, boolean calcFiles) throws IOException, BencodeException, ClassCastException {
         this.data = Files.readAllBytes(file.toPath());
