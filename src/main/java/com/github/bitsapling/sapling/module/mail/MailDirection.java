@@ -1,12 +1,15 @@
 package com.github.bitsapling.sapling.module.mail;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
+
 public enum MailDirection implements Serializable {
     IN((short) 0),
     OUT((short) 1);
+    @EnumValue
     private final short value;
 
     MailDirection(short value) {

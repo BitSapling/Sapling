@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.torrent;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("torrents")
 public class Torrent implements Serializable {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id")
     private Long id;
     @TableField("info_hash_v1")
     private String infoHashV1;

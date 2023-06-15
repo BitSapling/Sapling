@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.user;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -15,7 +14,7 @@ import java.math.BigInteger;
 @Accessors(chain = true)
 @TableName("user_metadata")
 public class UserMetadata implements Serializable {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id")
     private Long id;
     @TableField("user")
     private Long user;

@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.audit;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @TableName("audits")
 public class Audit implements Serializable {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id")
     private Long id;
     @TableField("user")
     private Long user;

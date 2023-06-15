@@ -26,6 +26,13 @@ spring:
       save-mode: ON_SET_ATTRIBUTE
       flush-mode: ON_SAVE
       repository-type: indexed
+mybatis-plus:
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: "logic_deleted"
 #  rabbitmq:
 #    addresses: 192.168.100.120:5672,192.168.100.121:5672,192.168.100.122:5672
 #    username: admin

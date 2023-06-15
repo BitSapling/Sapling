@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.module.uacontrol;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ public enum BCUAMatchType implements Serializable {
     START_WITH((short) 3),
     END_WITH((short) 4),
     REGEX((short) 5);
+    @EnumValue
     private final short value;
 
     BCUAMatchType(short value) {

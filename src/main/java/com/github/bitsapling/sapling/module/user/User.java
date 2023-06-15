@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.user;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.github.bitsapling.sapling.module.group.Group;
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 public class User implements Serializable {
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id")
     private Long id;
     @TableField("passkey")
     private String passkey;
