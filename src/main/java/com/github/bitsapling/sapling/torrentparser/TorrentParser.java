@@ -157,13 +157,15 @@ public class TorrentParser {
         return false;
     }
 
-    public Map<String, Long> getFileList() {
+    @NotNull
+    public Map<String, Long> getFileList() throws IllegalStateException {
         if (!calcFiles) {
             throw new IllegalStateException("Files not calculated yet!");
         }
         return fileList;
     }
 
+    @NotNull
     public Map<String, Object> getDict() {
         return dict;
     }
