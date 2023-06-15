@@ -4,7 +4,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for announcements
 -- ----------------------------
-DROP TABLE IF EXISTS `announcements`;
 CREATE TABLE `announcements`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The announcement id\r\n',
   `owner` int UNSIGNED NOT NULL COMMENT 'The announcement owner user id',
@@ -19,7 +18,6 @@ CREATE TABLE `announcements`  (
 -- ----------------------------
 -- Table structure for audits
 -- ----------------------------
-DROP TABLE IF EXISTS `audits`;
 CREATE TABLE `audits`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The audit event',
   `user` int UNSIGNED NULL DEFAULT NULL COMMENT 'The audit event user id',
@@ -38,7 +36,6 @@ CREATE TABLE `audits`  (
 -- ----------------------------
 -- Table structure for categories
 -- ----------------------------
-DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories`  (
   `id` int UNSIGNED NOT NULL COMMENT 'The category id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The category name',
@@ -51,7 +48,6 @@ CREATE TABLE `categories`  (
 -- ----------------------------
 -- Table structure for exam_plans
 -- ----------------------------
-DROP TABLE IF EXISTS `exam_plans`;
 CREATE TABLE `exam_plans`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The exam plan id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The exam plan name',
@@ -61,14 +57,13 @@ CREATE TABLE `exam_plans`  (
   `target_real_uploaded` bigint UNSIGNED NOT NULL COMMENT 'The exam target real uploaded',
   `target_real_downloaded` bigint UNSIGNED NOT NULL COMMENT 'The exam target real downloaded',
   `target_karma` bigint UNSIGNED NOT NULL COMMENT 'The exam target target',
-  `target_share_ratio` decimal(10, 2) UNSIGNED NOT NULL DEFAULT 0.00 COMMENT 'The exam target share ratio',
+  `target_share_ratio` decimal(10, 2)  NOT NULL DEFAULT 0.00 COMMENT 'The exam target share ratio',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for exams
 -- ----------------------------
-DROP TABLE IF EXISTS `exams`;
 CREATE TABLE `exams`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The exam entires id',
   `user` int UNSIGNED NOT NULL COMMENT 'The exam user id',
@@ -85,7 +80,6 @@ CREATE TABLE `exams`  (
 -- ----------------------------
 -- Table structure for groups
 -- ----------------------------
-DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The group id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The group name',
@@ -99,7 +93,6 @@ CREATE TABLE `groups`  (
 -- ----------------------------
 -- Table structure for mails
 -- ----------------------------
-DROP TABLE IF EXISTS `mails`;
 CREATE TABLE `mails`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The mail id',
   `sender` int UNSIGNED NOT NULL COMMENT 'The mail sender',
@@ -119,7 +112,6 @@ CREATE TABLE `mails`  (
 -- ----------------------------
 -- Table structure for peers
 -- ----------------------------
-DROP TABLE IF EXISTS `peers`;
 CREATE TABLE `peers`  (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The peers id',
   `torrent_id` int UNSIGNED NOT NULL COMMENT 'The torrent id',
@@ -147,7 +139,6 @@ CREATE TABLE `peers`  (
 -- ----------------------------
 -- Table structure for permissions
 -- ----------------------------
-DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The permission id',
   `group` int NOT NULL COMMENT 'The group id',
@@ -160,7 +151,6 @@ CREATE TABLE `permissions`  (
 -- ----------------------------
 -- Table structure for promotions
 -- ----------------------------
-DROP TABLE IF EXISTS `promotions`;
 CREATE TABLE `promotions`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The promotion id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The promotion name',
@@ -174,7 +164,6 @@ CREATE TABLE `promotions`  (
 -- ----------------------------
 -- Table structure for settings
 -- ----------------------------
-DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The setting id',
   `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The setting key',
@@ -186,7 +175,6 @@ CREATE TABLE `settings`  (
 -- ----------------------------
 -- Table structure for storage_files
 -- ----------------------------
-DROP TABLE IF EXISTS `storage_files`;
 CREATE TABLE `storage_files`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The file id',
   `provider` int UNSIGNED NOT NULL COMMENT 'The file storage provider',
@@ -201,7 +189,6 @@ CREATE TABLE `storage_files`  (
 -- ----------------------------
 -- Table structure for storage_providers
 -- ----------------------------
-DROP TABLE IF EXISTS `storage_providers`;
 CREATE TABLE `storage_providers`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Storage Provider ID',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Storage Provider DisplayName',
@@ -214,7 +201,6 @@ CREATE TABLE `storage_providers`  (
 -- ----------------------------
 -- Table structure for tags
 -- ----------------------------
-DROP TABLE IF EXISTS `tags`;
 CREATE TABLE `tags`  (
   `id` int NOT NULL COMMENT 'The tag id\r\n',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The tag name',
@@ -225,7 +211,6 @@ CREATE TABLE `tags`  (
 -- ----------------------------
 -- Table structure for teams
 -- ----------------------------
-DROP TABLE IF EXISTS `teams`;
 CREATE TABLE `teams`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The team id',
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The team name',
@@ -237,7 +222,6 @@ CREATE TABLE `teams`  (
 -- ----------------------------
 -- Table structure for torrent_comments
 -- ----------------------------
-DROP TABLE IF EXISTS `torrent_comments`;
 CREATE TABLE `torrent_comments`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The comment id',
   `torrent` int UNSIGNED NOT NULL COMMENT 'The torrent id',
@@ -255,7 +239,6 @@ CREATE TABLE `torrent_comments`  (
 -- ----------------------------
 -- Table structure for torrent_metadata
 -- ----------------------------
-DROP TABLE IF EXISTS `torrent_metadata`;
 CREATE TABLE `torrent_metadata`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The torrent metrics id',
   `torrent_id` int UNSIGNED NOT NULL COMMENT 'The torrent id',
@@ -269,7 +252,6 @@ CREATE TABLE `torrent_metadata`  (
 -- ----------------------------
 -- Table structure for torrents
 -- ----------------------------
-DROP TABLE IF EXISTS `torrents`;
 CREATE TABLE `torrents`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The torrent unique id',
   `info_hash_v1` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'The torrent info_hash (bittorrent v1)',
@@ -301,7 +283,6 @@ CREATE TABLE `torrents`  (
 -- ----------------------------
 -- Table structure for user_metadata
 -- ----------------------------
-DROP TABLE IF EXISTS `user_metadata`;
 CREATE TABLE `user_metadata`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The user metric record id',
   `user` int UNSIGNED NOT NULL COMMENT 'The user id',
@@ -309,7 +290,7 @@ CREATE TABLE `user_metadata`  (
   `uploaded` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT 'The user uploaded bytes',
   `real_downloaded` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT 'The user real downloaded bytes',
   `real_uploaded` bigint UNSIGNED NOT NULL DEFAULT 0 COMMENT 'The user real uploaded bytes',
-  `karma` decimal(30, 2) UNSIGNED NOT NULL COMMENT 'The user karma',
+  `karma` decimal(30, 2)  NOT NULL COMMENT 'The user karma',
   `total_seeding_time` bigint UNSIGNED NOT NULL COMMENT 'The user seeding time',
   `total_downloading_time` bigint UNSIGNED NOT NULL COMMENT 'The user downloading time',
   PRIMARY KEY (`id`) USING BTREE
@@ -318,7 +299,6 @@ CREATE TABLE `user_metadata`  (
 -- ----------------------------
 -- Table structure for user_torrent_metadata
 -- ----------------------------
-DROP TABLE IF EXISTS `user_torrent_metadata`;
 CREATE TABLE `user_torrent_metadata`  (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The user metric record id',
   `user` int UNSIGNED NOT NULL COMMENT 'The user id',
@@ -335,7 +315,6 @@ CREATE TABLE `user_torrent_metadata`  (
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'The user identifier',
   `passkey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The user passkey, used for login in BitTorrent client etc.',
