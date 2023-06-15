@@ -9,8 +9,8 @@ import org.slf4j.event.Level;
 import java.time.Duration;
 import java.time.Instant;
 
-public class PerfMonitor implements AutoCloseable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PerfMonitor.class);
+public class PerfMonitorBasic implements AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerfMonitorBasic.class);
     private final String name;
     private final Instant startTime;
     @Nullable
@@ -19,13 +19,13 @@ public class PerfMonitor implements AutoCloseable {
     private String context;
 
 
-    public PerfMonitor(@NotNull String name) {
+    public PerfMonitorBasic(@NotNull String name) {
         this.name = name;
         this.startTime = Instant.now();
         this.exceptedDuration = null;
     }
 
-    public PerfMonitor(@NotNull String name, @NotNull Duration exceptedDuration) {
+    public PerfMonitorBasic(@NotNull String name, @NotNull Duration exceptedDuration) {
         this.name = name;
         this.startTime = Instant.now();
         this.exceptedDuration = exceptedDuration;
