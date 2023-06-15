@@ -9,11 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.*;
 
 @Slf4j
 public class TorrentParserV2 {
@@ -24,8 +20,7 @@ public class TorrentParserV2 {
     private long totalSize;
     private final boolean calcFiles;
 
-    public TorrentParserV2(File file, boolean calcFiles) throws IOException, BencodeException,
-            ClassCastException {
+    public TorrentParserV2(File file, boolean calcFiles) throws IOException, BencodeException, ClassCastException {
         this.data = Files.readAllBytes(file.toPath());
         this.calcFiles = calcFiles;
         init();
@@ -38,8 +33,7 @@ public class TorrentParserV2 {
         init();
     }
 
-    public TorrentParserV2(URL url, boolean calcFiles) throws IOException, BencodeException,
-            ClassCastException {
+    public TorrentParserV2(URL url, boolean calcFiles) throws IOException, BencodeException, ClassCastException {
         try (InputStream stream = url.openStream()) {
             this.data = stream.readAllBytes();
         }
@@ -63,16 +57,23 @@ public class TorrentParserV2 {
 
     @SuppressWarnings("unchecked")
     public void verifyAndCalcFiles() {
-        Queue<Map<String, Object>> queue = new LinkedBlockingQueue<>();
+        Queue<Map<String, Object>> queue = new LinkedList<>();
+        Queue<String> files = new LinkedList<>();
         queue.add((Map<String, Object>) ((Map<String, Object>) this.dict.get("info")).get("file tree"));
         while (queue.size() > 0) {
             var cursor = queue.poll();
-            if (cursor.size() != 1 || !cursor.containsKey("")) {
-                cursor.values().stream().map(it -> (Map<String, Object>) it).forEach(queue::add);
+            var name = files.poll();
+            if (!cursor.containsKey("")) {
+                for (Map.Entry<String, Object> it : cursor.entrySet()) {
+                    var map = (Map<String, Object>) it.getValue();
+                    files.add(name + "/" + it.getKey());
+                    queue.add(map);
+                }
             } else {
                 var item = (Map<String, Object>) cursor.get("");
                 var length = (long) item.get("length");
                 totalSize += length;
+                fileList.put(name, length);
             }
         }
     }
