@@ -26,9 +26,9 @@ public class TorrentParser {
     private static final List<String> V2_KEYS = List.of("piece layers", "file tree");
     protected final byte[] data;
     protected final Map<String, Long> fileList = new LinkedHashMap<>();
+    protected final boolean calcFiles;
     protected Map<String, Object> dict;
     protected long totalSize;
-    protected final boolean calcFiles;
 
     public TorrentParser(File file, boolean calcFiles) throws IOException, BencodeException, TorrentException,
             ClassCastException {
@@ -169,7 +169,7 @@ public class TorrentParser {
     }
 
     @NotNull
-    public String utf8(@NotNull String latin) {
+    private String utf8(@NotNull String latin) {
         byte[] bytes = latin.getBytes(StandardCharsets.ISO_8859_1);
         return new String(bytes, StandardCharsets.UTF_8);
     }
