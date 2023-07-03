@@ -53,7 +53,30 @@ public class MailController {
                 return ApiResponse.forbidden();
             }
         }
+        if (mail.getOwner() == StpUtil.getLoginIdAsLong() && mail.getReadedAt() == null) {
+            mail.setReadedAt(LocalDateTime.now());
+            service.updateById(mail);
+        }
         return new ApiResponse<>((MailDTO) mail);
+    }
+
+    @DeleteMapping("/{identifier}")
+    @SaCheckPermission("mail:read")
+    public ApiResponse<?> deleteMail(@Validated @PathVariable("identifier") @Min(1) long mailId) {
+        Mail mail = service.getById(mailId);
+        if (mail == null) {
+            return ApiResponse.notFound();
+        }
+        if (mail.getOwner() != StpUtil.getLoginIdAsLong()) {
+            if (!StpUtil.hasPermission("mail:admin-write")) {
+                return ApiResponse.forbidden();
+            }
+        }
+        mail.setDeletedAt(LocalDateTime.now());
+        if (!service.updateById(mail)) {
+            throw new IllegalStateException("Failed to mark deleted the mail from database.");
+        }
+        return ApiResponse.ok();
     }
 
     @GetMapping("/user/{identifier}")
