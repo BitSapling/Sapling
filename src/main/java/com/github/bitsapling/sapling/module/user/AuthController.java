@@ -79,7 +79,7 @@ public class AuthController {
         log.debug("User {} successfully logged in with IP {}.", user.getUsername(), ip);
         auditService.save(new Audit(0L, user.getId(), "user_login", LocalDateTime.now(), ip, request.getHeader("User-Agent"), null));
         StpUtil.login(user.getId());
-        return ApiResponse.ok();
+        return new ApiResponse<>(StpUtil.getTokenInfo());
     }
 
     @PostMapping("/logout")
