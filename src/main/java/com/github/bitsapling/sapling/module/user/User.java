@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.module.user;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.github.bitsapling.sapling.module.group.Group;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -33,7 +32,7 @@ public class User implements Serializable {
     @TableField("email_confirmed")
     private Boolean email_confirmed;
     @TableField("group")
-    private Group group;
+    private Long group;
     @TableField("avatar_url")
     private String avatarUrl;
     @TableField("joined_at")
