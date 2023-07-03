@@ -27,7 +27,7 @@ public class SettingService extends ServiceImpl<SettingMapper, Setting> implemen
     }
 
     private boolean saveRedisCacheSetting(@NotNull String key, @NotNull Setting setting) {
-        return cache.set("setting-cache-" + key, setting);
+        return cache.set("setting-cache-" + key, setting, 60);
     }
 
     private Setting fetchRedisCacheSetting(@NotNull String key) {
