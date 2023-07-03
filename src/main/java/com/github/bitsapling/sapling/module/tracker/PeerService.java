@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.bitsapling.sapling.module.common.CommonService;
+import com.github.bitsapling.sapling.module.torrent.Torrent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -68,5 +69,10 @@ public class PeerService extends ServiceImpl<PeerMapper, Peer> implements Common
     public void deletePeersInactive(@NotNull LocalDateTime earlyThan) {
         baseMapper.delete(Wrappers.lambdaQuery(Peer.class)
                 .le(Peer::getLastAction, earlyThan));
+    }
+
+    public List<Peer> getPeers(Torrent torrent) {
+        return baseMapper.selectList(lambdaQuery()
+                .eq(Peer::getTorrent, torrent.getId()));
     }
 }

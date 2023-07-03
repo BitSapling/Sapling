@@ -1,7 +1,5 @@
 package com.github.bitsapling.sapling.module.permission;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
@@ -13,18 +11,14 @@ import java.util.List;
 @Service
 public class PermissionService extends ServiceImpl<PermissionMapper, Permission> implements CommonService<Permission> {
     @Nullable
-    public Permission getPermission(@NotNull String name) {
-        LambdaQueryWrapper<Permission> wrapper = Wrappers
-                .lambdaQuery(Permission.class)
-                .eq(Permission::getPermission, name);
-        return baseMapper.selectOne(wrapper);
+    public Permission getPermission(@NotNull Object identifier) {
+        return baseMapper.selectOne(lambdaQuery()
+                .eq(Permission::getId, identifier)
+                .or(w -> w.eq(Permission::getPermission, identifier)));
     }
 
-    @Nullable
+    @NotNull
     public List<Permission> getPermissionByGroup(@NotNull Long groupId) {
-        LambdaQueryWrapper<Permission> wrapper = Wrappers
-                .lambdaQuery(Permission.class)
-                .eq(Permission::getGroup, groupId);
-        return baseMapper.selectList(wrapper);
+        return baseMapper.selectList(lambdaQuery().eq(Permission::getGroup, groupId));
     }
 }

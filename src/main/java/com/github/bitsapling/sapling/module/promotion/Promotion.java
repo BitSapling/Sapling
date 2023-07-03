@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.module.promotion;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
+@AllArgsConstructor
 @Accessors(chain = true)
 @TableName("groups")
 public class Promotion implements Serializable {

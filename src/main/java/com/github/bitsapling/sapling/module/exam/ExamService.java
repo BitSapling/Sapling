@@ -1,7 +1,5 @@
 package com.github.bitsapling.sapling.module.exam;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
@@ -15,17 +13,16 @@ public class ExamService extends ServiceImpl<ExamMapper, Exam> implements Common
 
     @NotNull
     public List<Exam> getExamsByPlan(@NotNull Long examPlanId) {
-        LambdaQueryWrapper<Exam> wrapper = Wrappers
-                .lambdaQuery(Exam.class)
-                .eq(Exam::getExamPlan, examPlanId);
-        return baseMapper.selectList(wrapper);
+        return baseMapper.selectList(lambdaQuery().eq(Exam::getExamPlan, examPlanId));
     }
 
     @Nullable
     public Exam getExamByUser(@NotNull Long userId) {
-        LambdaQueryWrapper<Exam> wrapper = Wrappers
-                .lambdaQuery(Exam.class)
-                .eq(Exam::getUser, userId);
-        return baseMapper.selectOne(wrapper);
+        return baseMapper.selectOne(lambdaQuery().eq(Exam::getUser, userId));
+    }
+
+
+    public int removeExamForUser(@NotNull Long userId) {
+        return baseMapper.delete(lambdaQuery().eq(Exam::getUser, userId));
     }
 }

@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.module.user;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.github.bitsapling.sapling.module.group.Group;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,6 +11,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
 @Accessors(chain = true)
 public class User implements Serializable {
     @TableId(value = "id")

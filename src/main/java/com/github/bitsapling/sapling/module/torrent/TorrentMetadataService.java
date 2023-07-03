@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class TorrentMetadataServiceImpl extends ServiceImpl<TorrentMetadataMapper, TorrentMetadata> implements CommonService<TorrentMetadata> {
+public class TorrentMetadataService extends ServiceImpl<TorrentMetadataMapper, TorrentMetadata> implements CommonService<TorrentMetadata> {
     @NotNull
     public List<TorrentMetadata> getAllTorrentMetadata() {
-        return baseMapper.selectList(Wrappers.lambdaQuery(TorrentMetadata.class));
+        return baseMapper.selectList(lambdaQuery());
     }
 
     @Nullable

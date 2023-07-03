@@ -1,14 +1,35 @@
 package com.github.bitsapling.sapling.module.user;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Service;
 
-public interface UserService extends IService<User> {
+@Service
+public class UserService extends ServiceImpl<UserMapper, User> implements CommonService<User> {
 
+    @Nullable
+    public User getUser(Object identifier) {
+        return getOne(lambdaQuery()
+                .eq(User::getId, identifier)
+                .or(w -> w.eq(User::getUsername, identifier))
+                .or(w -> w.eq(User::getEmail, identifier))
+                .or(w -> w.eq(User::getPasskey, identifier)));
+    }
 
-    @Nullable User getUserByUsername(String username);
+    @Nullable
+    public User getUserByUsername(String username) {
+        return getOne(lambdaQuery().eq(User::getUsername, username));
+    }
 
-    @Nullable User getUserByEmail(String email);
+    @Nullable
+    public User getUserByEmail(String email) {
+        return getOne(lambdaQuery().eq(User::getEmail, email));
+    }
 
-    @Nullable User getUserByPasskey(String passkey);
+    @Nullable
+    public User getUserByPasskey(String passkey) {
+        return getOne(lambdaQuery().eq(User::getPasskey, passkey));
+    }
+
 }

@@ -1,7 +1,5 @@
 package com.github.bitsapling.sapling.module.announcement;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
@@ -15,11 +13,9 @@ public class AnnouncementService extends ServiceImpl<AnnouncementMapper, Announc
 
     @NotNull
     public List<Announcement> getLastNAnnouncements(int count) {
-        LambdaQueryWrapper<Announcement> wrapper = Wrappers
-                .lambdaQuery(Announcement.class)
+        return baseMapper.selectList(lambdaQuery()
                 .le(Announcement::getEndedAt, LocalDateTime.now())
                 .orderByDesc(Announcement::getAddedAt)
-                .last("LIMIT " + count);
-        return baseMapper.selectList(wrapper);
+                .last("LIMIT " + count));
     }
 }

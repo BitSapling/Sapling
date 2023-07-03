@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.module.user;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -12,6 +13,7 @@ import java.math.BigInteger;
 
 @Data
 @Accessors(chain = true)
+@AllArgsConstructor
 @TableName("user_metadata")
 public class UserMetadata implements Serializable {
     @TableId(value = "id")

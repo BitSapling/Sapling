@@ -1,10 +1,10 @@
 package com.github.bitsapling.sapling.module.tracker;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.yulichang.base.MPJBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface PeerMapper extends BaseMapper<Peer> {
+public interface PeerMapper extends MPJBaseMapper<Peer> {
 
 
 }
