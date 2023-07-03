@@ -45,9 +45,10 @@ public class PermissionController {
         if (!service.saveOrUpdate(permissionDTO)) {
             throw new IllegalStateException("Failed to write the Permission to database.");
         }
+        log.info("Permissions has been updated, users may need re-login to apply changes.");
         return ApiResponse.ok();
     }
-    
+
     @DeleteMapping("/{identifier}")
     @SaCheckPermission("permission:write")
     public ApiResponse<?> deletePermission(@PathVariable("identifier") String identifier) {

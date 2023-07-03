@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+
 @Service
 @Slf4j
 public class SettingService extends ServiceImpl<SettingMapper, Setting> implements CommonService<Setting> {
@@ -26,8 +28,13 @@ public class SettingService extends ServiceImpl<SettingMapper, Setting> implemen
         return setting;
     }
 
+    @Override
+    public boolean saveOrUpdateBatch(Collection<Setting> entityList, int batchSize) {
+        return super.saveOrUpdateBatch(entityList, batchSize);
+    }
+
     private boolean saveRedisCacheSetting(@NotNull String key, @NotNull Setting setting) {
-        return cache.set("setting-cache-" + key, setting, 60);
+        return cache.set("setting-cache-" + key, setting, 30);
     }
 
     private Setting fetchRedisCacheSetting(@NotNull String key) {
