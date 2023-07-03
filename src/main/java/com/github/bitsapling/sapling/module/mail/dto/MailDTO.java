@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class MailDTO extends Mail {
 
     public MailDTO(@PositiveOrZero Long id, @NotNull Long owner, @NotNull Long sender, String senderName,
-                   @NotNull MailDirection direction, @NotEmpty String title, @NotEmpty String description,
+                   @NotEmpty String title, @NotEmpty String description,
                    LocalDateTime createdAt, LocalDateTime readedAt, LocalDateTime deletedAt) {
-        super(id, owner, sender, senderName, direction, title, description, createdAt, readedAt, deletedAt);
+        super(id, owner, sender, senderName, title, description, createdAt, readedAt, deletedAt);
     }
 }
