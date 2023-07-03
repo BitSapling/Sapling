@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.user.dto;
 
-import com.github.bitsapling.sapling.module.group.Group;
 import com.github.bitsapling.sapling.module.user.User;
 import jakarta.validation.constraints.Positive;
 import lombok.EqualsAndHashCode;
@@ -14,7 +13,7 @@ public class UserLevelAdminReadOnlyDTO extends User {
 
     public UserLevelAdminReadOnlyDTO(@Positive Long id, String passkey, String username, String nickname,
                                      String password, Long loginProvider, String loginIdentifier,
-                                     String email, Boolean email_confirmed, Group group,
+                                     String email, Boolean email_confirmed, Long group,
                                      String avatarUrl, LocalDateTime joinedAt, LocalDateTime lastSeenAt,
                                      String registerIp, String siteLang, String bio, Boolean isBanned,
                                      Byte[] preferences) {
