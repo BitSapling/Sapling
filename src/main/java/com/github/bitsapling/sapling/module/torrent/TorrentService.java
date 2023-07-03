@@ -1,7 +1,8 @@
 package com.github.bitsapling.sapling.module.torrent;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public abstract class TorrentService implements IService<Torrent> {
+public class TorrentService extends ServiceImpl<TorrentMapper, Torrent> implements CommonService<Torrent> {
     @Autowired
     private TorrentMapper mapper;
 
