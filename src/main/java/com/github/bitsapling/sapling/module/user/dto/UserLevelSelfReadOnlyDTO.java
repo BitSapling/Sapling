@@ -1,6 +1,5 @@
 package com.github.bitsapling.sapling.module.user.dto;
 
-import com.github.bitsapling.sapling.module.group.Group;
 import com.github.bitsapling.sapling.module.user.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +18,7 @@ public class UserLevelSelfReadOnlyDTO {
     private Long loginProvider;
     private String email;
     private Boolean email_confirmed;
-    private Group group;
+    private Long group;
     private String avatarUrl;
     private LocalDateTime joinedAt;
     private LocalDateTime lastSeenAt;
