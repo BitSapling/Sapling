@@ -8,25 +8,25 @@ import java.util.List;
 
 @Data
 public class AnnounceData {
-    private final String userAgent;
-    private final List<String> ipv4;
-    private final List<String> ipv6;
-    private final List<String> clientReportIps;
-    private final String clientRequestIp;
-    private final List<String> clientAllIps = new ArrayList<>();
-    private final int port;
-    private final String passkey;
-    private final long left;
-    private final AnnounceEventType event;
-    private final boolean noPeerId;
-    private final boolean supportCrypto;
-    private final boolean compact;
-    private final String infoHash;
-    private final long downloaded;
-    private final long uploaded;
-    private final int redundant;
-    private final String peerId;
-    private final int numWant;
+    private String userAgent;
+    private List<String> ipv4;
+    private List<String> ipv6;
+    private List<String> clientReportIps;
+    private String clientRequestIp;
+    private List<String> clientAllIps = new ArrayList<>();
+    private int port;
+    private String passkey;
+    private long left;
+    private AnnounceEventType event;
+    private boolean noPeerId;
+    private boolean supportCrypto;
+    private boolean compact;
+    private String infoHash;
+    private long downloaded;
+    private long uploaded;
+    private int redundant;
+    private String peerId;
+    private int numWant;
 
     public AnnounceData(String userAgent, List<String> ipv4, List<String> ipv6, List<String> clientReportIps, String clientRequestIp, int port, String passkey, long left, String event, boolean noPeerId, boolean supportCrypto, boolean compact, String infoHash, long downloaded, long uploaded, int redundant, String peerId, int numWant) {
         this.userAgent = userAgent;

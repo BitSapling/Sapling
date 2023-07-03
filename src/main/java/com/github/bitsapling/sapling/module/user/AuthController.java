@@ -111,8 +111,8 @@ public class AuthController {
                 SHA512.digestHex(authRequestDTO.getCredential()),
                 ip,
                 request.getHeader("User-Agent")));
-        int maxAttempts = Integer.parseInt(settingService.getSetting("security.max_login_attempts").getValue());
-        int banLength = Integer.parseInt(settingService.getSetting("security.login_attempt_ban").getValue());
+        int maxAttempts = settingService.getSetting("security.max_login_attempts").getValueAsInteger(10);
+        int banLength = settingService.getSetting("security.login_attempt_ban").getValueAsInteger(900);
         long attempts = failedLoginService.getFailedAttempts(ip);
         if (attempts >= maxAttempts) {
             loginBanService.saveOrUpdate(new LoginBan(0L, ip, LocalDateTime.now().plusSeconds(banLength)));

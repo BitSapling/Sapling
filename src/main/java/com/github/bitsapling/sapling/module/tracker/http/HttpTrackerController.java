@@ -108,6 +108,8 @@ public class HttpTrackerController {
     @GetMapping("/announce")
     public ResponseEntity<String> announce(@RequestParam Map<String, String> queryStrings, HttpServletRequest request) throws RetryableAnnounceException, InvalidAnnounceException {
         AnnounceData announceData = parseRequest(request, queryStrings);
+        int maxAnnouncePeersReturned = setting.getSetting("tracker.max_peers_announce_returns").getValueAsInteger(300);
+        announceData.setNumWant(Math.min(announceData.getNumWant(), maxAnnouncePeersReturned));
         checkClient(announceData.getUserAgent(), announceData.getPeerId());
         User user = userService.getUserByPasskey(announceData.getPasskey());
         checkUser(user, announceData.getPasskey());

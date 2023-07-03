@@ -79,7 +79,6 @@ public class HttpQueryTrackerParser {
         if (redundant < 0) throw new IllegalArgumentException("redundant cannot be negative");
         if (port < 0) throw new IllegalArgumentException("port cannot be negative");
         if (numWant < 0) throw new IllegalArgumentException("numWant cannot be negative");
-        numWant = Math.min(numWant, 300);
     }
 
     public AnnounceData toAnnounceData() {
