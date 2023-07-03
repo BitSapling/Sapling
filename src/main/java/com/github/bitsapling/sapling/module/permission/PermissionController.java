@@ -59,6 +59,7 @@ public class PermissionController {
         if (!service.removeById(permission)) {
             throw new IllegalStateException("Failed to delete the Permission from database.");
         }
+        log.info("Permissions has been updated, users may need re-login to apply changes.");
         return ApiResponse.ok();
     }
 
