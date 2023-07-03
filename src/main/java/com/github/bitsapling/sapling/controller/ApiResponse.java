@@ -62,4 +62,11 @@ public class ApiResponse<T> {
     public static ApiResponse<Void> noContent() {
         return new ApiResponse<>(204, "no content", LocalDateTime.now(), null);
     }
+
+    @NotNull
+    public static ApiResponse<Void> forbidden() {
+        return new ApiResponse<>(401, "access denied", LocalDateTime.now(), null);
+    }
+
+
 }
