@@ -4,7 +4,7 @@
 
 我们在 Vultr 5$/mo 计划上运行了一个 BitSapling Tracker Demo，您可以在下方的页面查看其运行情况。
 
-http://sapling.ghostchu-services.top/
+~~http://sapling.ghostchu-services.top/~~ 暂时关了，在第二版重写完之前先不架演示站了，也可能搬到国内域名和服务器挤一挤节约开支。
 
 **Demo站主要用于测试 WebUI，因此使用的版本可能并不是最新的，可能和 API 文档对不上！**
 
@@ -59,6 +59,14 @@ BitSapling 是一个典型的前后端分离设计，所有的操作均通过 Js
 * [BEP 0053 - Magnet URI extension - Select specific file indices for download](http://bittorrent.org/beps/bep_0053.html)
 * [BEP 0019 - WebSeed - HTTP/FTP Seeding (GetRight style)](https://www.bittorrent.org/beps/bep_0019.html)
 * [BEP 0049 - Distributed Torrent Feeds](https://www.bittorrent.org/beps/bep_0049.html)
+
+## 第一版演示截图
+
+![image](https://github.com/BitSapling/Sapling/assets/30802565/3cb556c8-12d4-49f4-bf7c-95147f92bc87)
+
+![image](https://github.com/BitSapling/Sapling/assets/30802565/7d51a350-79bf-4c8f-9846-3d2580aa9bab)
+
+![image](https://github.com/BitSapling/Sapling/assets/30802565/d2b2fe43-3717-4170-b1c7-e859707b135b)
 
 ## 功能TODO
 
