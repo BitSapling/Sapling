@@ -1,4 +1,4 @@
-package com.github.bitsapling.sapling.module.audit;
+package com.github.bitsapling.sapling.module.failedlogin;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -11,22 +11,22 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @Accessors(chain = true)
-@TableName("audits")
-public class Audit implements Serializable {
+@AllArgsConstructor
+@TableName("failed_logins")
+public class FailedLogin implements Serializable {
     @TableId(value = "id")
     private Long id;
     @TableField("user")
     private Long user;
-    @TableField("event_type")
-    private String eventType;
-    @TableField("created_at")
-    private LocalDateTime createdAt;
+    @TableField("time")
+    private LocalDateTime time;
+    @TableField("identifier")
+    private String identifier;
+    @TableField("credential")
+    private String credential;
     @TableField("ip")
     private String ip;
     @TableField("user_agent")
     private String userAgent;
-    @TableField("data")
-    private String description;
 }

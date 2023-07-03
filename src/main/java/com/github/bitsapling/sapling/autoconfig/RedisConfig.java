@@ -1,11 +1,12 @@
 package com.github.bitsapling.sapling.autoconfig;
 
+import com.github.bitsapling.sapling.cache.GlobalCache;
+import com.github.bitsapling.sapling.cache.RedisCacheManager;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -56,6 +57,13 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new Jackson2JsonRedisSerializer<>(
                                 Object.class)));
-        return new RedisCacheManager(redisCacheWriter, defaultCacheConfig);
+        return new org.springframework.data.redis.cache.RedisCacheManager(redisCacheWriter, defaultCacheConfig);
     }
+
+    @Bean
+    public GlobalCache cache(RedisTemplate redisTemplate) {
+        return new RedisCacheManager(redisTemplate);
+    }
+
+
 }
