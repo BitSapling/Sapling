@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.module.torrent;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -11,12 +12,13 @@ import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
-@TableName("torrent_metadata")
+@AllArgsConstructor
+@TableName("torrent_comments")
 public class TorrentComment implements Serializable {
     @TableId(value = "id")
     private Long id;
     @TableField("torrent")
-    private Torrent torrent;
+    private Long torrent;
     @TableField("owner")
     private Long owner;
     @TableField("reply_to")

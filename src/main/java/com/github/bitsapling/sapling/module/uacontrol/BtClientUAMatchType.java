@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
-public enum BCUAMatchType implements Serializable {
+public enum BtClientUAMatchType implements Serializable {
     EQUALS((short) 0),
     CONTAINS((short) 1),
     NOT_CONTAINS((short) 2),
@@ -15,7 +15,7 @@ public enum BCUAMatchType implements Serializable {
     @EnumValue
     private final short value;
 
-    BCUAMatchType(short value) {
+    BtClientUAMatchType(short value) {
         this.value = value;
     }
 
@@ -24,8 +24,8 @@ public enum BCUAMatchType implements Serializable {
     }
 
     @Nullable
-    public BCUAMatchType fromValue(short value) {
-        for (BCUAMatchType matchType : BCUAMatchType.values()) {
+    public BtClientUAMatchType fromValue(short value) {
+        for (BtClientUAMatchType matchType : BtClientUAMatchType.values()) {
             if (matchType.getValue() == value) {
                 return matchType;
             }
