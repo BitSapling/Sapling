@@ -17,7 +17,7 @@ public class Permission implements Serializable {
     @TableId(value = "id")
     private Long id;
     @TableField("group_id")
-    private Long group;
+    private Long groupId;
     @TableField("permission")
     private String permission;
     @TableField("value")

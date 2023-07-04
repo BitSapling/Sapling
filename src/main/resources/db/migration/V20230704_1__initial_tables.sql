@@ -225,7 +225,7 @@ CREATE TABLE `permissions`  (
                                 `permission` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The permission name',
                                 `value` tinyint UNSIGNED NOT NULL COMMENT 'The permission status',
                                 PRIMARY KEY (`id`) USING BTREE,
-                                UNIQUE INDEX `group_permission_index`(`group`, `permission`) USING BTREE
+                                UNIQUE INDEX `group_permission_index`(`group_id`, `permission`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -524,7 +524,7 @@ CREATE TABLE `users`  (
                           `login_identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'The 3rd-party login provider user identifier',
                           `email` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The user email',
                           `email_confirmed` tinyint UNSIGNED NOT NULL COMMENT 'The user email has been confirmed',
-                          `group` int NOT NULL COMMENT 'The group that user at',
+                          `group_id` int NOT NULL COMMENT 'The group that user at',
                           `avatar_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'The user avatar',
                           `joined_at` datetime NOT NULL COMMENT 'The user register date time',
                           `last_seen_at` datetime NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'The user login date time of last login',
