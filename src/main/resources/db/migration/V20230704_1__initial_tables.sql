@@ -221,7 +221,7 @@ CREATE TABLE `peers`  (
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions`  (
                                 `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The permission id',
-                                `group` int NOT NULL COMMENT 'The group id',
+                                `group_id` int NOT NULL COMMENT 'The group id',
                                 `permission` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The permission name',
                                 `value` tinyint UNSIGNED NOT NULL COMMENT 'The permission status',
                                 PRIMARY KEY (`id`) USING BTREE,

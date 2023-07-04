@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class Permission implements Serializable {
     @TableId(value = "id")
     private Long id;
-    @TableField("group")
+    @TableField("group_id")
     private Long group;
     @TableField("permission")
     private String permission;
