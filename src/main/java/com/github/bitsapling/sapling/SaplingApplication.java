@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
-
 public class SaplingApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaplingApplication.class);
     private static SaplingPluginManager saplingPluginManager;

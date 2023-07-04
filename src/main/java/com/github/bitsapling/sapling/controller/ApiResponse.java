@@ -37,7 +37,7 @@ public class ApiResponse<T> {
 
     public ApiResponse(T data) {
         this.code = 0;
-        this.description = "success";
+        this.description = "ok";
         this.time = LocalDateTime.now();
         this.data = data;
     }
@@ -45,27 +45,27 @@ public class ApiResponse<T> {
 
     @NotNull
     public static ApiResponse<Void> ok() {
-        return new ApiResponse<>(0, "success", LocalDateTime.now(), null);
+        return new ApiResponse<>(0, "ok", LocalDateTime.now(), null);
     }
 
     @NotNull
     public static ApiResponse<Void> notFound() {
-        return new ApiResponse<>(404, "resource not found", LocalDateTime.now(), null);
+        return new ApiResponse<>(ApiCode.NOT_FOUND.code(), "resource not found", LocalDateTime.now(), null);
     }
 
     @NotNull
     public static ApiResponse<Void> internalError() {
-        return new ApiResponse<>(500, "internal server error (undefined)", LocalDateTime.now(), null);
+        return new ApiResponse<>(ApiCode.INTERNAL_ERROR.code(), "internal server error (undefined)", LocalDateTime.now(), null);
     }
 
     @NotNull
     public static ApiResponse<Void> noContent() {
-        return new ApiResponse<>(204, "no content", LocalDateTime.now(), null);
+        return new ApiResponse<>(ApiCode.NO_CONTENT.code(), "no content", LocalDateTime.now(), null);
     }
 
     @NotNull
     public static ApiResponse<Void> forbidden() {
-        return new ApiResponse<>(401, "access denied", LocalDateTime.now(), null);
+        return new ApiResponse<>(ApiCode.FORBIDDEN.code(), "access denied", LocalDateTime.now(), null);
     }
 
 

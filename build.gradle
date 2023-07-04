@@ -35,6 +35,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.springframework.session:spring-session-jdbc'
     implementation 'org.springframework.shell:spring-shell-starter'
@@ -80,6 +81,11 @@ dependencies {
     implementation 'org.javassist:javassist:3.29.2-GA'
     implementation 'cn.hutool:hutool-all:5.8.20'
     implementation 'com.meilisearch.sdk:meilisearch-java:0.11.1'
+    // https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    implementation "org.mapstruct:mapstruct:1.5.5.Final"
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+
 }
 
 dependencyManagement {

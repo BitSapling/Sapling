@@ -4,6 +4,9 @@ spring:
     url: jdbc:mysql://localhost:36336/sapling?characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username: sapling
     password: sapling
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   flyway:
     enabled: true
     encoding: UTF-8

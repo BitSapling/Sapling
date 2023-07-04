@@ -49,6 +49,4 @@ public class User implements Serializable {
     private Boolean isBanned;
     @TableField("preferences")
     private Byte[] preferences;
-
-
 }
