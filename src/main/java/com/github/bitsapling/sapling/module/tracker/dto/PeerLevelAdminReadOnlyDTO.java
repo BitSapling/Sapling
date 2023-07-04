@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Validated
 public class PeerLevelAdminReadOnlyDTO extends Peer {
-    public PeerLevelAdminReadOnlyDTO(@Positive Long id, @Positive Long torrent, @NotEmpty Byte[] peerId,
+    public PeerLevelAdminReadOnlyDTO(@Positive Long id, @Positive Long torrent, @NotEmpty String peerId,
                                      @Positive Long user, @NotEmpty String ip, @Positive Integer port, @PositiveOrZero BigInteger uploaded,
                                      @PositiveOrZero BigInteger downloaded, @PositiveOrZero BigInteger toGo, @NotNull LocalDateTime startedAt,
                                      @NotNull LocalDateTime lastAction, @NotNull LocalDateTime prevAction, @NotEmpty String userAgent,

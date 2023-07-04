@@ -21,7 +21,7 @@ public class Peer implements Serializable {
     @TableField("torrent_id")
     private Long torrent;
     @TableField("peer_id")
-    private Byte[] peerId;
+    private String peerId;
     @TableField("user_id")
     private Long user;
     @TableField("ip")
