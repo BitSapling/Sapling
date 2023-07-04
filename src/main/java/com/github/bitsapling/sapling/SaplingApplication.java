@@ -4,7 +4,6 @@ import com.github.bitsapling.sapling.plugin.Plugin;
 import com.github.bitsapling.sapling.plugin.PluginManager;
 import com.github.bitsapling.sapling.plugin.java.SaplingPlugin;
 import com.github.bitsapling.sapling.plugin.java.SaplingPluginManager;
-import com.github.bitsapling.sapling.util.Argon2idPwdUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -24,7 +23,6 @@ public class SaplingApplication {
         initClasses.add(SaplingApplication.class);
         initClasses.addAll(collectPluginClasses());
         LOGGER.info("Loading SpringBoot with " + initClasses.size() + " initialize classes.");
-        LOGGER.info(new Argon2idPwdUtil().hash("admin"));
         SpringApplication.run(initClasses.toArray(new Class[0]), args);
     }
 
