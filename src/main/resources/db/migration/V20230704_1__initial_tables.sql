@@ -119,20 +119,10 @@ CREATE TABLE `flyway_schema_history`  (
                                           `installed_by` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
                                           `installed_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                           `execution_time` int NOT NULL,
-                                          `success` tinyint(1) NOT NULL,
+                                          `success` tinyint NOT NULL,
                                           PRIMARY KEY (`installed_rank`) USING BTREE,
                                           INDEX `flyway_schema_history_s_idx`(`success`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of flyway_schema_history
--- ----------------------------
-INSERT INTO `flyway_schema_history` VALUES (1, '20230613.1', 'initial tables', 'SQL', 'V20230613_1__initial_tables.sql', 1081797600, 'sapling', '2023-06-15 13:59:53', 1371, 1);
-INSERT INTO `flyway_schema_history` VALUES (2, '20230614.1', 'add owner field for mail table', 'SQL', 'V20230614_1__add_owner_field_for_mail_table.sql', -1389237696, 'sapling', '2023-06-15 13:59:53', 31, 1);
-INSERT INTO `flyway_schema_history` VALUES (3, '20230615.1', 'add basic settings', 'SQL', 'V20230615_1__add_basic_settings.sql', 212003867, 'sapling', '2023-06-15 13:59:53', 42, 1);
-INSERT INTO `flyway_schema_history` VALUES (4, '20230615.2', 'add ua control table', 'SQL', 'V20230615_2__add_ua_control_table.sql', -1530243954, 'sapling', '2023-06-15 13:59:53', 60, 1);
-INSERT INTO `flyway_schema_history` VALUES (5, '20230615.3', 'add ua control clients', 'SQL', 'V20230615_3__add_ua_control_clients.sql', -1583123526, 'sapling', '2023-06-15 13:59:53', 39, 1);
-
 -- ----------------------------
 -- Table structure for groups
 -- ----------------------------
