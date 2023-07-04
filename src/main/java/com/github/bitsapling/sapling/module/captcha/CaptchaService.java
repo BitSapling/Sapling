@@ -21,6 +21,7 @@ public class CaptchaService {
     private GlobalCache cache;
 
     public boolean verifyCaptcha(UUID id, String code) {
+        if (id == null || code == null) return false;
         Object correctCodeObject = cache.get("captcha-ask-" + id);
         if (!(correctCodeObject instanceof String correctCode)) {
             return false;

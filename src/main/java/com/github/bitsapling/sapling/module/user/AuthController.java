@@ -17,13 +17,13 @@ import com.github.bitsapling.sapling.module.user.dto.AuthRequestDTO;
 import com.github.bitsapling.sapling.module.user.dto.UserLevelSelfReadOnlyDTO;
 import com.github.bitsapling.sapling.util.Argon2idPwdUtil;
 import com.github.bitsapling.sapling.util.IPUtil;
+import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -53,7 +53,7 @@ public class AuthController {
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
         }
         // verify captcha
-        boolean captchaVerified = captchaService.verifyCaptcha(UUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
+        boolean captchaVerified = captchaService.verifyCaptcha(SafeUUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
         if (!captchaVerified) {
             recordLoginFailed(authRequestDTO, request);
             log.debug("Incorrect captcha {} from {}", authRequestDTO.getCaptchaCode(), ip);
