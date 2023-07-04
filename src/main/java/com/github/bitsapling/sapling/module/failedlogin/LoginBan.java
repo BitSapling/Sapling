@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("login_bans")
+@TableName("`login_bans`")
 public class LoginBan {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("ip")
+    @TableField("`ip`")
     private String ip;
-    @TableField("end_time")
+    @TableField("`end_time`")
     private LocalDateTime endTime;
 }

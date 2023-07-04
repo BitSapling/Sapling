@@ -67,7 +67,7 @@ public class PermissionController {
         if (permission == null) {
             return ApiResponse.notFound();
         }
-        permission.setGroupId(draftedPermission.getGroup());
+        permission.setGroup(draftedPermission.getGroup());
         permission.setPermission(draftedPermission.getPermission());
         permission.setValue(draftedPermission.getValue());
         if (!service.saveOrUpdate(permission)) {

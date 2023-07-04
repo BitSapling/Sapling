@@ -13,36 +13,36 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("announcements")
+@TableName("`announcements`")
 public class Announcement implements Serializable {
     /**
      * 公告主键ID
      */
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
     /**
      * 公告发布人 UID
      */
-    @TableField("owner")
+    @TableField("`owner`")
     private Long owner;
     /**
      * 公告发布于
      */
-    @TableField("added_at")
+    @TableField("`added_at`")
     private LocalDateTime addedAt;
     /**
      * 公告结束于
      */
-    @TableField("ended_at")
+    @TableField("`ended_at`")
     private LocalDateTime endedAt;
     /**
      * 公告标题
      */
-    @TableField("title")
+    @TableField("`title`")
     private String title;
     /**
      * 公告内容
      */
-    @TableField("content")
+    @TableField("`content`")
     private String content;
 }

@@ -8,10 +8,6 @@ import com.github.bitsapling.sapling.controller.ApiResponse;
 import com.github.bitsapling.sapling.module.audit.Audit;
 import com.github.bitsapling.sapling.module.audit.AuditService;
 import com.github.bitsapling.sapling.module.captcha.CaptchaService;
-import com.github.bitsapling.sapling.module.failedlogin.FailedLogin;
-import com.github.bitsapling.sapling.module.failedlogin.FailedLoginService;
-import com.github.bitsapling.sapling.module.failedlogin.LoginBan;
-import com.github.bitsapling.sapling.module.failedlogin.LoginBanService;
 import com.github.bitsapling.sapling.module.setting.SettingService;
 import com.github.bitsapling.sapling.module.user.dto.AuthRequestDTO;
 import com.github.bitsapling.sapling.module.user.dto.UserLevelSelfReadOnlyDTO;
@@ -36,12 +32,12 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private AuditService auditService;
-    @Autowired
-    private FailedLoginService failedLoginService;
+    //@Autowired
+    //private FailedLoginService failedLoginService;
     @Autowired
     private SettingService settingService;
-    @Autowired
-    private LoginBanService loginBanService;
+    //    @Autowired
+//    private LoginBanService loginBanService;
     @Autowired
     private CaptchaService captchaService;
 
@@ -49,9 +45,9 @@ public class AuthController {
     public ApiResponse<?> authNormal(@RequestBody AuthRequestDTO authRequestDTO,
                                      HttpServletRequest request) {
         String ip = IPUtil.getRequestIp(request);
-        if (loginBanService.isBanned(ip, LocalDateTime.now())) {
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
-        }
+//        if (loginBanService.isBanned(ip, LocalDateTime.now())) {
+//            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
+//        }
         // verify captcha
         boolean captchaVerified = captchaService.verifyCaptcha(SafeUUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
         if (!captchaVerified) {
@@ -105,19 +101,19 @@ public class AuthController {
 
 
     private void recordLoginFailed(AuthRequestDTO authRequestDTO, HttpServletRequest request) {
-        String ip = IPUtil.getRequestIp(request);
-        failedLoginService.save(new FailedLogin(0L, 0L, LocalDateTime.now(),
-                authRequestDTO.getIdentifier(),
-                SHA512.digestHex(authRequestDTO.getCredential()),
-                ip,
-                request.getHeader("User-Agent")));
-        int maxAttempts = settingService.getSetting("security.max_login_attempts").getValueAsInteger(10);
-        int banLength = settingService.getSetting("security.login_attempt_ban").getValueAsInteger(900);
-        long attempts = failedLoginService.getFailedAttempts(ip);
-        if (attempts >= maxAttempts) {
-            loginBanService.saveOrUpdate(new LoginBan(0L, ip, LocalDateTime.now().plusSeconds(banLength)));
-            log.warn("IP address {} is banned for {} seconds due to too many failed login attempts.", ip, banLength);
-        }
+//        String ip = IPUtil.getRequestIp(request);
+//        failedLoginService.save(new FailedLogin(0L, 0L, LocalDateTime.now(),
+//                authRequestDTO.getIdentifier(),
+//                SHA512.digestHex(authRequestDTO.getCredential()),
+//                ip,
+//                request.getHeader("User-Agent")));
+//        int maxAttempts = settingService.getSetting("security.max_login_attempts").getValueAsInteger(10);
+//        int banLength = settingService.getSetting("security.login_attempt_ban").getValueAsInteger(900);
+//        long attempts = failedLoginService.getFailedAttempts(ip);
+//        if (attempts >= maxAttempts) {
+//            //loginBanService.saveOrUpdate(new LoginBan(0L, ip, LocalDateTime.now().plusSeconds(banLength)));
+//            log.warn("IP address {} is banned for {} seconds due to too many failed login attempts.", ip, banLength);
+//        }
     }
 
 

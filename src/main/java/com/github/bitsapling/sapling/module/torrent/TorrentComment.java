@@ -13,20 +13,20 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("torrent_comments")
+@TableName("`torrent_comments`")
 public class TorrentComment implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("torrent")
+    @TableField("`torrent")
     private Long torrent;
-    @TableField("owner")
+    @TableField("`owner`")
     private Long owner;
-    @TableField("reply_to")
+    @TableField("`reply_to`")
     private Long replyTo;
-    @TableField("created_at")
+    @TableField("`created_at`")
     private LocalDateTime createdAt;
-    @TableField("edited_at")
+    @TableField("`edited_at`")
     private LocalDateTime editedAt;
-    @TableField("description")
+    @TableField("`description`")
     private String description;
 }

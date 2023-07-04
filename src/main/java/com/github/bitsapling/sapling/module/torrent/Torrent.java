@@ -13,38 +13,38 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("torrents")
+@TableName("`torrents`")
 public class Torrent implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("info_hash_v1")
+    @TableField("`info_hash_v1`")
     private String infoHashV1;
-    @TableField("info_hash_v2")
+    @TableField("`info_hash_v2`")
     private String infoHashV2;
-    @TableField("uploader")
+    @TableField("`uploader`")
     private Long uploader;
-    @TableField("file_id")
+    @TableField("`file_id`")
     private Long fileId;
-    @TableField("is_review")
+    @TableField("`is_review`")
     private Boolean isReview;
-    @TableField("is_banned")
+    @TableField("`is_banned`")
     private Boolean isBanned;
-    @TableField("is_draft")
+    @TableField("`is_draft`")
     private Boolean isDraft;
-    @TableField("added_at")
+    @TableField("`added_at`")
     private LocalDateTime addedAt;
-    @TableField("anonymous")
+    @TableField("`anonymous`")
     private Boolean anonymous;
-    @TableField("title")
+    @TableField("`title`")
     private String title;
-    @TableField("subtitle")
+    @TableField("`subtitle`")
     private String subTitle;
-    @TableField("category")
+    @TableField("`category`")
     private Long category;
-    @TableField("description")
+    @TableField("`description`")
     private String description;
-    @TableField("promotion")
+    @TableField("`promotion`")
     private Long promotion;
-    @TableField("promotion_end_at")
+    @TableField("`promotion_end_at`")
     private LocalDateTime promotionEndAt;
 }

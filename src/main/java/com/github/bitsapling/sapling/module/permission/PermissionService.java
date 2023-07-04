@@ -17,6 +17,6 @@ public class PermissionService extends ServiceImpl<PermissionMapper, Permission>
 
     @NotNull
     public List<Permission> getPermissionByGroup(@NotNull Long groupId) {
-        return baseMapper.selectList(lambdaQuery().eq(Permission::getGroupId, groupId));
+        return baseMapper.selectList(lambdaQuery().eq(Permission::getGroup, groupId));
     }
 }

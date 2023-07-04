@@ -13,20 +13,20 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("failed_logins")
+@TableName("`failed_logins`")
 public class FailedLogin implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("user")
+    @TableField("`user`")
     private Long user;
-    @TableField("time")
+    @TableField("`time`")
     private LocalDateTime time;
-    @TableField("identifier")
+    @TableField("`identifier`")
     private String identifier;
-    @TableField("credential")
+    @TableField("`credential`")
     private String credential;
-    @TableField("ip")
+    @TableField("`ip`")
     private String ip;
-    @TableField("user_agent")
+    @TableField("`user_agent`")
     private String userAgent;
 }

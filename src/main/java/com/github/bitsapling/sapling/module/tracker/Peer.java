@@ -14,40 +14,40 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("peers")
+@TableName("`peers`")
 public class Peer implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("torrent_id")
+    @TableField("`torrent_id`")
     private Long torrent;
-    @TableField("peer_id")
+    @TableField("`peer_id`")
     private String peerId;
-    @TableField("user_id")
+    @TableField("`user_id`")
     private Long user;
-    @TableField("ip")
+    @TableField("`ip`")
     private String ip;
-    @TableField("port")
+    @TableField("`port`")
     private Integer port;
-    @TableField("uploaded")
+    @TableField("`uploaded`")
     private BigInteger uploaded;
-    @TableField("downloaded")
+    @TableField("`downloaded`")
     private BigInteger downloaded;
-    @TableField("to_go")
+    @TableField("`to_go`")
     private BigInteger toGo;
-    @TableField("started_at")
+    @TableField("`started_at`")
     private LocalDateTime startedAt;
-    @TableField("last_action")
+    @TableField("`last_action`")
     private LocalDateTime lastAction;
-    @TableField("prev_action")
+    @TableField("`prev_action`")
     private LocalDateTime prevAction;
-    @TableField("user_agent")
+    @TableField("`user_agent`")
     private String userAgent;
-    @TableField("finished_at")
+    @TableField("`finished_at`")
     private LocalDateTime finishedAt;
-    @TableField("downloaded_offset")
+    @TableField("`downloaded_offset`")
     private BigInteger downloadedOffset;
-    @TableField("uploaded_offset")
+    @TableField("`uploaded_offset`")
     private BigInteger uploadedOffset;
-    @TableField("connectable")
+    @TableField("`connectable`")
     private Boolean connectable;
 }

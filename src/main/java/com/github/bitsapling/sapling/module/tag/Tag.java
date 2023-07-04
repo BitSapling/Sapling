@@ -12,10 +12,10 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("tags")
+@TableName("`tags`")
 public class Tag implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("name")
+    @TableField("`name`")
     private String name;
 }

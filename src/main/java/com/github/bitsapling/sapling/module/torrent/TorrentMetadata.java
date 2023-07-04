@@ -12,18 +12,18 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("torrent_metadata")
+@TableName("`torrent_metadata`")
 public class TorrentMetadata implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("torrent_id")
+    @TableField("`torrent_id`")
     private Long torrent;
-    @TableField("seeders")
+    @TableField("`seeders`")
     private Long seeders;
-    @TableField("leechers")
+    @TableField("`leechers`")
     private Long leechers;
-    @TableField("times_completed")
+    @TableField("`times_completed`")
     private Long timesCompleted;
-    @TableField("times_file_downloaded")
+    @TableField("`times_file_downloaded`")
     private Long timesFileDownloaded;
 }

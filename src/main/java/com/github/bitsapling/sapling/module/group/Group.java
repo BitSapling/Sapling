@@ -12,16 +12,16 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("groups")
+@TableName("`groups`")
 public class Group implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("name")
+    @TableField("`name`")
     private String name;
-    @TableField("icon_url")
+    @TableField("`icon_url`")
     private String iconUrl;
-    @TableField("css_class_name")
+    @TableField("`css_class_name`")
     private String cssClassName;
-    @TableField("promotion")
+    @TableField("`promotion`")
     private Long promotion;
 }

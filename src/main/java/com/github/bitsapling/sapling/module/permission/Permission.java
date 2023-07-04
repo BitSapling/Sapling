@@ -12,14 +12,14 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("permissions")
+@TableName("`permissions`")
 public class Permission implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("group_id")
-    private Long groupId;
-    @TableField("permission")
+    @TableField("`group`")
+    private Long group;
+    @TableField("`permission`")
     private String permission;
-    @TableField("value")
+    @TableField("`value`")
     private Boolean value;
 }

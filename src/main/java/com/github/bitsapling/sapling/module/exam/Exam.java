@@ -13,18 +13,18 @@ import java.time.LocalDateTime;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("exams")
+@TableName("`exams`")
 public class Exam implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("user")
+    @TableField("`user`")
     private Long user;
-    @TableField("exam_plan")
+    @TableField("`exam_plan`")
     private Long examPlan;
-    @TableField("started_at")
+    @TableField("`started_at`")
     private LocalDateTime startedAt;
-    @TableField("end_at")
+    @TableField("`end_at`")
     private LocalDateTime endAt;
-    @TableField("status")
+    @TableField("`status`")
     private Short status;
 }

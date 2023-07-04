@@ -13,18 +13,18 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("groups")
+@TableName("`promotions`")
 public class Promotion implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("name")
+    @TableField("`name`")
     private String name;
-    @TableField("icon_url")
+    @TableField("`icon_url`")
     private String iconUrl;
-    @TableField("upload_multiplier")
+    @TableField("`upload_multiplier`")
     private BigDecimal uploadMultiplier;
-    @TableField("download_multiplier")
+    @TableField("`download_multiplier`")
     private BigDecimal downloadMultiplier;
-    @TableField("is_default")
+    @TableField("`is_default`")
     private Boolean isDefault;
 }

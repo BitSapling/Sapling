@@ -2,7 +2,7 @@ package com.github.bitsapling.sapling.module.captcha;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.ShearCaptcha;
-import cn.hutool.captcha.generator.MathGenerator;
+import cn.hutool.captcha.generator.RandomGenerator;
 import com.github.bitsapling.sapling.cache.GlobalCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,17 +25,28 @@ public class CaptchaService {
         return correctCode.equalsIgnoreCase(code);
     }
 
-    public GeneratedCaptcha generateCaptcha() {
+    public void invalidCaptcha(UUID id) {
+        cache.del("captcha-ask-" + id);
+    }
+
+    public PublicCaptcha generateCaptcha() {
         GeneratedCaptcha generatedCaptcha = _generate();
         cache.set("captcha-ask-" + generatedCaptcha.getId(), generatedCaptcha.getCode(), 60 * 15);
-        return generatedCaptcha;
+        return new PublicCaptcha(generatedCaptcha.getId(), generatedCaptcha.getImage());
     }
 
     private GeneratedCaptcha _generate() {
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(200, 45, 4, 4);
-        captcha.setGenerator(new MathGenerator());
+        captcha.setGenerator(new RandomGenerator(4));
         captcha.createCode();
         return new GeneratedCaptcha(UUID.randomUUID(), captcha.getImageBase64Data(), captcha.getCode());
+    }
+
+    @AllArgsConstructor
+    @Data
+    static class PublicCaptcha {
+        private UUID id;
+        private String image;
     }
 
     @AllArgsConstructor

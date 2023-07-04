@@ -13,24 +13,24 @@ import java.math.BigInteger;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("exams_plans")
+@TableName("`exams_plans`")
 public class ExamPlan implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("name")
+    @TableField("`name`")
     private String name;
-    @TableField("duration")
+    @TableField("`duration`")
     private BigInteger duration;
-    @TableField("target_uploaded")
+    @TableField("`target_uploaded`")
     private BigInteger targetUploaded;
-    @TableField("target_downloaded")
+    @TableField("`target_downloaded`")
     private BigInteger targetDownloaded;
-    @TableField("target_real_uploaded")
+    @TableField("`target_real_uploaded`")
     private BigInteger targetRealUploaded;
-    @TableField("target_real_downloaded")
+    @TableField("`target_real_downloaded`")
     private BigInteger targetRealDownloaded;
-    @TableField("target_karma")
+    @TableField("`target_karma")
     private BigInteger targetKarma;
-    @TableField("target_share_ratio")
+    @TableField("`target_share_ratio`")
     private BigInteger targetShareRatio;
 }

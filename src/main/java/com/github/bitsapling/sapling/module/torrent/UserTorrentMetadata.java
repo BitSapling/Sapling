@@ -13,25 +13,25 @@ import java.math.BigInteger;
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor
-@TableName("torrent_metadata")
+@TableName("`torrent_metadata`")
 public class UserTorrentMetadata implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("user")
+    @TableField("`user`")
     private Long user;
-    @TableField("torrent")
+    @TableField("`torrent`")
     private Long torrent;
-    @TableField("downloaded")
+    @TableField("`downloaded`")
     private BigInteger downloaded;
-    @TableField("uploaded")
+    @TableField("`uploaded`")
     private BigInteger uploaded;
-    @TableField("real_downloaded")
+    @TableField("`real_downloaded`")
     private BigInteger realDownloaded;
-    @TableField("real_uploaded")
+    @TableField("`real_uploaded`")
     private BigInteger realUploaded;
-    @TableField("seeding_time")
+    @TableField("`seeding_time`")
     private BigInteger seedingTime;
-    @TableField("downloading_time")
+    @TableField("`downloading_time`")
     private BigInteger downloadingTime;
 
 }

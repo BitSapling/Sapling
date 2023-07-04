@@ -12,12 +12,12 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("teams")
+@TableName("`teams`")
 public class Team implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("name")
+    @TableField("`name`")
     private String name;
-    @TableField("permission_name")
+    @TableField("`permission_name`")
     private String permissionName;
 }

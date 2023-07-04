@@ -12,16 +12,16 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @Accessors(chain = true)
-@TableName("announcements")
+@TableName("ua_control")
 public class BtClientUA implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("user_agent")
+    @TableField("`user_agent`")
     private String userAgent;
-    @TableField("match_type")
+    @TableField("`match_type`")
     private BtClientUAMatchType matchType;
-    @TableField("is_enabled")
+    @TableField("`is_enabled`")
     private Boolean enabled;
-    @TableField("description")
+    @TableField("`description`")
     private String description;
 }
