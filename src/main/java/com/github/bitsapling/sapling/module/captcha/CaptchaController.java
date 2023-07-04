@@ -23,7 +23,7 @@ public class CaptchaController {
     @Autowired
     private CaptchaService service;
 
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     public ApiResponse<?> generateCaptcha(HttpServletRequest request) {
         String ipHash = SHA1.digestHex(IPUtil.getRequestIp(request));
         long count = 0L;

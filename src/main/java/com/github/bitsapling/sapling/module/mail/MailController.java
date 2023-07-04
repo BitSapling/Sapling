@@ -38,7 +38,7 @@ public class MailController {
     private UserService userService;
 
     @Operation(summary = "列出自己的所有站内信")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("mail:read")
     public ApiResponse<PagedResult<PublishedMailSummary>> listMails(@Min(1) long current, @Min(1) @Max(1000) long size) {
         IPage<Mail> mails = service.getMailsByReceiver(StpUtil.getLoginIdAsLong(), false, Page.of(current, size));
@@ -47,7 +47,7 @@ public class MailController {
     }
 
     @Operation(summary = "查看指定站内信（非管理员查看将自动标记已读）")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("mail:read")
     public ApiResponse<?> queryMail(@PathVariable("identifier") @Min(1) long mailId) {
         Mail mail = service.getById(mailId);
@@ -89,7 +89,7 @@ public class MailController {
     }
 
     @Operation(summary = "列出指定用户的站内信列表")
-    @GetMapping(value = "/user/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/user/{identifier}", produces = "application/json")
     @SaCheckPermission("mail:admin-read")
     public ApiResponse<?> queryMailByUser(@PathVariable("identifier") @Min(1) long userId) {
         IPage<Mail> mails = service.getMailsByReceiver(userId, false, Page.of(1, 1000));

@@ -23,21 +23,21 @@ public class PermissionController {
     private PermissionService service;
 
     @Operation(summary = "列出所有组的所有权限")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("permission:read")
     public ApiResponse<List<RegisteredPermission>> listingPermissions() {
         return new ApiResponse<>(service.list().stream().map(DTO_MAPPER::toRegisteredObject).toList());
     }
 
     @Operation(summary = "列出指定组的所有权限")
-    @GetMapping(value = "/group/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/group/{identifier}", produces = "application/json")
     @SaCheckPermission("permission:read")
     public ApiResponse<List<RegisteredPermission>> listingPermissionsByGroup(@PathVariable("identifier") Long identifier) {
         return new ApiResponse<>(service.getPermissionByGroup(identifier).stream().map(DTO_MAPPER::toRegisteredObject).toList());
     }
 
     @Operation(summary = "查询指定权限信息")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("permission:read")
     public ApiResponse<?> queryPermission(@PathVariable("identifier") String identifier) {
         Permission permission = service.getById(identifier);

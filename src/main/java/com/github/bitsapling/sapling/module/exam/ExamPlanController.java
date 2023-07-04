@@ -23,14 +23,14 @@ public class ExamPlanController {
     private ExamPlanService service;
 
     @Operation(summary = "获取所有考核计划列表")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("exam-plan:read")
     public ApiResponse<List<PublishedExamPlan>> listingPlans() {
         return new ApiResponse<>(service.list().stream().map(DTO_MAPPER::toPublishedExamPlan).toList());
     }
 
     @Operation(summary = "获取指定考核计划")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("exam-plan:read")
     public ApiResponse<?> queryPlan(@PathVariable("identifier") String identifier) {
         ExamPlan examPlan = service.getExamPlan(identifier);

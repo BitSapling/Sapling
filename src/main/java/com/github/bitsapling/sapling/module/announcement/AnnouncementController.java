@@ -47,7 +47,7 @@ public class AnnouncementController {
 
 
     @Operation(summary = "获取公告列表")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("announcement:read")
     public ApiResponse<List<PublishedAnnouncement>> listAnnouncements() {
         List<Announcement> announcements = service.getLastNAnnouncements(10);
@@ -55,7 +55,7 @@ public class AnnouncementController {
     }
 
     @Operation(summary = "阅读指定公告详情")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("announcement:read")
     public ApiResponse<?> queryAnnouncement(@PathVariable("identifier") String identifier) {
         Announcement announcement = service.getById(Long.parseLong(identifier));
@@ -84,7 +84,7 @@ public class AnnouncementController {
     }
 
     @Operation(summary = "删除指定公告")
-    @DeleteMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @DeleteMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("announcement:write")
     public ApiResponse<Void> deleteAnnouncement(@PathVariable("identifier") String identifier) {
         Announcement announcement = service.getById(Long.parseLong(identifier));

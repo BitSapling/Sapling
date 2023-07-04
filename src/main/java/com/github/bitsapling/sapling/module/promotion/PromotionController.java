@@ -24,14 +24,14 @@ public class PromotionController {
     private PromotionService service;
 
     @Operation(summary = "列出所有促销规则")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("promotion:read")
     public ApiResponse<List<DeployedPromotion>> listPromotions() {
         return new ApiResponse<>(service.list().stream().map(DTO_MAPPER::toDeployedObject).toList());
     }
 
     @Operation(summary = "查询指定促销规则详细信息")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("promotion:read")
     public ApiResponse<?> queryPromotion(@PathVariable("identifier") String identifier) {
         Promotion promotion = service.getPromotion(identifier);
@@ -72,7 +72,7 @@ public class PromotionController {
         return ApiResponse.ok();
     }
 
-
+    @Operation(summary = "删除种子促销规则")
     @DeleteMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
     @SaCheckPermission("promotion:write")
     public ApiResponse<Void> deletePromotion(@PathVariable("identifier") String identifier) {

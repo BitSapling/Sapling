@@ -23,14 +23,14 @@ public class GroupController {
     private GroupService service;
 
     @Operation(summary = "获取所有权限组")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("group:read")
     public ApiResponse<List<PublishedGroup>> listingGroups() {
         return new ApiResponse<>(service.list().stream().map(DTO_MAPPER::toDeployedObject).toList());
     }
 
     @Operation(summary = "获取指定权限组的详细信息")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("group:read")
     public ApiResponse<?> queryGroup(@PathVariable("identifier") String identifier) {
         Group group = service.getGroup(identifier);

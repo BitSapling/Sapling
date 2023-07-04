@@ -24,14 +24,14 @@ public class CategoryController {
     private CategoryService service;
 
     @Operation(summary = "列出所有种子分类")
-    @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/", produces = "application/json")
     @SaCheckPermission("category:read")
     public ApiResponse<List<PublishedCategory>> listCategories() {
         return new ApiResponse<>(service.list().stream().map(DTO_MAPPER::toPublishedObject).toList());
     }
 
     @Operation(summary = "读取指定种子分类")
-    @GetMapping(value = "/{identifier}", consumes = "application/json", produces = "application/json")
+    @GetMapping(value = "/{identifier}", produces = "application/json")
     @SaCheckPermission("category:read")
     public ApiResponse<?> queryCategory(@PathVariable("identifier") String identifier) {
         Category category = service.getCategory(identifier);
