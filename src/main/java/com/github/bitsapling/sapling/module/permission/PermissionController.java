@@ -22,7 +22,6 @@ public class PermissionController {
     @Autowired
     private PermissionService service;
 
-    @Autowired
     @Operation(summary = "列出所有组的所有权限")
     @GetMapping(value = "/", consumes = "application/json", produces = "application/json")
     @SaCheckPermission("permission:read")
