@@ -4,7 +4,6 @@ import com.dampcake.bencode.Bencode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -28,7 +27,7 @@ public class BencodeUtil {
         return UTF8_STANDARD;
     }
 
-    @Nullable
+    @NotNull
     public static String compactPeers(@NotNull Collection<BencodePeer> peers, boolean isV6) {
         ByteBuffer buffer = ByteBuffer.allocate((isV6 ? 18 : 6) * peers.size());
         for (BencodePeer peer : peers) {
@@ -40,9 +39,8 @@ public class BencodeUtil {
                 int in = peer.getPort();
                 buffer.put((byte) ((in >>> 8) & 0xFF));
                 buffer.put((byte) (in & 0xFF));
-            } catch (UnknownHostException e) {
-                return null;
-//                throw new RetryableAnnounceException("incorrect ip format encountered when compact peer ip", 0);
+            } catch (UnknownHostException ignored) {
+                //                throw new RetryableAnnounceException("incorrect ip format encountered when compact peer ip", 0);
             }
         }
         return convertToString(buffer.array());
