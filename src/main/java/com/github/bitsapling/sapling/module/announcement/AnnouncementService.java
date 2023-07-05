@@ -6,7 +6,6 @@ import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -14,9 +13,9 @@ public class AnnouncementService extends ServiceImpl<AnnouncementMapper, Announc
 
     @NotNull
     public List<Announcement> getLastNAnnouncements(int count) {
-        return baseMapper.selectList(ChainWrappers.lambdaUpdateChain(Announcement.class)
-                .le(Announcement::getEndedAt, LocalDateTime.now())
+        return ChainWrappers.lambdaQueryChain(Announcement.class)
                 .orderByDesc(Announcement::getAddedAt)
-                .last("LIMIT " + count));
+                .last("LIMIT " + count)
+                .list();
     }
 }

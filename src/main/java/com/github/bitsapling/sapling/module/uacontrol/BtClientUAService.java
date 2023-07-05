@@ -1,9 +1,8 @@
 package com.github.bitsapling.sapling.module.uacontrol;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -15,10 +14,9 @@ public class BtClientUAService extends ServiceImpl<BtClientUAMapper, BtClientUA>
 
     @SuppressWarnings("SameParameterValue")
     @NotNull List<BtClientUA> getAllRules(boolean onlyEnabled) {
-        LambdaQueryWrapper<BtClientUA> wrapper = Wrappers
-                .lambdaQuery(BtClientUA.class)
-                .eq(onlyEnabled, BtClientUA::getEnabled, true);
-        return baseMapper.selectList(wrapper);
+        return ChainWrappers.lambdaQueryChain(BtClientUA.class)
+                .eq(onlyEnabled, BtClientUA::getEnabled, true)
+                .list();
     }
 
     public boolean isAllowedClient(String clientUA) {

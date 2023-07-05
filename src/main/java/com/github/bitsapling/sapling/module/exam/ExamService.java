@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.module.exam;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,16 +14,22 @@ public class ExamService extends ServiceImpl<ExamMapper, Exam> implements Common
 
     @NotNull
     public List<Exam> getExamsByPlan(@NotNull Long examPlanId) {
-        return baseMapper.selectList(lambdaQuery().eq(Exam::getExamPlan, examPlanId));
+        return ChainWrappers.lambdaQueryChain(Exam.class)
+                .eq(Exam::getExamPlan, examPlanId)
+                .list();
     }
 
     @Nullable
     public Exam getExamByUser(@NotNull Long userId) {
-        return baseMapper.selectOne(lambdaQuery().eq(Exam::getUser, userId));
+        return ChainWrappers.lambdaQueryChain(Exam.class)
+                .eq(Exam::getUser, userId)
+                .one();
     }
 
 
-    public int removeExamForUser(@NotNull Long userId) {
-        return baseMapper.delete(lambdaQuery().eq(Exam::getUser, userId));
+    public boolean removeExamForUser(@NotNull Long userId) {
+        return ChainWrappers.lambdaUpdateChain(Exam.class)
+                .eq(Exam::getUser, userId)
+                .remove();
     }
 }

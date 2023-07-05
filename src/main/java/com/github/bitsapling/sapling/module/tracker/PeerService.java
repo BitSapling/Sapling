@@ -1,8 +1,7 @@
 package com.github.bitsapling.sapling.module.tracker;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import com.github.bitsapling.sapling.module.torrent.Torrent;
 import org.jetbrains.annotations.NotNull;
@@ -15,64 +14,54 @@ import java.util.List;
 public class PeerService extends ServiceImpl<PeerMapper, Peer> implements CommonService<Peer> {
     @NotNull
     public List<Peer> getPeersByPeerId(byte[] peerId) {
-        LambdaQueryWrapper<Peer> wrapper = Wrappers
-                .lambdaQuery(Peer.class)
-                .eq(Peer::getPeerId, peerId);
-        return baseMapper.selectList(wrapper);
+        return ChainWrappers.lambdaQueryChain(Peer.class)
+                .eq(Peer::getPeerId, peerId).list();
     }
 
     @NotNull
     public List<Peer> getPeersByUser(Long userId) {
-        LambdaQueryWrapper<Peer> wrapper = Wrappers
-                .lambdaQuery(Peer.class)
-                .eq(Peer::getUser, userId);
-        return baseMapper.selectList(wrapper);
+        return ChainWrappers.lambdaQueryChain(Peer.class)
+                .eq(Peer::getUser, userId).list();
     }
 
     @NotNull
     public List<Peer> getPeersByTorrent(Long torrentId) {
-        LambdaQueryWrapper<Peer> wrapper = Wrappers
-                .lambdaQuery(Peer.class)
-                .eq(Peer::getTorrent, torrentId);
-        return baseMapper.selectList(wrapper);
+        return ChainWrappers.lambdaQueryChain(Peer.class)
+                .eq(Peer::getTorrent, torrentId).list();
     }
 
     @NotNull
     public List<Peer> getPeersByTorrent(Long torrentId, int limit) {
-        LambdaQueryWrapper<Peer> wrapper = Wrappers
-                .lambdaQuery(Peer.class)
+        return ChainWrappers.lambdaQueryChain(Peer.class)
                 .eq(Peer::getTorrent, torrentId)
-                .last("LIMIT " + limit);
-        return baseMapper.selectList(wrapper);
+                .last("LIMIT " + limit).list();
     }
 
     @NotNull
     public List<Peer> getPeersByTorrentRandom(Long torrentId, int limit) {
-        LambdaQueryWrapper<Peer> wrapper = Wrappers
-                .lambdaQuery(Peer.class)
+        return ChainWrappers.lambdaQueryChain(Peer.class)
                 .eq(Peer::getTorrent, torrentId)
-                .last("ORDER BY RAND() LIMIT " + limit);
-        return baseMapper.selectList(wrapper);
+                .last("ORDER BY RAND() LIMIT " + limit).list();
     }
 
 
-    public void deletePeersByTorrentId(@NotNull Long torrentId) {
-        baseMapper.delete(Wrappers.lambdaQuery(Peer.class)
-                .eq(Peer::getTorrent, torrentId));
+    public boolean deletePeersByTorrentId(@NotNull Long torrentId) {
+        return ChainWrappers.lambdaUpdateChain(Peer.class)
+                .eq(Peer::getTorrent, torrentId).remove();
     }
 
-    public void deletePeersByUserId(@NotNull Long userId) {
-        baseMapper.delete(Wrappers.lambdaQuery(Peer.class)
-                .eq(Peer::getUser, userId));
+    public boolean deletePeersByUserId(@NotNull Long userId) {
+        return ChainWrappers.lambdaUpdateChain(Peer.class)
+                .eq(Peer::getUser, userId).remove();
     }
 
-    public void deletePeersInactive(@NotNull LocalDateTime earlyThan) {
-        baseMapper.delete(Wrappers.lambdaQuery(Peer.class)
-                .le(Peer::getLastAction, earlyThan));
+    public boolean deletePeersInactive(@NotNull LocalDateTime earlyThan) {
+        return ChainWrappers.lambdaUpdateChain(Peer.class)
+                .le(Peer::getLastAction, earlyThan).remove();
     }
 
     public List<Peer> getPeers(Torrent torrent) {
-        return baseMapper.selectList(lambdaQuery()
-                .eq(Peer::getTorrent, torrent.getId()));
+        return ChainWrappers.lambdaQueryChain(Peer.class)
+                .eq(Peer::getTorrent, torrent.getId()).list();
     }
 }
