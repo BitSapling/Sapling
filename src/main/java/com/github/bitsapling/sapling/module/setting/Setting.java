@@ -10,13 +10,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Accessors(chain = true)
-@TableName("settings")
+@TableName("`settings`")
 public class Setting implements Serializable {
-    @TableId(value = "id")
+    @TableId(value = "`id`")
     private Long id;
-    @TableField("key")
+    @TableField("`key`")
     private String key;
-    @TableField("value")
+    @TableField("`value`")
     private String value;
 
     public Long getId() {
