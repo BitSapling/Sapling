@@ -11,5 +11,4 @@ public class RegisteredPermission {
     private Long id;
     private Long group;
     private String permission;
-    private Boolean value;
 }

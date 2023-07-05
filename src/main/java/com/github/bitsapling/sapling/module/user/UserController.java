@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
-    @SaCheckPermission("user:admin-update")
+    @SaCheckPermission("user:admin-write")
     public ApiResponse<?> updateUser(@RequestBody UserLevelAdminReadOnlyDTO userDTO) {
         User user = service.getUserByUsername(userDTO.getUsername());
         if (user == null) {

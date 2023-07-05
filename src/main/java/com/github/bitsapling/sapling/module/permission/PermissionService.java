@@ -23,4 +23,5 @@ public class PermissionService extends ServiceImpl<PermissionMapper, Permission>
                 .eq(Permission::getGroup, groupId)
                 .list();
     }
+
 }

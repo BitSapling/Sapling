@@ -14,7 +14,7 @@ CREATE TABLE `announcements`  (
                                   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The announcement content',
                                   PRIMARY KEY (`id`) USING BTREE,
                                   INDEX `endtime_index`(`ended_at`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of announcements
@@ -55,7 +55,7 @@ CREATE TABLE `categories`  (
                                `css_class_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'The custom category title css class name',
                                `permission_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The category access permission',
                                PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of categories
@@ -77,7 +77,7 @@ CREATE TABLE `exam_plans`  (
                                `target_karma` bigint UNSIGNED NOT NULL COMMENT 'The exam target target',
                                `target_share_ratio` decimal(10, 2) NOT NULL DEFAULT 0.00 COMMENT 'The exam target share ratio',
                                PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of exam_plans
@@ -106,6 +106,29 @@ CREATE TABLE `exams`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for failed_logins
+-- ----------------------------
+DROP TABLE IF EXISTS `failed_logins`;
+CREATE TABLE `failed_logins`  (
+                                  `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+                                  `user` int UNSIGNED NULL DEFAULT NULL COMMENT '相关联的用户UID',
+                                  `time` datetime NOT NULL COMMENT '记录创建时间',
+                                  `identifier` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '登陆尝试的标识符',
+                                  `credential` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '登陆尝试使用的凭据',
+                                  `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '登陆所使用的 IP 地址',
+                                  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+                                  PRIMARY KEY (`id`) USING BTREE,
+                                  INDEX `user_idx`(`user`) USING BTREE,
+                                  INDEX `time_idx`(`time`) USING BTREE,
+                                  INDEX `identifier`(`identifier`) USING BTREE,
+                                  INDEX `ip`(`ip`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of failed_logins
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for flyway_schema_history
 -- ----------------------------
 DROP TABLE IF EXISTS `flyway_schema_history`;
@@ -122,7 +145,13 @@ CREATE TABLE `flyway_schema_history`  (
                                           `success` tinyint NOT NULL,
                                           PRIMARY KEY (`installed_rank`) USING BTREE,
                                           INDEX `flyway_schema_history_s_idx`(`success`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of flyway_schema_history
+-- ----------------------------
+INSERT INTO `flyway_schema_history` VALUES (1, '20230704.1', 'initial tables', 'SQL', 'V20230704_1__initial_tables.sql', 1052321592, 'sapling', '2023-07-05 05:17:17', 1641, 1);
+
 -- ----------------------------
 -- Table structure for groups
 -- ----------------------------
@@ -133,14 +162,32 @@ CREATE TABLE `groups`  (
                            `icon_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The group icon url',
                            `css_class_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The group custom css class name',
                            `promotion` int UNSIGNED NOT NULL COMMENT 'The promotion rule will appy to this group',
+                           `extend` int UNSIGNED NULL DEFAULT NULL COMMENT 'The group permission should extend on group',
                            PRIMARY KEY (`id`) USING BTREE,
                            UNIQUE INDEX `group_name_unique`(`name`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of groups
 -- ----------------------------
-INSERT INTO `groups` VALUES (1, 'Default', 'https://example.com/noimage.jpg', 'group_default', 1);
+INSERT INTO `groups` VALUES (1, 'Default', 'https://example.com/noimage.jpg', 'group_default', 1, NULL);
+INSERT INTO `groups` VALUES (2, 'Administrator', 'https://example.com/noimage.jpg', 'group_admin', 1, 1);
+
+-- ----------------------------
+-- Table structure for login_bans
+-- ----------------------------
+DROP TABLE IF EXISTS `login_bans`;
+CREATE TABLE `login_bans`  (
+                               `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '阻止ID',
+                               `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '禁止登陆的 IP 地址',
+                               `end_time` datetime NOT NULL COMMENT '登陆封禁结束时间',
+                               PRIMARY KEY (`id`) USING BTREE,
+                               INDEX `ip_idx`(`ip`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of login_bans
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for login_providers
@@ -152,7 +199,7 @@ CREATE TABLE `login_providers`  (
                                     `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The login provider class name',
                                     `enabled` tinyint NOT NULL COMMENT 'The login provider enabled status',
                                     PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of login_providers
@@ -176,7 +223,7 @@ CREATE TABLE `mails`  (
                           INDEX `sender_index`(`sender`) USING BTREE,
                           INDEX `readed_at_index`(`readed_at`) USING BTREE,
                           INDEX `title_index`(`title`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mails
@@ -221,16 +268,44 @@ CREATE TABLE `peers`  (
 DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions`  (
                                 `id` int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'The permission id',
-                                `group_` int NOT NULL COMMENT 'The group id',
+                                `group` int NOT NULL COMMENT 'The group id',
                                 `permission` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'The permission name',
-                                `value` tinyint UNSIGNED NOT NULL COMMENT 'The permission status',
                                 PRIMARY KEY (`id`) USING BTREE,
-                                UNIQUE INDEX `group_permission_index`(`group_`, `permission`) USING BTREE
+                                UNIQUE INDEX `group_permission_index`(`group`, `permission`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of permissions
 -- ----------------------------
+INSERT INTO `permissions` VALUES (4, 1, 'announcement:read');
+INSERT INTO `permissions` VALUES (5, 1, 'category:read');
+INSERT INTO `permissions` VALUES (9, 1, 'group:read');
+INSERT INTO `permissions` VALUES (11, 1, 'mail:read');
+INSERT INTO `permissions` VALUES (12, 1, 'mail:write');
+INSERT INTO `permissions` VALUES (15, 1, 'permission:read');
+INSERT INTO `permissions` VALUES (17, 1, 'promotion:read');
+INSERT INTO `permissions` VALUES (19, 1, 'tag:read');
+INSERT INTO `permissions` VALUES (21, 1, 'team:read');
+INSERT INTO `permissions` VALUES (1, 1, 'torrent:announce');
+INSERT INTO `permissions` VALUES (2, 1, 'torrent:scrape');
+INSERT INTO `permissions` VALUES (26, 1, 'user:read');
+INSERT INTO `permissions` VALUES (28, 1, 'user:write');
+INSERT INTO `permissions` VALUES (3, 2, 'announcement:write');
+INSERT INTO `permissions` VALUES (6, 2, 'category:write');
+INSERT INTO `permissions` VALUES (7, 2, 'exam:read');
+INSERT INTO `permissions` VALUES (8, 2, 'exam:write');
+INSERT INTO `permissions` VALUES (10, 2, 'group:write');
+INSERT INTO `permissions` VALUES (13, 2, 'mail:admin-read');
+INSERT INTO `permissions` VALUES (14, 2, 'mail:admin-write');
+INSERT INTO `permissions` VALUES (16, 2, 'permission:write');
+INSERT INTO `permissions` VALUES (18, 2, 'promotion:write');
+INSERT INTO `permissions` VALUES (20, 2, 'tag:write');
+INSERT INTO `permissions` VALUES (22, 2, 'team:write');
+INSERT INTO `permissions` VALUES (23, 2, 'uacontrol:read');
+INSERT INTO `permissions` VALUES (24, 2, 'uacontrol:write');
+INSERT INTO `permissions` VALUES (27, 2, 'user:admin-update');
+INSERT INTO `permissions` VALUES (29, 2, 'user:admin-write');
+INSERT INTO `permissions` VALUES (25, 2, 'user:list');
 
 -- ----------------------------
 -- Table structure for promotions
@@ -244,7 +319,7 @@ CREATE TABLE `promotions`  (
                                `download_multiplier` decimal(10, 2) NOT NULL COMMENT 'The multiplier of download',
                                `is_default` tinyint UNSIGNED NOT NULL COMMENT 'Is this promotion is global default promotion',
                                PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of promotions
@@ -261,7 +336,7 @@ CREATE TABLE `settings`  (
                              `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT 'The setting value',
                              PRIMARY KEY (`id`) USING BTREE,
                              UNIQUE INDEX `key_unique`(`key`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of settings
@@ -445,7 +520,7 @@ CREATE TABLE `ua_control`  (
                                PRIMARY KEY (`id`) USING BTREE,
                                UNIQUE INDEX `unique_idx`(`user_agent`, `match_type`) USING BTREE,
                                INDEX `is_enabled_idx`(`is_enabled`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ua_control
@@ -482,7 +557,7 @@ CREATE TABLE `user_metadata`  (
                                   `total_seeding_time` bigint UNSIGNED NOT NULL COMMENT 'The user seeding time',
                                   `total_downloading_time` bigint UNSIGNED NOT NULL COMMENT 'The user downloading time',
                                   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user_metadata
@@ -538,7 +613,7 @@ CREATE TABLE `users`  (
                           UNIQUE INDEX `users_email_unique`(`email`) USING BTREE,
                           INDEX `users_nickname_index`(`nickname`) USING BTREE,
                           INDEX `users_banned_index`(`is_banned`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users

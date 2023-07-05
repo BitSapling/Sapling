@@ -20,6 +20,4 @@ public class Permission implements Serializable {
     private Long group;
     @TableField("`permission`")
     private String permission;
-    @TableField("`value`")
-    private Boolean value;
 }

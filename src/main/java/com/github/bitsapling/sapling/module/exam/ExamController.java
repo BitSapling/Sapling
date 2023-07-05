@@ -92,8 +92,7 @@ public class ExamController {
     @DeleteMapping(value = "/user/{identifier}", consumes = "application/json", produces = "application/json")
     @SaCheckPermission("exam:write")
     public ApiResponse<Void> deleteExam(@Positive @PathVariable("identifier") Long uid) {
-        int changedLines = service.removeExamForUser(uid);
-        if (changedLines == 0) {
+        if (!service.removeExamForUser(uid)) {
             return ApiResponse.noContent();
         }
         return ApiResponse.ok();

@@ -51,7 +51,7 @@ public class PermissionController {
     @PostMapping(value = "/", consumes = "application/json", produces = "application/json")
     @SaCheckPermission("permission:write")
     public ApiResponse<Void> writePermission(@RequestBody DraftedPermission draftedPermission) {
-        Permission permission = new Permission(0L, draftedPermission.getGroup(), draftedPermission.getPermission(), draftedPermission.getValue());
+        Permission permission = new Permission(0L, draftedPermission.getGroup(), draftedPermission.getPermission());
         if (!service.saveOrUpdate(permission)) {
             throw new IllegalStateException("无法写入权限到数据库中");
         }
@@ -69,7 +69,6 @@ public class PermissionController {
         }
         permission.setGroup(draftedPermission.getGroup());
         permission.setPermission(draftedPermission.getPermission());
-        permission.setValue(draftedPermission.getValue());
         if (!service.saveOrUpdate(permission)) {
             throw new IllegalStateException("无法写入权限到数据库中");
         }

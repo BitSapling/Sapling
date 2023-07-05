@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.module.tracker.http;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.module.setting.SettingService;
 import com.github.bitsapling.sapling.module.torrent.Torrent;
 import com.github.bitsapling.sapling.module.torrent.TorrentMetadata;
@@ -71,7 +72,7 @@ public class HttpTrackerController {
         }
         checkClient(userAgent, peerId);
         User user = userService.getUserByPasskey(passkey);
-        checkUser(user, passkey);
+        checkUser(user, passkey, "scrape");
         Map<String, Object> dict = new LinkedHashMap<>();
         Map<String, Integer> flags = new LinkedHashMap<>();
         flags.put("min_request_interval", randomInterval());
@@ -112,7 +113,7 @@ public class HttpTrackerController {
         announceData.setNumWant(Math.min(announceData.getNumWant(), maxAnnouncePeersReturned));
         checkClient(announceData.getUserAgent(), announceData.getPeerId());
         User user = userService.getUserByPasskey(announceData.getPasskey());
-        checkUser(user, announceData.getPasskey());
+        checkUser(user, announceData.getPasskey(), "announce");
         Torrent torrent = torrentService.getTorrentByInfoHash(announceData.getInfoHash());
         checkTorrent(torrent, announceData);
         Long length = queueService.insertTask(new AnnounceTask(announceData, user.getId(), torrent.getId()));
@@ -141,13 +142,28 @@ public class HttpTrackerController {
         }
     }
 
-    private void checkUser(User user, String passkey) throws InvalidAnnounceException, RetryableAnnounceException {
+    private void checkUser(User user, String passkey, String checkType) throws InvalidAnnounceException, RetryableAnnounceException {
         if (user == null) {
             throw new InvalidAnnounceException("Invalid passkey: " + passkey + " are not registered on this tracker.");
         }
         if (user.getIsBanned()) {
             throw new RetryableAnnounceException("Banned user: " + user.getUsername() + " are banned on this tracker.", 60 * 60 * 24);
         }
+        switch (checkType) {
+            case "announce" -> {
+                if (!StpUtil.hasPermission(user.getId(), "torrent:announce")) {
+                    throw new RetryableAnnounceException("Permission Denied: " + user.getUsername() + " are not allowed to announce torrents.", 60 * 60 * 8);
+                }
+            }
+            case "scrape" -> {
+                if (!StpUtil.hasPermission(user.getId(), "torrent:scrape")) {
+                    throw new RetryableAnnounceException("Permission Denied: " + user.getUsername() + " are not allowed to scrape torrents.", 60 * 60 * 8);
+                }
+            }
+            default -> {
+            } // do nothing
+        }
+
     }
 
     private PeerResult feedPeers(AnnounceData data, Torrent torrent) {

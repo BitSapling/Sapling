@@ -49,9 +49,9 @@ public class AuthController {
     public ApiResponse<?> authNormal(@RequestBody AuthRequestDTO authRequestDTO,
                                      HttpServletRequest request) {
         String ip = IPUtil.getRequestIp(request);
-//        if (loginBanService.isBanned(ip, LocalDateTime.now())) {
-//            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
-//        }
+        if (loginBanService.isBanned(ip, LocalDateTime.now())) {
+            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
+        }
         // verify captcha
         boolean captchaVerified = captchaService.verifyCaptcha(SafeUUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
         if (!captchaVerified) {

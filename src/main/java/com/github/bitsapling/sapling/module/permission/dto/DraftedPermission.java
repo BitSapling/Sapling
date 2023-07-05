@@ -2,7 +2,6 @@ package com.github.bitsapling.sapling.module.permission.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +14,4 @@ public class DraftedPermission {
     private Long group;
     @NotEmpty
     private String permission;
-    @NotNull
-    private Boolean value;
 }
