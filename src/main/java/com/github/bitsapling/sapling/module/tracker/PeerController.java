@@ -9,6 +9,7 @@ import com.github.bitsapling.sapling.module.tracker.dto.PeerLevelAdminReadOnlyDT
 import com.github.bitsapling.sapling.module.tracker.dto.PeerLevelNormalReadOnlyDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +33,7 @@ public class PeerController {
     public ApiResponse<?> getPeers(@PathVariable("torrentInfoHash") String torrentInfoHash) {
         Torrent torrent = torrentService.getTorrentByInfoHash(torrentInfoHash);
         if (torrent == null) {
-            return new ApiResponse<>(404, "Torrent " + torrentInfoHash + " not found.");
+            return new ApiResponse<>(HttpStatus.NOT_FOUND, "Torrent " + torrentInfoHash + " not found.");
         }
         List<Peer> peers = service.getPeersByTorrent(torrent.getId());
         if (StpUtil.hasPermission("peer:admin-read")) {

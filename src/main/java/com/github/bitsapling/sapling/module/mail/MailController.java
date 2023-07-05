@@ -4,7 +4,6 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.bitsapling.sapling.controller.ApiCode;
 import com.github.bitsapling.sapling.controller.ApiResponse;
 import com.github.bitsapling.sapling.mbp.PagedResult;
 import com.github.bitsapling.sapling.module.mail.dto.DraftedMail;
@@ -19,6 +18,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -109,7 +109,7 @@ public class MailController {
         String senderName = sender.getNickname() != null ? sender.getNickname() : sender.getUsername();
         User receiver = userService.getUser(draftedMail.getReceiver());
         if (receiver == null) {
-            return new ApiResponse<>(ApiCode.NOT_FOUND.code(), "指定的接收者不存在");
+            return new ApiResponse<>(HttpStatus.NOT_FOUND, "指定的接收者不存在");
         }
         Mail mail = new Mail(0L, receiver.getId(), senderId, senderName, draftedMail.getTitle(), draftedMail.getDescription(), LocalDateTime.now(),
                 null, null);
@@ -137,6 +137,6 @@ public class MailController {
         if (!service.saveBatch(mails)) {
             throw new IllegalStateException("无法将站内信保存到数据库");
         }
-        return new ApiResponse<>(ApiCode.OK.code(), "成功发送了 " + mails.size() + " 封站内信.");
+        return new ApiResponse<>("成功发送了 " + mails.size() + " 封站内信.");
     }
 }

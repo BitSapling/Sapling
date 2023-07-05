@@ -2,18 +2,25 @@ package com.github.bitsapling.sapling.module.advice;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import com.github.bitsapling.sapling.controller.ApiCode;
 import com.github.bitsapling.sapling.controller.ApiResponse;
 import com.github.bitsapling.sapling.module.tracker.exception.FixedAnnounceException;
 import com.github.bitsapling.sapling.module.tracker.exception.RetryableAnnounceException;
 import com.github.bitsapling.sapling.util.BencodeUtil;
 import com.github.bitsapling.sapling.util.ClassUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +30,7 @@ import java.util.Map;
  */
 @ControllerAdvice
 @Slf4j
-public class GlobalControllerAdvice {
+public class GlobalControllerAdvice implements ResponseBodyAdvice<ApiResponse<?>> {
     @Autowired
     private ClassUtil classUtil;
 
@@ -72,9 +79,8 @@ public class GlobalControllerAdvice {
     @ResponseBody
     public ApiResponse<?> apiExceptionHandler(Exception exception) {
         log.error("Catch an API exception", exception);
-        return new ApiResponse<>(ApiCode.INTERNAL_ERROR.code(), "Failed to handle API request",
-                Map.of("status", "error",
-                        "type", classUtil.getClassSimpleName(exception.getClass()),
+        return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, "处理 API 请求失败",
+                Map.of("type", classUtil.getClassSimpleName(exception.getClass()),
                         "message", "<hidden for user, see console>"));
     }
 
@@ -87,7 +93,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseBody
     public ApiResponse<String> argumentExceptionHandler(IllegalArgumentException exception) {
-        return new ApiResponse<>(ApiCode.BAD_REQUEST.code(), "The argument is invalid", exception.getMessage());
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST, "请求参数无效", exception.getMessage());
     }
 
     /**
@@ -99,7 +105,7 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = NotLoginException.class)
     @ResponseBody
     public ApiResponse<String> loginExceptionHandler(NotLoginException exception) {
-        return new ApiResponse<>(ApiCode.UNAUTHORIZED.code(), "The operation required to be logged in", exception.getMessage());
+        return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "该操作要求传递有效登陆状态令牌", exception.getMessage());
     }
 
     /**
@@ -111,6 +117,22 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(value = NotPermissionException.class)
     @ResponseBody
     public ApiResponse<String> permissionExceptionHandler(NotPermissionException exception) {
-        return new ApiResponse<>(ApiCode.FORBIDDEN.code(), "Permission Denied", exception.getPermission());
+        return new ApiResponse<>(HttpStatus.FORBIDDEN, "权限不足", exception.getPermission());
+    }
+
+    @Override
+    public boolean supports(@NotNull MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+        return true;
+    }
+
+    @Override
+    public ApiResponse<?> beforeBodyWrite(ApiResponse<?> body, @NotNull MethodParameter returnType, @NotNull MediaType selectedContentType, @NotNull Class<? extends HttpMessageConverter<?>> selectedConverterType, @NotNull ServerHttpRequest request, @NotNull ServerHttpResponse response) {
+        if (body != null) {
+            if (body.getHttpCode() != null) {
+                response.setStatusCode(body.getHttpCode());
+                log.info("响应状态码重写为 " + body.getHttpCode());
+            }
+        }
+        return body;
     }
 }

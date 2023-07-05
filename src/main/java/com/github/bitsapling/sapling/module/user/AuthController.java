@@ -3,7 +3,6 @@ package com.github.bitsapling.sapling.module.user;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
-import com.github.bitsapling.sapling.controller.ApiCode;
 import com.github.bitsapling.sapling.controller.ApiResponse;
 import com.github.bitsapling.sapling.module.audit.Audit;
 import com.github.bitsapling.sapling.module.audit.AuditService;
@@ -21,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -51,19 +51,19 @@ public class AuthController {
                                      HttpServletRequest request) {
         String ip = IPUtil.getRequestIp(request);
         if (loginBanService.isBanned(ip, LocalDateTime.now())) {
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "You are reached maximum login attempts. Please try again later.");
         }
         UUID captchaId = SafeUUID.fromString(authRequestDTO.getCaptchaId());
         if (captchaId == null) {
             log.debug("Incorrect captcha form {} from {}", authRequestDTO.getCaptchaCode(), ip);
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Captcha data invalid");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Captcha data invalid");
         }
         // verify captcha
         boolean captchaVerified = captchaService.verifyCaptcha(captchaId, authRequestDTO.getCaptchaCode());
         captchaService.invalidCaptcha(captchaId); // invalid the captcha after verification attempt
         if (!captchaVerified) {
             log.debug("Incorrect captcha {} from {}", authRequestDTO.getCaptchaCode(), ip);
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Captcha incorrect or expired");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Captcha incorrect or expired");
         }
         // verify username
         User user = userService.getUserByUsername(authRequestDTO.getIdentifier());
@@ -71,7 +71,7 @@ public class AuthController {
         if (user == null) {
             recordLoginFailed(authRequestDTO, null, request);
             log.debug("Incorrect identifier {} from {}", authRequestDTO.getIdentifier(), ip);
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Identifier or password incorrect");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Identifier or password incorrect");
         }
         // verify password
         String passwordHash = user.getPassword();
@@ -79,7 +79,7 @@ public class AuthController {
         if (!passwordVerified) {
             recordLoginFailed(authRequestDTO, user.getId(), request);
             log.debug("Incorrect credentials {} from {}", authRequestDTO.getIdentifier(), ip);
-            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Identifier or password incorrect");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Identifier or password incorrect");
         }
         // set login session
         log.debug("User {} successfully logged in with IP {}.", user.getUsername(), ip);
@@ -91,7 +91,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiResponse<?> logout() {
         if (!StpUtil.isLogin()) {
-            return new ApiResponse<>(ApiCode.UNAUTHORIZED.code(), "You already logged out!");
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "You already logged out!");
         }
         StpUtil.logout();
         return ApiResponse.ok();
@@ -100,13 +100,13 @@ public class AuthController {
     @GetMapping("/me")
     public ApiResponse<?> me() {
         if (!StpUtil.isLogin()) {
-            return new ApiResponse<>(ApiCode.UNAUTHORIZED.code());
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED);
         }
         User user = userService.getUser(StpUtil.getLoginIdAsLong());
         if (user == null) {
-            return new ApiResponse<>(ApiCode.BAD_REQUEST.code(), "Login session valid but account not exists, is it deleted?");
+            return new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, "Login session valid but account not exists, is it deleted?");
         }
-        return new ApiResponse<>(ApiCode.OK.code(), "already logged in", new UserLevelSelfReadOnlyDTO(user));
+        return new ApiResponse<>(HttpStatus.OK, "already logged in", new UserLevelSelfReadOnlyDTO(user));
     }
 
 

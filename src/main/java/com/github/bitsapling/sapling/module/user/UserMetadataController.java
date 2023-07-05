@@ -3,6 +3,7 @@ package com.github.bitsapling.sapling.module.user;
 import com.github.bitsapling.sapling.controller.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,10 +33,10 @@ public class UserMetadataController {
             if (userMetadata != null) {
                 return new ApiResponse<>(userMetadata);
             } else {
-                return new ApiResponse<>(404, "User metadata not found.");
+                return new ApiResponse<>(HttpStatus.NOT_FOUND, "User metadata not found.");
             }
         } else {
-            return new ApiResponse<>(404, "User not found.");
+            return new ApiResponse<>(HttpStatus.NOT_FOUND, "User not found.");
         }
     }
 
