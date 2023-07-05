@@ -130,7 +130,6 @@ public class GlobalControllerAdvice implements ResponseBodyAdvice<ApiResponse<?>
         if (body != null) {
             if (body.getHttpCode() != null) {
                 response.setStatusCode(body.getHttpCode());
-                log.info("响应状态码重写为 " + body.getHttpCode());
             }
         }
         return body;

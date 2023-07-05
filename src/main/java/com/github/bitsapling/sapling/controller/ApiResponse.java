@@ -1,5 +1,6 @@
 package com.github.bitsapling.sapling.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -9,35 +10,36 @@ import java.time.LocalDateTime;
 
 @Data
 public class ApiResponse<T> {
+    @JsonIgnore
     private HttpStatusCode httpCode;
-    private String description;
+    private String msg;
     private LocalDateTime time;
     private T data;
 
-    public ApiResponse(HttpStatus httpCode, String description, LocalDateTime time, T data) {
+    public ApiResponse(HttpStatus httpCode, String msg, LocalDateTime time, T data) {
         this.httpCode = httpCode;
-        this.description = description;
+        this.msg = msg;
         this.time = time;
         this.data = data;
     }
 
-    public ApiResponse(HttpStatus httpCode, String description, T data) {
+    public ApiResponse(HttpStatus httpCode, String msg, T data) {
         this.httpCode = httpCode;
-        this.description = description;
+        this.msg = msg;
         this.time = LocalDateTime.now();
         this.data = data;
     }
 
-    public ApiResponse(HttpStatus httpCode, String description) {
+    public ApiResponse(HttpStatus httpCode, String msg) {
         this.httpCode = httpCode;
-        this.description = description;
+        this.msg = msg;
         this.time = LocalDateTime.now();
         this.data = null;
     }
 
     public ApiResponse(T data) {
         this.httpCode = HttpStatus.OK;
-        this.description = "ok";
+        this.msg = "ok";
         this.time = LocalDateTime.now();
         this.data = data;
     }
