@@ -1,6 +1,7 @@
 package com.github.bitsapling.sapling.module.setting;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.github.bitsapling.sapling.cache.GlobalCache;
 import com.github.bitsapling.sapling.module.common.CommonService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class SettingService extends ServiceImpl<SettingMapper, Setting> implemen
         if (setting != null) {
             return setting;
         }
-        setting = baseMapper.selectOne(lambdaQuery().eq(Setting::getKey, key));
+        setting = ChainWrappers.lambdaQueryChain(Setting.class).eq(Setting::getKey, key).one();
         if (!saveRedisCacheSetting(key, setting)) {
             log.warn("Failed to save setting to redis cache");
         }
