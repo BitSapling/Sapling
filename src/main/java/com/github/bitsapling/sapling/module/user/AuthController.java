@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -52,10 +53,15 @@ public class AuthController {
         if (loginBanService.isBanned(ip, LocalDateTime.now())) {
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "You are reached maximum login attempts. Please try again later.");
         }
+        UUID captchaId = SafeUUID.fromString(authRequestDTO.getCaptchaId());
+        if (captchaId == null) {
+            log.debug("Incorrect captcha form {} from {}", authRequestDTO.getCaptchaCode(), ip);
+            return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Captcha data invalid");
+        }
         // verify captcha
-        boolean captchaVerified = captchaService.verifyCaptcha(SafeUUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
+        boolean captchaVerified = captchaService.verifyCaptcha(captchaId, authRequestDTO.getCaptchaCode());
+        captchaService.invalidCaptcha(captchaId); // invalid the captcha after verification attempt
         if (!captchaVerified) {
-            recordLoginFailed(authRequestDTO, null, request);
             log.debug("Incorrect captcha {} from {}", authRequestDTO.getCaptchaCode(), ip);
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Captcha incorrect or expired");
         }
