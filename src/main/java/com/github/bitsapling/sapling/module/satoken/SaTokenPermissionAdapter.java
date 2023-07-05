@@ -1,6 +1,9 @@
 package com.github.bitsapling.sapling.module.satoken;
 
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.session.SaSessionCustomUtil;
 import cn.dev33.satoken.stp.StpInterface;
+import cn.dev33.satoken.stp.StpUtil;
 import com.github.bitsapling.sapling.module.group.Group;
 import com.github.bitsapling.sapling.module.group.GroupService;
 import com.github.bitsapling.sapling.module.permission.Permission;
@@ -11,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,22 +29,20 @@ public class SaTokenPermissionAdapter implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        return List.of("promotion:read");
-//        List<String> permissionList = new ArrayList<>();
-//        for (String roleId : getRoleList(loginId, loginType)) {
-//            SaSession roleSession = SaSessionCustomUtil.getSessionById("role-" + roleId);
-//            List<String> list = roleSession.get("Permission_List", () -> readPermissionsFromDatabase(loginId));
-//            permissionList.addAll(list);
-//        }
-//        return permissionList;
+        List<String> permissionList = new ArrayList<>();
+        for (String roleId : getRoleList(loginId, loginType)) {
+            SaSession roleSession = SaSessionCustomUtil.getSessionById("role-" + roleId);
+            List<String> list = roleSession.get("Permission_List", () -> readPermissionsFromDatabase(loginId));
+            permissionList.addAll(list);
+        }
+        return permissionList;
     }
 
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        return List.of();
-//        SaSession session = StpUtil.getSessionByLoginId(loginId);
-//        return session.get("Role_List", () -> readRolesFromDatabase(loginId));
+        SaSession session = StpUtil.getSessionByLoginId(loginId);
+        return session.get("Role_List", () -> readRolesFromDatabase(loginId));
     }
 
 

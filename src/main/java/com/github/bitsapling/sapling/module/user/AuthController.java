@@ -8,6 +8,9 @@ import com.github.bitsapling.sapling.controller.ApiResponse;
 import com.github.bitsapling.sapling.module.audit.Audit;
 import com.github.bitsapling.sapling.module.audit.AuditService;
 import com.github.bitsapling.sapling.module.captcha.CaptchaService;
+import com.github.bitsapling.sapling.module.failedlogin.FailedLogin;
+import com.github.bitsapling.sapling.module.failedlogin.FailedLoginService;
+import com.github.bitsapling.sapling.module.failedlogin.LoginBanService;
 import com.github.bitsapling.sapling.module.setting.SettingService;
 import com.github.bitsapling.sapling.module.user.dto.AuthRequestDTO;
 import com.github.bitsapling.sapling.module.user.dto.UserLevelSelfReadOnlyDTO;
@@ -16,6 +19,7 @@ import com.github.bitsapling.sapling.util.IPUtil;
 import com.github.bitsapling.sapling.util.SafeUUID;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +36,12 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private AuditService auditService;
-    //@Autowired
-    //private FailedLoginService failedLoginService;
+    @Autowired
+    private FailedLoginService failedLoginService;
     @Autowired
     private SettingService settingService;
-    //    @Autowired
-//    private LoginBanService loginBanService;
+    @Autowired
+    private LoginBanService loginBanService;
     @Autowired
     private CaptchaService captchaService;
 
@@ -51,7 +55,7 @@ public class AuthController {
         // verify captcha
         boolean captchaVerified = captchaService.verifyCaptcha(SafeUUID.fromString(authRequestDTO.getCaptchaId()), authRequestDTO.getCaptchaCode());
         if (!captchaVerified) {
-            recordLoginFailed(authRequestDTO, request);
+            recordLoginFailed(authRequestDTO, null, request);
             log.debug("Incorrect captcha {} from {}", authRequestDTO.getCaptchaCode(), ip);
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Captcha incorrect or expired");
         }
@@ -59,7 +63,7 @@ public class AuthController {
         User user = userService.getUserByUsername(authRequestDTO.getIdentifier());
         if (user == null) userService.getUserByEmail(authRequestDTO.getIdentifier());
         if (user == null) {
-            recordLoginFailed(authRequestDTO, request);
+            recordLoginFailed(authRequestDTO, null, request);
             log.debug("Incorrect identifier {} from {}", authRequestDTO.getIdentifier(), ip);
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Identifier or password incorrect");
         }
@@ -67,7 +71,7 @@ public class AuthController {
         String passwordHash = user.getPassword();
         boolean passwordVerified = pwdUtil.validate(passwordHash, authRequestDTO.getCredential());
         if (!passwordVerified) {
-            recordLoginFailed(authRequestDTO, request);
+            recordLoginFailed(authRequestDTO, user.getId(), request);
             log.debug("Incorrect credentials {} from {}", authRequestDTO.getIdentifier(), ip);
             return new ApiResponse<>(ApiCode.AUTHENTICATION_FAILED.code(), "Identifier or password incorrect");
         }
@@ -100,20 +104,21 @@ public class AuthController {
     }
 
 
-    private void recordLoginFailed(AuthRequestDTO authRequestDTO, HttpServletRequest request) {
-//        String ip = IPUtil.getRequestIp(request);
-//        failedLoginService.save(new FailedLogin(0L, 0L, LocalDateTime.now(),
-//                authRequestDTO.getIdentifier(),
-//                SHA512.digestHex(authRequestDTO.getCredential()),
-//                ip,
-//                request.getHeader("User-Agent")));
-//        int maxAttempts = settingService.getSetting("security.max_login_attempts").getValueAsInteger(10);
-//        int banLength = settingService.getSetting("security.login_attempt_ban").getValueAsInteger(900);
-//        long attempts = failedLoginService.getFailedAttempts(ip);
-//        if (attempts >= maxAttempts) {
-//            //loginBanService.saveOrUpdate(new LoginBan(0L, ip, LocalDateTime.now().plusSeconds(banLength)));
-//            log.warn("IP address {} is banned for {} seconds due to too many failed login attempts.", ip, banLength);
-//        }
+    private void recordLoginFailed(AuthRequestDTO authRequestDTO, @Nullable Long uid, HttpServletRequest request) {
+        String ip = IPUtil.getRequestIp(request);
+        if (uid == null) uid = 0L;
+        failedLoginService.save(new FailedLogin(0L, uid, LocalDateTime.now(),
+                authRequestDTO.getIdentifier(),
+                SHA512.digestHex(authRequestDTO.getCredential()),
+                ip,
+                request.getHeader("User-Agent")));
+        int maxAttempts = settingService.getSetting("security.max_login_attempts").getValueAsInteger(10);
+        int banLength = settingService.getSetting("security.login_attempt_ban").getValueAsInteger(900);
+        long attempts = failedLoginService.getFailedAttempts(ip);
+        if (attempts >= maxAttempts) {
+            //loginBanService.saveOrUpdate(new LoginBan(0L, ip, LocalDateTime.now().plusSeconds(banLength)));
+            log.warn("IP address {} is banned for {} seconds due to too many failed login attempts.", ip, banLength);
+        }
     }
 
 
