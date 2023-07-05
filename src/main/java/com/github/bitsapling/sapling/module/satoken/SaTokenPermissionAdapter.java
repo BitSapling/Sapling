@@ -14,9 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class SaTokenPermissionAdapter implements StpInterface {
@@ -59,6 +57,17 @@ public class SaTokenPermissionAdapter implements StpInterface {
         if (user == null) return Collections.emptyList();
         Group group = groupService.getById(user.getGroup());
         if (group == null) return Collections.emptyList();
-        return permissionService.getPermissionByGroup(group.getId()).stream().map(Permission::getPermission).toList();
+
+        Set<Long> discoveredGroup = new HashSet<>();
+
+        discoveredGroup.add(group.getId());
+        Set<Permission> discoveredPermissions = new HashSet<>(permissionService.getPermissionByGroup(group.getId()));
+        while (group.getExtend() != null && group.getExtend() > 0 && !discoveredGroup.contains(group.getExtend())) {
+            group = groupService.getById(group.getExtend());
+            discoveredGroup.add(group.getId());
+            discoveredPermissions.addAll(permissionService.getPermissionByGroup(group.getId()));
+        }
+
+        return discoveredPermissions.stream().map(Permission::getPermission).toList();
     }
 }

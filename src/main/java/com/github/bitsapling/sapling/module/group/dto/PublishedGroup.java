@@ -28,4 +28,8 @@ public class PublishedGroup {
      * 权限组种子优惠策略ID
      */
     private Long promotion;
+    /**
+     * 权限组父组
+     */
+    private long extend;
 }

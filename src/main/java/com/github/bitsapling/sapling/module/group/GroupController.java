@@ -49,7 +49,8 @@ public class GroupController {
                 draftedGroup.getName(),
                 draftedGroup.getIconUrl(),
                 draftedGroup.getCssClassName(),
-                draftedGroup.getPromotion());
+                draftedGroup.getPromotion(),
+                draftedGroup.getExtend());
         if (!service.save(group)) {
             throw new IllegalStateException("无法将权限组保存到数据库");
         }

@@ -24,4 +24,6 @@ public class Group implements Serializable {
     private String cssClassName;
     @TableField("`promotion`")
     private Long promotion;
+    @TableField("`extend`")
+    private Long extend;
 }
